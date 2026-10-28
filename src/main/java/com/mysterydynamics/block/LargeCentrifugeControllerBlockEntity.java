@@ -131,7 +131,19 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
         var source = ModDamageTypes.centrifuge(level);
         Vec3 center = Vec3.atCenterOf(worldPosition);
 
-        for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, area)) {
+        // LivingEntity 查询对普通生物有效；玩家显式补扫，避免玩家实体不在
+        // 区块实体索引里时漏判。
+        java.util.List<LivingEntity> targets =
+                new java.util.ArrayList<>(level.getEntitiesOfClass(LivingEntity.class, area));
+        if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+            for (net.minecraft.server.level.ServerPlayer player : serverLevel.players()) {
+                if (!targets.contains(player) && area.intersects(player.getBoundingBox())) {
+                    targets.add(player);
+                }
+            }
+        }
+
+        for (LivingEntity entity : targets) {
             if (!entity.hurt(source, damage)) {
                 continue;
             }
