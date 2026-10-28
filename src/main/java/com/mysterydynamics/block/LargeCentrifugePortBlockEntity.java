@@ -34,10 +34,23 @@ public class LargeCentrifugePortBlockEntity extends BlockEntity
     }
 
     private LargeCentrifugeControllerBlockEntity controller() {
-        if (level == null || center.equals(BlockPos.ZERO)) {
+        if (level == null) {
             return null;
         }
-        return level.getBlockEntity(center) instanceof LargeCentrifugeControllerBlockEntity c ? c : null;
+        if (!center.equals(BlockPos.ZERO)) {
+            return level.getBlockEntity(center) instanceof LargeCentrifugeControllerBlockEntity c ? c : null;
+        }
+        for (int dy = -2; dy <= 2; dy++) {
+            for (int dx = -2; dx <= 2; dx++) {
+                for (int dz = -2; dz <= 2; dz++) {
+                    if (level.getBlockEntity(worldPosition.offset(dx, dy, dz))
+                            instanceof LargeCentrifugeControllerBlockEntity c) {
+                        return c;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     private Direction outward() {
