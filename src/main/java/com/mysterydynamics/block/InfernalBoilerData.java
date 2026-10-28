@@ -14,14 +14,12 @@ import net.neoforged.fml.ModList;
 /**
  * 炼狱锅炉的锅炉数据。
  *
- * <p>Create 原版锅炉的应力受“热等级 / 引擎数量”限制；这里把目标输出
- * 改写为：热等级 3 时 4096 SU，热等级 6 以上 8192 SU，超频再乘 2。
- * 最终值不得超过已链接蒸汽引擎的最大总输出（每台 1024 SU），
- * 因此效率 = min(目标, 引擎数 × 1024) / (引擎数 × 1024)。</p>
+ * <p>未超频时严格沿用 Create 原版锅炉的效率公式：
+ * 引擎数不超过热等级时效率为 1，超过后效率 = 热等级 / 引擎数。
+ * 这样增加蒸汽引擎不会让总应力量反而下降。超频维持原有自定义上限。</p>
  */
 public class InfernalBoilerData extends BoilerData {
 
-    public static final float BASE_TOTAL_STRESS = 4096.0F;
     /** Create 蒸汽引擎单台最大应力输出。 */
     public static final float ENGINE_STRESS = 1024.0F;
     /** 原版满级锅炉护目镜显示：18 热 × 16 × 1024 = 294912 SU。 */
@@ -130,20 +128,18 @@ public class InfernalBoilerData extends BoilerData {
         if (!hasWater(controller)) {
             return 0.0F;
         }
+        if (!controller.isOverclock()) {
+            // Create 原版：引擎数超过热等级后，单台效率 = 热等级 / 引擎数；
+            // 总输出不再按“目标值 / 引擎最大总输出”倒推，因此不会越加越少。
+            return attachedEngines <= heat ? 1.0F : (float) heat / attachedEngines;
+        }
         double configuredCapacity = BlockStressValues.getCapacity(AllBlocks.STEAM_ENGINE.get());
         float capacity = configuredCapacity > 0.0D ? (float) configuredCapacity : ENGINE_STRESS;
-        float deviceMax = capacity * attachedEngines;
-        float target = BASE_TOTAL_STRESS * Math.min(2.0F, heat / 3.0F);
-        if (controller.isOverclock()) {
-            // 超频硬上限 589824：引擎多于满级18台时自动降低单台效率，
-            // 保证护目镜公式 eff * 16 * max(heat, engines) * capacity 不超过两倍原版满级。
-            int effectiveCount = Math.max(heat, attachedEngines);
-            float maxEfficiency = OVERCLOCK_TOTAL_STRESS
-                    / (16.0F * effectiveCount * capacity);
-            return Math.min(2.0F, maxEfficiency);
-        }
-        // 上限是“链接的应力输出设备”的最大总输出，而不是固定值。
-        target = Math.min(target, deviceMax);
-        return Math.min(1.0F, target / deviceMax);
+        // 超频硬上限 589824：引擎多于满级18台时自动降低单台效率，
+        // 保证护目镜公式 eff * 16 * max(heat, engines) * capacity 不超过两倍原版满级。
+        int effectiveCount = Math.max(heat, attachedEngines);
+        float maxEfficiency = OVERCLOCK_TOTAL_STRESS
+                / (16.0F * effectiveCount * capacity);
+        return Math.min(2.0F, maxEfficiency);
     }
 }
