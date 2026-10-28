@@ -1,0 +1,52 @@
+{
+  "key": "LARGE_CENTRIFUGE",
+  "order": 14,
+  "category": "MYSTERY_DYNAMICS",
+  "col": 5,
+  "row": 4,
+  "complexity": 5,
+  "warp": 0,
+  "parents": [
+    "CENTRIFUGE"
+  ],
+  "parents_hidden": [],
+  "siblings": [],
+  "flags": [],
+  "text_pages": [
+    "mystery_dynamics.research.large_centrifuge.text"
+  ],
+  "aspects": [
+    {
+      "aspect": "machina",
+      "amount": 8
+    },
+    {
+      "aspect": "motus",
+      "amount": 8
+    },
+    {
+      "aspect": "praecantatio",
+      "amount": 6
+    },
+    {
+      "aspect": "instrumentum",
+      "amount": 6
+    },
+    {
+      "aspect": "fabrico",
+      "amount": 4
+    },
+    {
+      "aspect": "permutatio",
+      "amount": 4
+    }
+  ],
+  "pages": [
+    {
+      "type": "TEXT",
+      "text": "mystery_dynamics.research.large_centrifuge.text",
+      "source": "mystery_dynamics.research.large_centrifuge.text"
+    }
+  ],
+  "icon": "mystery_dynamics:textures/misc/r_large_centrifuge.png"
+}

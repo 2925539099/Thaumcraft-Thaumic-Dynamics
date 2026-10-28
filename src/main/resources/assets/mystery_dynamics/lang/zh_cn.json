@@ -73,5 +73,8 @@
   "block.mystery_dynamics.large_centrifuge_input_port": "大型奥法离心机源质输入口",
   "block.mystery_dynamics.large_centrifuge_output_port": "大型奥法离心机源质输出口",
   "death.attack.mystery_dynamics.centrifuge": "%1$s 被离心机抽飞了",
-  "death.attack.mystery_dynamics.centrifuge.player": "%1$s 被 %2$s 推进了离心机"
+  "death.attack.mystery_dynamics.centrifuge.player": "%1$s 被 %2$s 推进了离心机",
+  "tc.research_name.LARGE_CENTRIFUGE": "大型奥法离心机",
+  "tc.research_text.LARGE_CENTRIFUGE": "我说配平你耳龙吗!",
+  "mystery_dynamics.research.large_centrifuge.text": "那些离心机确实不错，但是效率太低了，而你又有一批货物急着赶工。<BR><BR>所以你做出了离心机的大型版本，也就是这个玩意，它可以一次性处理大量源质，只不过因为一些暂时没探明的问题，它同一批只能离心出同一种源质出来。<BR><BR>好在它可以接入更快的转速来使得它运转的更快，而代价则是一些小小的安全隐患。<BR><BR>而且这玩意看起来有不少人有采购的意向，所以你最好在在他们拜访之前把嵌墙上的傀儡给扣下来。"
 }
