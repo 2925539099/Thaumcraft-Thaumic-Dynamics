@@ -45,6 +45,8 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
     private boolean processingActive;
     private float progress;
     private Aspect decision;
+    private int transferCooldown;
+    private boolean dirty;
 
     public LargeCentrifugeControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -82,8 +84,11 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
     }
 
     private void serverTick() {
-        pullFromInputPipe();
-        pushToOutputPipe();
+        if (--transferCooldown <= 0) {
+            transferCooldown = 2;
+            pullFromInputPipe();
+            pushToOutputPipe();
+        }
         float speed = inputSpeed();
         if (!processingActive && speed >= MIN_RPM && input.totalAmount() > 0) {
             boolean redstone = level.hasNeighborSignal(worldPosition);
@@ -93,6 +98,9 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
         }
         if (processingActive) {
             process(speed);
+        }
+        if (dirty && level.getGameTime() % 10L == 0L) {
+            sync();
         }
     }
 
@@ -157,7 +165,7 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
     }
 
     private void startProcessing() {
-        if (input.isEmpty()) {
+        if (input.totalAmount() <= 0) {
             return;
         }
         decision = null;
@@ -181,13 +189,20 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
         if (speed < MIN_RPM) {
             return;
         }
+        if (processing.totalAmount() <= 0) {
+            processing = new AspectList();
+            processingActive = false;
+            sync();
+            return;
+        }
         if (processing.isEmpty()) {
             processingActive = false;
             sync();
             return;
         }
         if (speed >= MAX_RPM) {
-            while (!processing.isEmpty()) {
+            // 最多处理容量个单位；即使旧数据里有 0 量条目也不会卡死服务端。
+            for (int i = 0; i < CAPACITY && !processing.isEmpty(); i++) {
                 processOne();
             }
             processingActive = false;
@@ -199,7 +214,8 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
             progress -= PROCESS_TIME;
             processOne();
         }
-        if (processing.isEmpty()) {
+        if (processing.totalAmount() <= 0) {
+            processing = new AspectList();
             processingActive = false;
         }
         if (level != null && level.getGameTime() % 20 == 0) {
@@ -214,7 +230,9 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
             if (processing.amount(aspect) <= 0) {
                 continue;
             }
-            processing.reduce(aspect, 1);
+            // remove(...,1) 会在数量归零时移除键；reduce 会留下 amount=0 的条目，
+            // 而 AspectList.isEmpty() 仍会认为它非空，旧实现会在此死循环。
+            processing.remove(aspect, 1);
             if (decision != null) {
                 output.add(decision, 1);
             }
@@ -249,7 +267,8 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
         int accepted = Math.min(amount, CAPACITY - input.totalAmount());
         if (accepted > 0) {
             input.add(aspect, accepted);
-            sync();
+            setChanged();
+            dirty = true;
         }
         return accepted;
     }
@@ -278,7 +297,8 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
         int taken = Math.min(amount, output.amount(aspect));
         if (taken > 0) {
             output.remove(aspect, taken);
-            sync();
+            setChanged();
+            dirty = true;
         }
         return taken;
     }
@@ -333,6 +353,7 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
 
     private void sync() {
         setChanged();
+        dirty = false;
         if (level != null && !level.isClientSide) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
         }

@@ -42,6 +42,7 @@ public class LargeCentrifugePortBlock extends Block implements EntityBlock {
                          boolean movedByPiston) {
         if (!level.isClientSide && !newState.is(state.getBlock())
                 && !LargeCentrifugeStructure.isRestoring()) {
+            level.levelEvent(2001, pos, Block.getId(state));
             LargeCentrifugeStructure.requestDismantleNear(level, pos);
         }
     }

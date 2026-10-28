@@ -10,6 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -68,6 +69,7 @@ public class LargeCentrifugeInputBlock extends KineticBlock
         super.onRemove(state, level, pos, newState, movedByPiston);
         if (!level.isClientSide && !newState.is(state.getBlock())
                 && !LargeCentrifugeStructure.isRestoring()) {
+            level.levelEvent(2001, pos, Block.getId(state));
             LargeCentrifugeStructure.requestDismantleNear(level, pos);
         }
     }
