@@ -151,7 +151,7 @@ public final class LargeCentrifugeStructure {
                     if (state.is(MysteryDynamics.LARGE_CENTRIFUGE_CONTROLLER.get())) {
                         int rotation = state.hasProperty(LargeCentrifugeControllerBlock.ROTATION)
                                 ? state.getValue(LargeCentrifugeControllerBlock.ROTATION) : 0;
-                        requestDismantle(level, candidate, rotation);
+                        requestDismantle(level, candidate, rotation, around);
                         return;
                     }
                 }
@@ -159,15 +159,15 @@ public final class LargeCentrifugeStructure {
         }
     }
 
-    public static void requestDismantle(Level level, BlockPos center, int rotation) {
+    public static void requestDismantle(Level level, BlockPos center, int rotation, BlockPos brokenPos) {
         if (level.isClientSide || center.equals(BlockPos.ZERO) || isRestoring()
                 || level.getServer() == null) {
             return;
         }
-        level.getServer().execute(() -> dismantle(level, center, rotation));
+        level.getServer().execute(() -> dismantle(level, center, rotation, brokenPos));
     }
 
-    public static void dismantle(Level level, BlockPos center, int rotation) {
+    public static void dismantle(Level level, BlockPos center, int rotation, BlockPos brokenPos) {
         if (center.equals(BlockPos.ZERO)) {
             return;
         }
@@ -176,6 +176,9 @@ public final class LargeCentrifugeStructure {
             for (int x = -1; x <= 1; x++) {
                 for (int z = -1; z <= 1; z++) {
                     BlockPos pos = world(center, x, -1, z, rotation);
+                    if (pos.equals(brokenPos)) {
+                        continue;
+                    }
                     Block block;
                     if (x == 0 && z == 0) {
                         block = AllBlocks.MECHANICAL_BEARING.get();
@@ -187,11 +190,15 @@ public final class LargeCentrifugeStructure {
                     level.setBlock(pos, block.defaultBlockState(), 3);
                 }
             }
-            level.removeBlockEntity(center);
-            level.setBlock(center, TCBlocks.ALCHEMICAL_CONSTRUCT.get().defaultBlockState(), 3);
+            if (!center.equals(brokenPos)) {
+                level.removeBlockEntity(center);
+                level.setBlock(center, TCBlocks.ALCHEMICAL_CONSTRUCT.get().defaultBlockState(), 3);
+            }
             BlockPos top = world(center, 0, 1, 0, rotation);
-            level.removeBlockEntity(top);
-            level.setBlock(top, AllBlocks.CLUTCH.get().defaultBlockState(), 3);
+            if (!top.equals(brokenPos)) {
+                level.removeBlockEntity(top);
+                level.setBlock(top, AllBlocks.CLUTCH.get().defaultBlockState(), 3);
+            }
         } finally {
             RESTORING.set(false);
         }
