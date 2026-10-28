@@ -161,8 +161,12 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
                 dx = offset.x / horizontal;
                 dz = offset.z / horizontal;
             }
-            // 与原版击退附魔同强度：每级额外 0.5 格/秒，最高 X 级。
-            entity.knockback(0.5D * knockbackLevel, dx, dz);
+            // 明确向外击退；击退抗性按原版属性削减。
+            double resistance = entity.getAttributeValue(
+                    net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE);
+            float factor = (float) Math.max(0.0D, 1.0D - resistance);
+            double strength = (0.5D * knockbackLevel + 0.2D) * factor;
+            entity.push(dx * strength, 0.35D + 0.02D * knockbackLevel, dz * strength);
             entity.hurtMarked = true;
         }
     }
