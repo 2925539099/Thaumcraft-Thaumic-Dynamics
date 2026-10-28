@@ -38,7 +38,7 @@ public final class LargeCentrifugeWorldRenderer {
         BlockPos cameraBlock = camera.getBlockPosition();
         int centerX = cameraBlock.getX() >> 4;
         int centerZ = cameraBlock.getZ() >> 4;
-        int radius = Math.min(12, minecraft.options.getEffectiveRenderDistance());
+        int radius = Math.min(6, minecraft.options.getEffectiveRenderDistance());
         PoseStack pose = event.getPoseStack();
         MultiBufferSource.BufferSource bufferSource = minecraft.renderBuffers().bufferSource();
 

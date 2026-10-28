@@ -1,10 +1,16 @@
 package com.mysterydynamics.block;
 
 import com.mysterydynamics.compat.LargeCentrifugeStructure;
+import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -23,7 +29,7 @@ import java.util.List;
  * 内部最多存储 24 点源质，存满或收到红石信号后开始离心，输出口把处理后的
  * 源质交给管道，输出清空前不接受新源质。</p>
  */
-public class LargeCentrifugeControllerBlockEntity extends BlockEntity {
+public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements IHaveGoggleInformation {
 
     public static final int CAPACITY = 24;
     public static final int MIN_RPM = 32;
@@ -147,7 +153,7 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity {
         input = new AspectList();
         processingActive = true;
         progress = 0.0F;
-        setChanged();
+        sync();
     }
 
     private void process(float speed) {
@@ -156,7 +162,7 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity {
         }
         if (processing.isEmpty()) {
             processingActive = false;
-            setChanged();
+            sync();
             return;
         }
         if (speed >= MAX_RPM) {
@@ -164,7 +170,7 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity {
                 processOne();
             }
             processingActive = false;
-            setChanged();
+            sync();
             return;
         }
         progress += speed / (float) MIN_RPM;
@@ -175,7 +181,11 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity {
         if (processing.isEmpty()) {
             processingActive = false;
         }
-        setChanged();
+        if (level != null && level.getGameTime() % 20 == 0) {
+            sync();
+        } else {
+            setChanged();
+        }
     }
 
     private void processOne() {
@@ -215,7 +225,7 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity {
         int accepted = Math.min(amount, CAPACITY - input.totalAmount());
         if (accepted > 0) {
             input.add(aspect, accepted);
-            setChanged();
+            sync();
         }
         return accepted;
     }
@@ -244,7 +254,7 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity {
         int taken = Math.min(amount, output.amount(aspect));
         if (taken > 0) {
             output.remove(aspect, taken);
-            setChanged();
+            sync();
         }
         return taken;
     }
@@ -259,6 +269,52 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity {
 
     public int storedOutput() {
         return output.totalAmount();
+    }
+
+    @Override
+    public boolean addToGoggleTooltip(java.util.List<Component> tooltip, boolean isPlayerSneaking) {
+        tooltip.add(Component.translatable("block.mystery_dynamics.large_centrifuge_controller")
+                .withStyle(ChatFormatting.GOLD));
+        tooltip.add(Component.literal("源质: " + input.totalAmount() + " / " + CAPACITY)
+                .withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.literal("状态: " + (processingActive ? "离心中"
+                        : output.isEmpty() ? "待输入" : "输出中"))
+                .withStyle(ChatFormatting.GRAY));
+        if (!processing.isEmpty()) {
+            tooltip.add(Component.literal("处理中: " + processing.totalAmount())
+                    .withStyle(ChatFormatting.DARK_AQUA));
+        }
+        for (Aspect aspect : output.aspects()) {
+            int amount = output.amount(aspect);
+            if (amount > 0) {
+                tooltip.add(Component.literal("  ")
+                        .append(Component.translatable("tc.aspect." + aspect.getTag()))
+                        .append(Component.literal(" × " + amount))
+                        .withStyle(ChatFormatting.AQUA));
+            }
+        }
+        tooltip.add(Component.literal("转速: " + Math.round(inputSpeed()) + " RPM")
+                .withStyle(ChatFormatting.DARK_GRAY));
+        return true;
+    }
+
+    private void sync() {
+        setChanged();
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        CompoundTag tag = new CompoundTag();
+        saveAdditional(tag, registries);
+        return tag;
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override
