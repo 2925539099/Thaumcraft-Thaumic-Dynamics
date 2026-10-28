@@ -1,6 +1,7 @@
 package com.mysterydynamics.block;
 
 import com.mysterydynamics.compat.LargeCentrifugeStructure;
+import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -13,7 +14,8 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.IEssentiaTransport;
 
 /** 大型奥法离心机源质端口 BE：西面输入、东面输出，直接实现源质接口。 */
-public class LargeCentrifugePortBlockEntity extends BlockEntity implements IEssentiaTransport {
+public class LargeCentrifugePortBlockEntity extends BlockEntity
+        implements IEssentiaTransport, IHaveGoggleInformation {
 
     private final boolean input;
     private BlockPos center = BlockPos.ZERO;
@@ -123,6 +125,13 @@ public class LargeCentrifugePortBlockEntity extends BlockEntity implements IEsse
     @Override
     public int getMinimumSuction() {
         return 0;
+    }
+
+    @Override
+    public boolean addToGoggleTooltip(java.util.List<net.minecraft.network.chat.Component> tooltip,
+                                      boolean isPlayerSneaking) {
+        LargeCentrifugeControllerBlockEntity c = controller();
+        return c != null && c.addToGoggleTooltip(tooltip, isPlayerSneaking);
     }
 
     @Override

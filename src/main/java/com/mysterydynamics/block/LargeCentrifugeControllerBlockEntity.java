@@ -82,6 +82,8 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
     }
 
     private void serverTick() {
+        pullFromInputPipe();
+        pushToOutputPipe();
         float speed = inputSpeed();
         if (!processingActive && speed >= MIN_RPM && input.totalAmount() > 0) {
             boolean redstone = level.hasNeighborSignal(worldPosition);
@@ -116,6 +118,9 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
                 continue;
             }
             int taken = pipe.takeEssentia(aspect, 1, dir.getOpposite());
+            if (taken == 0) {
+                taken = pipe.takeEssentia(aspect, 1, dir);
+            }
             if (taken > 0) {
                 addEssentia(aspect, taken);
                 return;
@@ -141,6 +146,9 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
                 return;
             }
             int accepted = pipe.addEssentia(aspect, 1, dir.getOpposite());
+            if (accepted == 0) {
+                accepted = pipe.addEssentia(aspect, 1, dir);
+            }
             if (accepted > 0) {
                 takeEssentia(aspect, accepted);
                 return;
