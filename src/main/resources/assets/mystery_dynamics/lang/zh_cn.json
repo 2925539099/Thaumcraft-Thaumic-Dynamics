@@ -71,5 +71,6 @@
   "block.mystery_dynamics.large_centrifuge_casing": "大型奥法离心机外壳",
   "block.mystery_dynamics.large_centrifuge_input": "大型奥法离心机应力输入口",
   "block.mystery_dynamics.large_centrifuge_input_port": "大型奥法离心机源质输入口",
-  "block.mystery_dynamics.large_centrifuge_output_port": "大型奥法离心机源质输出口"
+  "block.mystery_dynamics.large_centrifuge_output_port": "大型奥法离心机源质输出口",
+  "death.attack.mystery_dynamics.centrifuge": "%1 被离心机抽飞了"
 }

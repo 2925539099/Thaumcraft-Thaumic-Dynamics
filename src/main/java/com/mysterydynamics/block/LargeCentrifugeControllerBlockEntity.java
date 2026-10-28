@@ -1,6 +1,7 @@
 package com.mysterydynamics.block;
 
 import com.mysterydynamics.compat.LargeCentrifugeStructure;
+import com.mysterydynamics.damage.ModDamageTypes;
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -11,10 +12,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.EssentiaCapabilities;
@@ -98,8 +103,59 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
         if (processingActive) {
             process(speed);
         }
+        applySpinDamage(speed);
         if (dirty && level.getGameTime() % 10L == 0L) {
             sync();
+        }
+    }
+
+    /**
+     * 只对旋转组实际占据的区域造成伤害：
+     * 水平 ±1.125 格，垂直 -0.25 ~ +1.75 格（相对控制器）。
+     */
+    private void applySpinDamage(float speed) {
+        if (level == null || speed < MIN_RPM) {
+            return;
+        }
+        float clamped = Math.min(speed, MAX_RPM);
+        float t = (clamped - MIN_RPM) / (float) (MAX_RPM - MIN_RPM);
+        float damage = 4.0F + 36.0F * t;
+        int knockbackLevel = 1 + Math.round(9.0F * t);
+        float knockback = 0.5F * knockbackLevel;
+
+        AABB area = new AABB(
+                worldPosition.getX() - 0.625D, worldPosition.getY() - 0.25D,
+                worldPosition.getZ() - 0.625D,
+                worldPosition.getX() + 1.625D, worldPosition.getY() + 1.75D,
+                worldPosition.getZ() + 1.625D);
+        var source = ModDamageTypes.centrifuge(level);
+        Vec3 center = Vec3.atCenterOf(worldPosition);
+
+        for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, area,
+                e -> e.isAlive() && e.hurtTime <= 0)) {
+            if (!entity.hurt(source, damage)) {
+                continue;
+            }
+            Vec3 offset = entity.position().subtract(center);
+            double horizontal = Math.sqrt(offset.x * offset.x + offset.z * offset.z);
+            double dx;
+            double dz;
+            if (horizontal < 1.0E-4D) {
+                dx = level.random.nextDouble() - 0.5D;
+                dz = level.random.nextDouble() - 0.5D;
+                double len = Math.max(1.0E-4D, Math.sqrt(dx * dx + dz * dz));
+                dx /= len;
+                dz /= len;
+            } else {
+                dx = offset.x / horizontal;
+                dz = offset.z / horizontal;
+            }
+            double resistance = entity.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE);
+            float factor = (float) Math.max(0.0D, 1.0D - resistance);
+            entity.push(dx * knockback * factor,
+                    0.25D + 0.03D * knockbackLevel,
+                    dz * knockback * factor);
+            entity.hurtMarked = true;
         }
     }
 
