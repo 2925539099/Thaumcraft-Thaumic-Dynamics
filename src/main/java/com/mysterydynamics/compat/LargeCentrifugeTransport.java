@@ -46,12 +46,16 @@ public final class LargeCentrifugeTransport implements IEssentiaTransport {
                     BlockPos inputPos = LargeCentrifugeStructure.world(center, -1, -1, 0, rotation);
                     BlockPos outputPos = LargeCentrifugeStructure.world(center, 1, -1, 0, rotation);
                     if (pos.equals(inputPos)
-                            && side == LargeCentrifugeStructure.directionForLocal(-1, 0, rotation)) {
-                        return new LargeCentrifugeTransport(controller, side, true);
+                            && (side == LargeCentrifugeStructure.directionForLocal(-1, 0, rotation)
+                            || side == LargeCentrifugeStructure.directionForLocal(-1, 0, rotation).getOpposite())) {
+                        return new LargeCentrifugeTransport(controller,
+                                LargeCentrifugeStructure.directionForLocal(-1, 0, rotation), true);
                     }
                     if (pos.equals(outputPos)
-                            && side == LargeCentrifugeStructure.directionForLocal(1, 0, rotation)) {
-                        return new LargeCentrifugeTransport(controller, side, false);
+                            && (side == LargeCentrifugeStructure.directionForLocal(1, 0, rotation)
+                            || side == LargeCentrifugeStructure.directionForLocal(1, 0, rotation).getOpposite())) {
+                        return new LargeCentrifugeTransport(controller,
+                                LargeCentrifugeStructure.directionForLocal(1, 0, rotation), false);
                     }
                 }
             }

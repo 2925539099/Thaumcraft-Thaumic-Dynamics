@@ -1,6 +1,18 @@
 {
   "textures": {
-    "particle": "minecraft:block/glass"
+    "particle": "minecraft:block/glass",
+    "tex0": "mystery_dynamics:block/large_centrifuge/tex0",
+    "tex1": "mystery_dynamics:block/large_centrifuge/tex1",
+    "tex2": "mystery_dynamics:block/large_centrifuge/tex2",
+    "tex3": "mystery_dynamics:block/large_centrifuge/tex3",
+    "tex4": "mystery_dynamics:block/large_centrifuge/tex4",
+    "tex5": "mystery_dynamics:block/large_centrifuge/tex5",
+    "tex6": "mystery_dynamics:block/large_centrifuge/tex6",
+    "tex7": "mystery_dynamics:block/large_centrifuge/tex7",
+    "tex8": "mystery_dynamics:block/large_centrifuge/tex8",
+    "tex9": "mystery_dynamics:block/large_centrifuge/tex9",
+    "tex10": "mystery_dynamics:block/large_centrifuge/tex10",
+    "tex11": "mystery_dynamics:block/large_centrifuge/tex11"
   },
   "elements": []
 }

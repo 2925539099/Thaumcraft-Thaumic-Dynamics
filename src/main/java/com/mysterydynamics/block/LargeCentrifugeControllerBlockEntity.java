@@ -1,6 +1,8 @@
 package com.mysterydynamics.block;
 
+import com.mysterydynamics.compat.LargeCentrifugeStructure;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
@@ -9,6 +11,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.aspects.EssentiaCapabilities;
+import thaumcraft.api.aspects.IEssentiaTransport;
 
 import java.util.List;
 
@@ -71,6 +75,8 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity {
     }
 
     private void serverTick() {
+        pullFromInputPipe();
+        pushToOutputPipe();
         float speed = inputSpeed();
         if (!processingActive && speed >= MIN_RPM && input.totalAmount() > 0) {
             boolean redstone = level.hasNeighborSignal(worldPosition);
@@ -80,6 +86,56 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity {
         }
         if (processingActive) {
             process(speed);
+        }
+    }
+
+    /** 与炼狱锅炉一致：主动从端口相邻管道抽取源质，避免只依赖管道推送。 */
+    private void pullFromInputPipe() {
+        if (level == null || !canInputEssentia()) {
+            return;
+        }
+        int rotation = rotation();
+        BlockPos port = LargeCentrifugeStructure.world(worldPosition, -1, -1, 0, rotation);
+        Direction outward = LargeCentrifugeStructure.directionForLocal(-1, 0, rotation);
+        BlockPos pipePos = port.relative(outward);
+        IEssentiaTransport pipe = EssentiaCapabilities.find(level, pipePos, outward.getOpposite());
+        if (pipe == null) {
+            return;
+        }
+        Direction access = outward.getOpposite();
+        Aspect aspect = pipe.getEssentiaType(access);
+        if (aspect == null) {
+            aspect = pipe.getSuctionType(access);
+        }
+        if (aspect != null) {
+            int taken = pipe.takeEssentia(aspect, 1, access);
+            if (taken > 0) {
+                addEssentia(aspect, taken);
+            }
+        }
+    }
+
+    /** 主动把处理好的源质推给输出口相邻管道。 */
+    private void pushToOutputPipe() {
+        if (level == null || !canOutputEssentia()) {
+            return;
+        }
+        int rotation = rotation();
+        BlockPos port = LargeCentrifugeStructure.world(worldPosition, 1, -1, 0, rotation);
+        Direction outward = LargeCentrifugeStructure.directionForLocal(1, 0, rotation);
+        BlockPos pipePos = port.relative(outward);
+        IEssentiaTransport pipe = EssentiaCapabilities.find(level, pipePos, outward.getOpposite());
+        if (pipe == null) {
+            return;
+        }
+        Direction access = outward.getOpposite();
+        Aspect aspect = outputAspect();
+        if (aspect == null) {
+            return;
+        }
+        int accepted = pipe.addEssentia(aspect, 1, access);
+        if (accepted > 0) {
+            takeEssentia(aspect, accepted);
         }
     }
 

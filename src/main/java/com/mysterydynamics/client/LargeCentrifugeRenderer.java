@@ -15,16 +15,19 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.InventoryMenu;
 
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** 实装大型奥法离心机模型的 BER：每张原贴图独立绑定，static/rotor 分开绘制。 */
+/** 实装大型奥法离心机模型的 BER：按炼狱锅炉方式使用方块图集 sprite。 */
 public final class LargeCentrifugeRenderer implements BlockEntityRenderer<LargeCentrifugeControllerBlockEntity> {
 
     private record Vertex(float x, float y, float z, float u, float v) {
@@ -39,6 +42,7 @@ public final class LargeCentrifugeRenderer implements BlockEntityRenderer<LargeC
 
     private static ModelData staticModel;
     private static ModelData rotorModel;
+    private static final Map<ResourceLocation, TextureAtlasSprite> SPRITES = new HashMap<>();
 
     public LargeCentrifugeRenderer(BlockEntityRendererProvider.Context context) {
     }
@@ -53,7 +57,6 @@ public final class LargeCentrifugeRenderer implements BlockEntityRenderer<LargeC
         }
 
         pose.pushPose();
-        // The model is authored around the controller block center (8,8,8).
         pose.translate(0.5D, 0.5D, 0.5D);
         pose.mulPose(Axis.YP.rotationDegrees(controller.rotation() * 90.0F));
         pose.translate(-0.5D, -0.5D, -0.5D);
@@ -69,34 +72,40 @@ public final class LargeCentrifugeRenderer implements BlockEntityRenderer<LargeC
     }
 
     private static void draw(ModelData model, PoseStack pose, MultiBufferSource buffers, int packedLight) {
-        Map<ResourceLocation, List<Quad>> opaque = new LinkedHashMap<>();
-        Map<ResourceLocation, List<Quad>> translucent = new LinkedHashMap<>();
-        for (Quad quad : model.quads()) {
-            (quad.translucent() ? translucent : opaque)
-                    .computeIfAbsent(quad.texture(), key -> new ArrayList<>()).add(quad);
-        }
-        drawGroups(opaque, false, pose, buffers, packedLight);
-        drawGroups(translucent, true, pose, buffers, packedLight);
+        drawPass(model, false, RenderType.entityCutoutNoCull(InventoryMenu.BLOCK_ATLAS),
+                pose, buffers, packedLight);
+        drawPass(model, true, RenderType.entityTranslucent(InventoryMenu.BLOCK_ATLAS),
+                pose, buffers, packedLight);
     }
 
-    private static void drawGroups(Map<ResourceLocation, List<Quad>> groups, boolean translucent,
-                                   PoseStack pose, MultiBufferSource buffers, int packedLight) {
-        for (var entry : groups.entrySet()) {
-            ResourceLocation texture = entry.getKey();
-            Minecraft.getInstance().getTextureManager().getTexture(texture);
-            VertexConsumer consumer = buffers.getBuffer(translucent
-                    ? RenderType.entityTranslucent(texture)
-                    : RenderType.entityCutoutNoCull(texture));
-            for (Quad quad : entry.getValue()) {
-                for (Vertex vertex : quad.vertices()) {
-                    consumer.addVertex(pose.last(), vertex.x() / 16.0F, vertex.y() / 16.0F,
-                                    vertex.z() / 16.0F)
-                            .setColor(255, 255, 255, 255)
-                            .setUv(vertex.u() / quad.tw(), vertex.v() / quad.th())
-                            .setLight(packedLight)
-                            .setOverlay(OverlayTexture.NO_OVERLAY)
-                            .setNormal(pose.last(), quad.nx(), quad.ny(), quad.nz());
-                }
+    private static void drawPass(ModelData model, boolean translucent, RenderType renderType,
+                                 PoseStack pose, MultiBufferSource buffers, int packedLight) {
+        boolean any = false;
+        for (Quad quad : model.quads()) {
+            if (quad.translucent() == translucent) {
+                any = true;
+                break;
+            }
+        }
+        if (!any) {
+            return;
+        }
+        var atlas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS);
+        VertexConsumer consumer = buffers.getBuffer(renderType);
+        for (Quad quad : model.quads()) {
+            if (quad.translucent() != translucent) {
+                continue;
+            }
+            TextureAtlasSprite sprite = SPRITES.computeIfAbsent(quad.texture(), atlas);
+            for (Vertex vertex : quad.vertices()) {
+                consumer.addVertex(pose.last(), vertex.x() / 16.0F, vertex.y() / 16.0F,
+                                vertex.z() / 16.0F)
+                        .setColor(255, 255, 255, 255)
+                        .setUv(sprite.getU(vertex.u() / quad.tw()),
+                                sprite.getV(vertex.v() / quad.th()))
+                        .setLight(packedLight)
+                        .setOverlay(OverlayTexture.NO_OVERLAY)
+                        .setNormal(pose.last(), quad.nx(), quad.ny(), quad.nz());
             }
         }
     }
@@ -137,9 +146,6 @@ public final class LargeCentrifugeRenderer implements BlockEntityRenderer<LargeC
                 int colon = texture.indexOf(':');
                 String namespace = colon > 0 ? texture.substring(0, colon) : MysteryDynamics.MODID;
                 String texturePath = colon > 0 ? texture.substring(colon + 1) : texture;
-                if (!texturePath.startsWith("textures/")) {
-                    texturePath = "textures/" + texturePath + ".png";
-                }
                 ResourceLocation textureId = ResourceLocation.fromNamespaceAndPath(namespace, texturePath);
                 quads.add(new Quad(corners, normal.get(0).getAsFloat(), normal.get(1).getAsFloat(),
                         normal.get(2).getAsFloat(), object.get("t").getAsBoolean(),
