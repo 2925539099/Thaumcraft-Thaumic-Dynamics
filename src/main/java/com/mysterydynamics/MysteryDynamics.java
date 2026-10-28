@@ -14,6 +14,8 @@ import com.mysterydynamics.block.LargeCentrifugeControllerBlock;
 import com.mysterydynamics.block.LargeCentrifugeControllerBlockEntity;
 import com.mysterydynamics.block.LargeCentrifugeInputBlock;
 import com.mysterydynamics.block.LargeCentrifugeInputBlockEntity;
+import com.mysterydynamics.block.LargeCentrifugePortBlock;
+import com.mysterydynamics.block.LargeCentrifugePortBlockEntity;
 import com.mysterydynamics.block.RedstoneEngineBlock;
 import com.mysterydynamics.block.RedstoneEngineBlockEntity;
 import com.mysterydynamics.compat.InfernalBoilerConstruct;
@@ -149,6 +151,16 @@ public class MysteryDynamics {
             BLOCKS.register("large_centrifuge_input",
                     () -> new LargeCentrifugeInputBlock(largeCentrifugeProperties()));
 
+    /** 大型奥法离心机西面源质输入端口。 */
+    public static final DeferredBlock<LargeCentrifugePortBlock> LARGE_CENTRIFUGE_INPUT_PORT =
+            BLOCKS.register("large_centrifuge_input_port",
+                    () -> new LargeCentrifugePortBlock(largeCentrifugeProperties(), true));
+
+    /** 大型奥法离心机东面源质输出端口。 */
+    public static final DeferredBlock<LargeCentrifugePortBlock> LARGE_CENTRIFUGE_OUTPUT_PORT =
+            BLOCKS.register("large_centrifuge_output_port",
+                    () -> new LargeCentrifugePortBlock(largeCentrifugeProperties(), false));
+
     // ---- 物品 ----
     public static final DeferredItem<BlockItem> STRAW_ITEM = ITEMS.registerSimpleBlockItem(STRAW_GOLEM_POWER);
     public static final DeferredItem<BlockItem> WOOD_ITEM = ITEMS.registerSimpleBlockItem(WOOD_GOLEM_POWER);
@@ -216,6 +228,13 @@ public class MysteryDynamics {
                     (pos, state) -> new LargeCentrifugeInputBlockEntity(
                             largeCentrifugeInputType(), pos, state),
                     LARGE_CENTRIFUGE_INPUT.get()).build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<LargeCentrifugePortBlockEntity>> LARGE_CENTRIFUGE_PORT_BE =
+            BLOCK_ENTITY_TYPES.register("large_centrifuge_port", () -> BlockEntityType.Builder.of(
+                    (pos, state) -> new LargeCentrifugePortBlockEntity(
+                            largeCentrifugePortType(), pos, state,
+                            state.is(LARGE_CENTRIFUGE_INPUT_PORT.get())),
+                    LARGE_CENTRIFUGE_INPUT_PORT.get(), LARGE_CENTRIFUGE_OUTPUT_PORT.get()).build(null));
 
     /** 独立创造模式标签页。 */
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = CREATIVE_TABS.register("main",
@@ -294,6 +313,10 @@ public class MysteryDynamics {
 
     private static BlockEntityType<?> largeCentrifugeInputType() {
         return LARGE_CENTRIFUGE_INPUT_BE.get();
+    }
+
+    private static BlockEntityType<?> largeCentrifugePortType() {
+        return LARGE_CENTRIFUGE_PORT_BE.get();
     }
 
     private static BlockBehaviour.Properties largeCentrifugeProperties() {

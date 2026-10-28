@@ -104,14 +104,23 @@ public final class LargeCentrifugeStructure {
             for (int x = -1; x <= 1; x++) {
                 for (int z = -1; z <= 1; z++) {
                     BlockPos pos = world(center, x, -1, z, rotation);
-                    level.setBlock(pos,
-                            MysteryDynamics.LARGE_CENTRIFUGE_CASING.get().defaultBlockState(), 3);
+                    var block = x == -1 && z == 0
+                            ? MysteryDynamics.LARGE_CENTRIFUGE_INPUT_PORT.get()
+                            : x == 1 && z == 0
+                            ? MysteryDynamics.LARGE_CENTRIFUGE_OUTPUT_PORT.get()
+                            : MysteryDynamics.LARGE_CENTRIFUGE_CASING.get();
+                    level.setBlock(pos, block.defaultBlockState(), 3);
+                    if (level.getBlockEntity(pos)
+                            instanceof com.mysterydynamics.block.LargeCentrifugePortBlockEntity port) {
+                        port.setFormation(center, rotation);
+                    }
                 }
             }
             // Top center: kinetic input (accepts a shaft above).
             BlockPos top = world(center, 0, 1, 0, rotation);
             level.setBlock(top, MysteryDynamics.LARGE_CENTRIFUGE_INPUT.get().defaultBlockState(), 3);
             // Controller at the middle center.
+            level.removeBlockEntity(center);
             level.setBlock(center,
                     MysteryDynamics.LARGE_CENTRIFUGE_CONTROLLER.get().defaultBlockState()
                             .setValue(LargeCentrifugeControllerBlock.ROTATION, rotation), 3);
@@ -178,9 +187,11 @@ public final class LargeCentrifugeStructure {
                     level.setBlock(pos, block.defaultBlockState(), 3);
                 }
             }
+            level.removeBlockEntity(center);
             level.setBlock(center, TCBlocks.ALCHEMICAL_CONSTRUCT.get().defaultBlockState(), 3);
-            level.setBlock(world(center, 0, 1, 0, rotation),
-                    AllBlocks.CLUTCH.get().defaultBlockState(), 3);
+            BlockPos top = world(center, 0, 1, 0, rotation);
+            level.removeBlockEntity(top);
+            level.setBlock(top, AllBlocks.CLUTCH.get().defaultBlockState(), 3);
         } finally {
             RESTORING.set(false);
         }

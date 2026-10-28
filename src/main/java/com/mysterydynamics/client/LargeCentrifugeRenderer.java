@@ -16,16 +16,20 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.phys.Vec3;
 
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /** 实装大型奥法离心机模型的 BER：按炼狱锅炉方式使用方块图集 sprite。 */
 public final class LargeCentrifugeRenderer implements BlockEntityRenderer<LargeCentrifugeControllerBlockEntity> {
@@ -43,6 +47,7 @@ public final class LargeCentrifugeRenderer implements BlockEntityRenderer<LargeC
     private static ModelData staticModel;
     private static ModelData rotorModel;
     private static final Map<ResourceLocation, TextureAtlasSprite> SPRITES = new HashMap<>();
+    private static final Set<BlockPos> RENDERED_THIS_FRAME = new HashSet<>();
 
     public LargeCentrifugeRenderer(BlockEntityRendererProvider.Context context) {
     }
@@ -50,6 +55,30 @@ public final class LargeCentrifugeRenderer implements BlockEntityRenderer<LargeC
     @Override
     public void render(LargeCentrifugeControllerBlockEntity controller, float partialTick,
                        PoseStack pose, MultiBufferSource buffers, int packedLight, int packedOverlay) {
+        RENDERED_THIS_FRAME.add(controller.getBlockPos());
+        drawModel(controller, partialTick, pose, buffers, packedLight);
+    }
+
+    public static boolean wasRenderedThisFrame(BlockPos pos) {
+        return RENDERED_THIS_FRAME.contains(pos);
+    }
+
+    public static void clearFrameCache() {
+        RENDERED_THIS_FRAME.clear();
+    }
+
+    /** 视锥兜底渲染：pose 是关卡相机相对空间，需要自行平移到控制器。 */
+    public static void renderAt(LargeCentrifugeControllerBlockEntity controller, float partialTick,
+                                PoseStack pose, Vec3 camera, MultiBufferSource buffers, int packedLight) {
+        pose.pushPose();
+        BlockPos pos = controller.getBlockPos();
+        pose.translate(pos.getX() - camera.x, pos.getY() - camera.y, pos.getZ() - camera.z);
+        drawModel(controller, partialTick, pose, buffers, packedLight);
+        pose.popPose();
+    }
+
+    private static void drawModel(LargeCentrifugeControllerBlockEntity controller, float partialTick,
+                                  PoseStack pose, MultiBufferSource buffers, int packedLight) {
         ModelData statics = staticModel();
         ModelData rotor = rotorModel();
         if (statics.quads().isEmpty() && rotor.quads().isEmpty()) {

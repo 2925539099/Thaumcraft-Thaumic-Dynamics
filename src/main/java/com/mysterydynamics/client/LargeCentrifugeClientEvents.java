@@ -17,5 +17,7 @@ public final class LargeCentrifugeClientEvents {
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(MysteryDynamics.LARGE_CENTRIFUGE_CONTROLLER_BE.get(),
                 LargeCentrifugeRenderer::new);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
+                LargeCentrifugeWorldRenderer::onRenderLevel);
     }
 }

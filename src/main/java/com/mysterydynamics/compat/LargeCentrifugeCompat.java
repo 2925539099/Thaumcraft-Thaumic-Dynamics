@@ -32,6 +32,8 @@ public final class LargeCentrifugeCompat {
     }
 
     public static void registerCapabilities(RegisterCapabilitiesEvent event) {
+        event.registerBlockEntity(EssentiaCapabilities.TRANSPORT,
+                MysteryDynamics.LARGE_CENTRIFUGE_PORT_BE.get(), (be, side) -> be);
         event.registerBlock(EssentiaCapabilities.TRANSPORT,
                 (level, pos, state, blockEntity, side) -> LargeCentrifugeTransport.get(level, pos, side),
                 MysteryDynamics.LARGE_CENTRIFUGE_CASING.get());

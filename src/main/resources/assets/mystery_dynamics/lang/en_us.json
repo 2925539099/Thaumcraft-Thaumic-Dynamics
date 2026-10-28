@@ -69,5 +69,7 @@
   "mystery_dynamics.large_centrifuge.no_vis": "Not enough vis: 50 of each aspect required",
   "block.mystery_dynamics.large_centrifuge_controller": "Large Alchemical Centrifuge Controller",
   "block.mystery_dynamics.large_centrifuge_casing": "Large Alchemical Centrifuge Casing",
-  "block.mystery_dynamics.large_centrifuge_input": "Large Alchemical Centrifuge Kinetic Input"
+  "block.mystery_dynamics.large_centrifuge_input": "Large Alchemical Centrifuge Kinetic Input",
+  "block.mystery_dynamics.large_centrifuge_input_port": "Large Alchemical Centrifuge Essentia Input",
+  "block.mystery_dynamics.large_centrifuge_output_port": "Large Alchemical Centrifuge Essentia Output"
 }
