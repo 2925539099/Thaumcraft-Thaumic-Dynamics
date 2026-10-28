@@ -113,6 +113,9 @@ public final class LargeCentrifugeStructure {
                     if (level.getBlockEntity(pos)
                             instanceof com.mysterydynamics.block.LargeCentrifugePortBlockEntity port) {
                         port.setFormation(center, rotation);
+                    } else if (level.getBlockEntity(pos)
+                            instanceof com.mysterydynamics.block.LargeCentrifugeCasingInfoBlockEntity casing) {
+                        casing.setFormation(center, rotation);
                     }
                 }
             }

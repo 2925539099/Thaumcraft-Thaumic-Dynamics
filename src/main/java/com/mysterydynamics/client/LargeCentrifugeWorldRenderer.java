@@ -19,6 +19,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import thaumcraft.api.aspects.Aspect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,12 +110,18 @@ public final class LargeCentrifugeWorldRenderer {
         }
         BlockPos pos = controller.getBlockPos();
         Vec3 cameraPos = camera.getPosition();
-        Component text = Component.literal("源质 " + controller.storedInput() + " / 24")
-                .withStyle(ChatFormatting.AQUA);
-        Component sub = Component.literal(controller.isProcessing()
+        Aspect in = controller.inputAspect();
+        String name = in == null ? "空" : Component.translatable("tc.aspect." + in.getTag()).getString();
+        int color = in == null ? 0xFFAAAAAA : (0xFF000000 | (in.getColor() & 0xFFFFFF));
+        Component text = Component.literal(name + " " + controller.storedInput() + " / 24");
+        float speed = controller.speed();
+        Component sub = Component.literal(speed < 32.0F
+                        ? "转速不足 · 需要 32 RPM"
+                        : controller.isProcessing()
                         ? "离心中 · 输出 " + controller.storedOutput()
-                        : controller.storedOutput() > 0 ? "输出中 " + controller.storedOutput() : "待输入")
-                .withStyle(ChatFormatting.GRAY);
+                        : controller.storedOutput() > 0
+                        ? "输出中 " + controller.storedOutput() : "待输入")
+                .withStyle(speed < 32.0F ? ChatFormatting.RED : ChatFormatting.GRAY);
         pose.pushPose();
         pose.translate(pos.getX() + 0.5D - cameraPos.x,
                 pos.getY() + 1.95D - cameraPos.y,
@@ -123,9 +130,10 @@ public final class LargeCentrifugeWorldRenderer {
         pose.scale(-0.022F, -0.022F, 0.022F);
         var font = minecraft.font;
         var matrix = pose.last().pose();
-        font.drawInBatch(text, -font.width(text) / 2.0F, 0, 0xFFFFFFFF, false,
+        font.drawInBatch(text, -font.width(text) / 2.0F, 0, color, false,
                 matrix, buffers, Font.DisplayMode.SEE_THROUGH, 0x66000000, light);
-        font.drawInBatch(sub, -font.width(sub) / 2.0F, 11, 0xFFFFFFFF, false,
+        int subColor = speed < 32.0F ? 0xFFFF5555 : 0xFFAAAAAA;
+        font.drawInBatch(sub, -font.width(sub) / 2.0F, 11, subColor, false,
                 matrix, buffers, Font.DisplayMode.SEE_THROUGH, 0x66000000, light);
         pose.popPose();
     }

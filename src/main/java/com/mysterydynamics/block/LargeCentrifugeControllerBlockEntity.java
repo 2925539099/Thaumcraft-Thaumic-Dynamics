@@ -328,6 +328,10 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
         return input.totalAmount();
     }
 
+    public float speed() {
+        return inputSpeed();
+    }
+
     public Aspect inputAspect() {
         for (Aspect aspect : input.aspects()) {
             if (input.amount(aspect) > 0) {
@@ -345,7 +349,13 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
     public boolean addToGoggleTooltip(java.util.List<Component> tooltip, boolean isPlayerSneaking) {
         tooltip.add(Component.translatable("block.mystery_dynamics.large_centrifuge_controller")
                 .withStyle(ChatFormatting.GOLD));
-        tooltip.add(Component.literal("源质: " + input.totalAmount() + " / " + CAPACITY)
+        Aspect in = inputAspect();
+        Component inputName = in == null
+                ? Component.literal("空").withStyle(ChatFormatting.DARK_GRAY)
+                : Component.translatable("tc.aspect." + in.getTag())
+                        .withStyle(style -> style.withColor(in.getColor() & 0xFFFFFF));
+        tooltip.add(Component.literal("源质: ").append(inputName)
+                .append(Component.literal(" " + input.totalAmount() + " / " + CAPACITY))
                 .withStyle(ChatFormatting.GRAY));
         tooltip.add(Component.literal("状态: " + (processingActive ? "离心中"
                         : output.isEmpty() ? "待输入" : "输出中"))
@@ -358,13 +368,21 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
             int amount = output.amount(aspect);
             if (amount > 0) {
                 tooltip.add(Component.literal("  ")
-                        .append(Component.translatable("tc.aspect." + aspect.getTag()))
+                        .append(Component.translatable("tc.aspect." + aspect.getTag())
+                                .withStyle(style -> style.withColor(aspect.getColor() & 0xFFFFFF)))
                         .append(Component.literal(" × " + amount))
                         .withStyle(ChatFormatting.AQUA));
             }
         }
-        tooltip.add(Component.literal("转速: " + Math.round(inputSpeed()) + " RPM")
-                .withStyle(ChatFormatting.DARK_GRAY));
+        float speed = inputSpeed();
+        if (speed < MIN_RPM) {
+            tooltip.add(Component.literal("转速不足: 需要 " + MIN_RPM + " RPM（当前 "
+                            + Math.round(speed) + "）")
+                    .withStyle(ChatFormatting.RED));
+        } else {
+            tooltip.add(Component.literal("转速: " + Math.round(speed) + " RPM")
+                    .withStyle(ChatFormatting.DARK_GRAY));
+        }
         return true;
     }
 

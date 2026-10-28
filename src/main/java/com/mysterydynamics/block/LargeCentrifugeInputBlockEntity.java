@@ -1,6 +1,9 @@
 package com.mysterydynamics.block;
 
+import com.mysterydynamics.block.LargeCentrifugeControllerBlockEntity;
+import com.simibubi.create.AllBlocks;
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
+import com.simibubi.create.api.stress.BlockStressValues;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 
 import net.minecraft.core.BlockPos;
@@ -18,7 +21,8 @@ public class LargeCentrifugeInputBlockEntity extends KineticBlockEntity
 
     @Override
     public float calculateStressApplied() {
-        return 0.0F;
+        double mixer = BlockStressValues.getImpact(AllBlocks.MECHANICAL_MIXER.get());
+        return 18.0F * (mixer > 0.0D ? (float) mixer : 4.0F);
     }
 
     @Override

@@ -10,6 +10,7 @@ import com.mysterydynamics.block.InfernalBoilerCasingBlockEntity;
 import com.mysterydynamics.block.InfernalBoilerFaceBlock;
 import com.mysterydynamics.block.InfernalBoilerShellBlock;
 import com.mysterydynamics.block.LargeCentrifugeCasingBlock;
+import com.mysterydynamics.block.LargeCentrifugeCasingInfoBlockEntity;
 import com.mysterydynamics.block.LargeCentrifugeControllerBlock;
 import com.mysterydynamics.block.LargeCentrifugeControllerBlockEntity;
 import com.mysterydynamics.block.LargeCentrifugeInputBlock;
@@ -236,6 +237,12 @@ public class MysteryDynamics {
                             state.is(LARGE_CENTRIFUGE_INPUT_PORT.get())),
                     LARGE_CENTRIFUGE_INPUT_PORT.get(), LARGE_CENTRIFUGE_OUTPUT_PORT.get()).build(null));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<LargeCentrifugeCasingInfoBlockEntity>> LARGE_CENTRIFUGE_CASING_BE =
+            BLOCK_ENTITY_TYPES.register("large_centrifuge_casing", () -> BlockEntityType.Builder.of(
+                    (pos, state) -> new LargeCentrifugeCasingInfoBlockEntity(
+                            largeCentrifugeCasingType(), pos, state),
+                    LARGE_CENTRIFUGE_CASING.get()).build(null));
+
     /** 独立创造模式标签页。 */
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = CREATIVE_TABS.register("main",
             () -> CreativeModeTab.builder()
@@ -317,6 +324,10 @@ public class MysteryDynamics {
 
     private static BlockEntityType<?> largeCentrifugePortType() {
         return LARGE_CENTRIFUGE_PORT_BE.get();
+    }
+
+    private static BlockEntityType<?> largeCentrifugeCasingType() {
+        return LARGE_CENTRIFUGE_CASING_BE.get();
     }
 
     private static BlockBehaviour.Properties largeCentrifugeProperties() {
