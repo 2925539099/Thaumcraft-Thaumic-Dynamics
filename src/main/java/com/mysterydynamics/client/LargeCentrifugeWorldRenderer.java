@@ -1,7 +1,6 @@
 package com.mysterydynamics.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import com.mysterydynamics.block.LargeCentrifugeControllerBlockEntity;
 import com.simibubi.create.content.equipment.goggles.GogglesItem;
 
@@ -21,10 +20,16 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /** 3×3×3 离心机不挂在单个方块截面的视锥裁剪上；视角偏离时由关卡阶段补画。 */
 public final class LargeCentrifugeWorldRenderer {
+
+    private static final List<BlockPos> CONTROLLERS = new ArrayList<>();
+    private static ClientLevel cachedLevel;
+    private static long lastScanTick = Long.MIN_VALUE;
 
     private LargeCentrifugeWorldRenderer() {
     }
@@ -41,12 +46,45 @@ public final class LargeCentrifugeWorldRenderer {
         Camera camera = event.getCamera();
         Vec3 cameraPos = camera.getPosition();
         BlockPos cameraBlock = camera.getBlockPosition();
-        int centerX = cameraBlock.getX() >> 4;
-        int centerZ = cameraBlock.getZ() >> 4;
         int radius = Math.min(6, minecraft.options.getEffectiveRenderDistance());
         PoseStack pose = event.getPoseStack();
         MultiBufferSource.BufferSource bufferSource = minecraft.renderBuffers().bufferSource();
 
+        long gameTime = level.getGameTime();
+        if (level != cachedLevel || gameTime < lastScanTick
+                || gameTime - lastScanTick >= 20L) {
+            cachedLevel = level;
+            lastScanTick = gameTime;
+            refreshControllers(level, cameraBlock, radius);
+        }
+
+        for (BlockPos pos : CONTROLLERS) {
+            if (!(level.getBlockEntity(pos) instanceof LargeCentrifugeControllerBlockEntity controller)) {
+                continue;
+            }
+            AABB bounds = new AABB(pos.getX() - 1.0D, pos.getY() - 1.0D, pos.getZ() - 1.0D,
+                    pos.getX() + 2.0D, pos.getY() + 2.0D, pos.getZ() + 2.0D).inflate(0.5D);
+            if (!event.getFrustum().isVisible(bounds)) {
+                continue;
+            }
+            int light = LevelRenderer.getLightColor(level, pos.above());
+            if (!LargeCentrifugeRenderer.wasRenderedThisFrame(pos)) {
+                LargeCentrifugeRenderer.renderAt(controller,
+                        event.getPartialTick().getGameTimeDeltaPartialTick(false),
+                        pose, cameraPos, bufferSource, light);
+            }
+            drawGoggleLabel(controller, pose, camera, bufferSource, light);
+        }
+
+        bufferSource.endBatch(RenderType.entityCutoutNoCull(InventoryMenu.BLOCK_ATLAS));
+        bufferSource.endBatch(RenderType.entityTranslucent(InventoryMenu.BLOCK_ATLAS));
+        LargeCentrifugeRenderer.clearFrameCache();
+    }
+
+    private static void refreshControllers(ClientLevel level, BlockPos cameraBlock, int radius) {
+        CONTROLLERS.clear();
+        int centerX = cameraBlock.getX() >> 4;
+        int centerZ = cameraBlock.getZ() >> 4;
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dz = -radius; dz <= radius; dz++) {
                 LevelChunk chunk = level.getChunkSource().getChunk(centerX + dx, centerZ + dz, false);
@@ -54,30 +92,12 @@ public final class LargeCentrifugeWorldRenderer {
                     continue;
                 }
                 for (Map.Entry<BlockPos, ?> entry : chunk.getBlockEntities().entrySet()) {
-                    if (!(entry.getValue() instanceof LargeCentrifugeControllerBlockEntity controller)) {
-                        continue;
+                    if (entry.getValue() instanceof LargeCentrifugeControllerBlockEntity controller) {
+                        CONTROLLERS.add(controller.getBlockPos());
                     }
-                    if (LargeCentrifugeRenderer.wasRenderedThisFrame(controller.getBlockPos())) {
-                        continue;
-                    }
-                    BlockPos pos = controller.getBlockPos();
-                    AABB bounds = new AABB(pos.getX() - 1.0D, pos.getY() - 1.0D, pos.getZ() - 1.0D,
-                            pos.getX() + 2.0D, pos.getY() + 2.0D, pos.getZ() + 2.0D).inflate(0.5D);
-                    if (!event.getFrustum().isVisible(bounds)) {
-                        continue;
-                    }
-                    int light = LevelRenderer.getLightColor(level, pos.above());
-                    LargeCentrifugeRenderer.renderAt(controller,
-                            event.getPartialTick().getGameTimeDeltaPartialTick(false),
-                            pose, cameraPos, bufferSource, light);
-                    drawGoggleLabel(controller, pose, camera, bufferSource, light);
                 }
             }
         }
-
-        bufferSource.endBatch(RenderType.entityCutoutNoCull(InventoryMenu.BLOCK_ATLAS));
-        bufferSource.endBatch(RenderType.entityTranslucent(InventoryMenu.BLOCK_ATLAS));
-        LargeCentrifugeRenderer.clearFrameCache();
     }
 
     /** 与神秘时代源质罐/揭示护目镜类似：戴护目镜时在控制器上方显示内部源质。 */
