@@ -2,6 +2,7 @@ package com.mysterydynamics.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mysterydynamics.block.LargeCentrifugeControllerBlockEntity;
+import com.mysterydynamics.compat.LargeCentrifugeStructure;
 import com.simibubi.create.content.equipment.goggles.GogglesItem;
 
 import net.minecraft.ChatFormatting;
@@ -135,6 +136,32 @@ public final class LargeCentrifugeWorldRenderer {
         int subColor = speed < 32.0F ? 0xFFFF5555 : 0xFFAAAAAA;
         font.drawInBatch(sub, -font.width(sub) / 2.0F, 11, subColor, false,
                 matrix, buffers, Font.DisplayMode.SEE_THROUGH, 0x66000000, light);
+        pose.popPose();
+
+        // 九个基座方块各自显示一份源质信息；不依赖旧存档里的 BlockEntity。
+        Component base = Component.literal((in == null ? "空" : name)
+                + " " + controller.storedInput() + "/24");
+        for (int x = -1; x <= 1; x++) {
+            for (int z = -1; z <= 1; z++) {
+                BlockPos basePos = LargeCentrifugeStructure.world(pos, x, -1, z,
+                        controller.rotation());
+                drawTextAt(base, basePos.getX() + 0.5D, basePos.getY() + 1.12D,
+                        basePos.getZ() + 0.5D, pose, camera, font, buffers, light, color, 0.015F);
+            }
+        }
+    }
+
+    private static void drawTextAt(Component text, double x, double y, double z,
+                                   PoseStack pose, Camera camera, Font font,
+                                   MultiBufferSource buffers, int light, int color, float scale) {
+        Vec3 cameraPos = camera.getPosition();
+        pose.pushPose();
+        pose.translate(x - cameraPos.x, y - cameraPos.y, z - cameraPos.z);
+        pose.mulPose(camera.rotation());
+        pose.scale(-scale, -scale, scale);
+        var matrix = pose.last().pose();
+        font.drawInBatch(text, -font.width(text) / 2.0F, 0, color, false,
+                matrix, buffers, Font.DisplayMode.SEE_THROUGH, 0x55000000, light);
         pose.popPose();
     }
 }
