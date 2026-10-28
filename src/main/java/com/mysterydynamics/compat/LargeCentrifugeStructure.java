@@ -51,7 +51,7 @@ public final class LargeCentrifugeStructure {
                 BlockPos pos = world(center, x, -1, z, rotation);
                 BlockState state = level.getBlockState(pos);
                 if (x == 0 && z == 0) {
-                    if (!state.is(AllBlocks.WINDMILL_BEARING.get())) {
+                    if (!state.is(AllBlocks.MECHANICAL_BEARING.get())) {
                         return false;
                     }
                 } else if (x == 0 && z == -1) {
@@ -169,7 +169,7 @@ public final class LargeCentrifugeStructure {
                     BlockPos pos = world(center, x, -1, z, rotation);
                     Block block;
                     if (x == 0 && z == 0) {
-                        block = AllBlocks.WINDMILL_BEARING.get();
+                        block = AllBlocks.MECHANICAL_BEARING.get();
                     } else if (x == 0 && z == -1) {
                         block = TCBlocks.ALCHEMICAL_CONSTRUCT.get();
                     } else {
