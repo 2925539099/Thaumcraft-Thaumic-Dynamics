@@ -248,12 +248,12 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
                 ? Math.abs(input.getSpeed()) : 0.0F;
     }
 
-    /** 强启只认正面底层中央这一个方块。 */
+    /** 强启只认模型名为“强启控制器”的那个底层方块（局部 x=1,z=-1）。 */
     private boolean redstonePowered() {
         if (level == null) {
             return false;
         }
-        BlockPos control = LargeCentrifugeStructure.world(worldPosition, 0, -1, -1, rotation());
+        BlockPos control = LargeCentrifugeStructure.world(worldPosition, 1, -1, -1, rotation());
         return level.hasNeighborSignal(control);
     }
 
