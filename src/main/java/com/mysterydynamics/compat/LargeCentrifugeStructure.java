@@ -45,7 +45,7 @@ public final class LargeCentrifugeStructure {
         if (!level.isLoaded(center)) {
             return false;
         }
-        // Bottom layer: 3×3 arcane bricks, center mechanical bearing, opposite-side alchemical construct.
+        // Bottom layer: 3×3 arcane bricks, center mechanical bearing, front-center alchemical construct.
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
                 BlockPos pos = world(center, x, -1, z, rotation);
@@ -54,7 +54,7 @@ public final class LargeCentrifugeStructure {
                     if (!state.is(AllBlocks.MECHANICAL_BEARING.get())) {
                         return false;
                     }
-                } else if (x == 0 && z == 1) {
+                } else if (x == 0 && z == -1) {
                     if (!state.is(TCBlocks.ALCHEMICAL_CONSTRUCT.get())) {
                         return false;
                     }
@@ -182,7 +182,7 @@ public final class LargeCentrifugeStructure {
                     Block block;
                     if (x == 0 && z == 0) {
                         block = AllBlocks.MECHANICAL_BEARING.get();
-                    } else if (x == 0 && z == 1) {
+                    } else if (x == 0 && z == -1) {
                         block = TCBlocks.ALCHEMICAL_CONSTRUCT.get();
                     } else {
                         block = TCBlocks.ARCANE_STONE_BRICKS.get();
