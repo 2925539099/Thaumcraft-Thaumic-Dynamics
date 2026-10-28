@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * 大型奥法离心机结构页。
  *
- * <p>3×3×3：底层 3×3 奥术石砖，中心动力轴承，正面中央炼金构材；
+ * <p>3×3×3：底层 3×3 奥术石砖，中心动力轴承，橙色位置的炼金构材；
  * 中层中心炼金构材；顶层中心离合器，其余为空气。</p>
  */
 public final class LargeCentrifugeConstruct {
@@ -55,7 +55,7 @@ public final class LargeCentrifugeConstruct {
         if (x == 1 && z == 1) {
             return new ItemStack(AllBlocks.MECHANICAL_BEARING.get());
         }
-        if (x == 1 && z == 0) {
+        if (x == 1 && z == 2) {
             return new ItemStack(TCBlocks.ALCHEMICAL_CONSTRUCT.get());
         }
         return new ItemStack(TCBlocks.ARCANE_STONE_BRICKS.get());
