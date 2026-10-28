@@ -143,21 +143,8 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
             }
         }
 
-        if (level.getGameTime() % 20L == 0L) {
-            System.out.println("[CentrifugeDamage] speed=" + speed
-                    + " area=" + area + " targets=" + targets.size());
-        }
-
         for (LivingEntity entity : targets) {
-            boolean hit = entity.hurt(source, damage);
-            if (entity instanceof net.minecraft.server.level.ServerPlayer player
-                    && level.getGameTime() % 20L == 0L) {
-                player.displayClientMessage(Component.literal(
-                        "[离心机] hit=" + hit + " damage=" + damage
-                                + " health=" + player.getHealth()
-                                + " invulnerable=" + player.isInvulnerable()), true);
-            }
-            if (!hit) {
+            if (!entity.hurt(source, damage)) {
                 continue;
             }
             Vec3 offset = entity.position().subtract(center);
