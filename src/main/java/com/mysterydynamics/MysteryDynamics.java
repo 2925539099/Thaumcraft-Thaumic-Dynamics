@@ -12,6 +12,8 @@ import com.mysterydynamics.block.InfernalBoilerShellBlock;
 import com.mysterydynamics.block.LargeCentrifugeCasingBlock;
 import com.mysterydynamics.block.LargeCentrifugeControllerBlock;
 import com.mysterydynamics.block.LargeCentrifugeControllerBlockEntity;
+import com.mysterydynamics.block.LargeCentrifugeInputBlock;
+import com.mysterydynamics.block.LargeCentrifugeInputBlockEntity;
 import com.mysterydynamics.block.RedstoneEngineBlock;
 import com.mysterydynamics.block.RedstoneEngineBlockEntity;
 import com.mysterydynamics.compat.InfernalBoilerConstruct;
@@ -142,6 +144,11 @@ public class MysteryDynamics {
             BLOCKS.register("large_centrifuge_casing",
                     () -> new LargeCentrifugeCasingBlock(largeCentrifugeProperties()));
 
+    /** 大型奥法离心机顶部应力输入口。 */
+    public static final DeferredBlock<LargeCentrifugeInputBlock> LARGE_CENTRIFUGE_INPUT =
+            BLOCKS.register("large_centrifuge_input",
+                    () -> new LargeCentrifugeInputBlock(largeCentrifugeProperties()));
+
     // ---- 物品 ----
     public static final DeferredItem<BlockItem> STRAW_ITEM = ITEMS.registerSimpleBlockItem(STRAW_GOLEM_POWER);
     public static final DeferredItem<BlockItem> WOOD_ITEM = ITEMS.registerSimpleBlockItem(WOOD_GOLEM_POWER);
@@ -203,6 +210,12 @@ public class MysteryDynamics {
                     (pos, state) -> new LargeCentrifugeControllerBlockEntity(
                             largeCentrifugeControllerType(), pos, state),
                     LARGE_CENTRIFUGE_CONTROLLER.get()).build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<LargeCentrifugeInputBlockEntity>> LARGE_CENTRIFUGE_INPUT_BE =
+            BLOCK_ENTITY_TYPES.register("large_centrifuge_input", () -> BlockEntityType.Builder.of(
+                    (pos, state) -> new LargeCentrifugeInputBlockEntity(
+                            largeCentrifugeInputType(), pos, state),
+                    LARGE_CENTRIFUGE_INPUT.get()).build(null));
 
     /** 独立创造模式标签页。 */
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = CREATIVE_TABS.register("main",
@@ -279,6 +292,10 @@ public class MysteryDynamics {
         return LARGE_CENTRIFUGE_CONTROLLER_BE.get();
     }
 
+    private static BlockEntityType<?> largeCentrifugeInputType() {
+        return LARGE_CENTRIFUGE_INPUT_BE.get();
+    }
+
     private static BlockBehaviour.Properties largeCentrifugeProperties() {
         return BlockBehaviour.Properties.of()
                 .mapColor(MapColor.METAL)
@@ -341,6 +358,7 @@ public class MysteryDynamics {
                 INFERNAL_BOILER_CASING_BE.get(), (be, side) -> be);
         if (ModList.get().isLoaded("thaumcraft")) {
             com.mysterydynamics.compat.InfernalBoilerCompat.registerCapabilities(event);
+            com.mysterydynamics.compat.LargeCentrifugeCompat.registerCapabilities(event);
         }
     }
 

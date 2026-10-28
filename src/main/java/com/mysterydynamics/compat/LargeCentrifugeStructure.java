@@ -108,9 +108,9 @@ public final class LargeCentrifugeStructure {
                             MysteryDynamics.LARGE_CENTRIFUGE_CASING.get().defaultBlockState(), 3);
                 }
             }
-            // Top center casing.
+            // Top center: kinetic input (accepts a shaft above).
             BlockPos top = world(center, 0, 1, 0, rotation);
-            level.setBlock(top, MysteryDynamics.LARGE_CENTRIFUGE_CASING.get().defaultBlockState(), 3);
+            level.setBlock(top, MysteryDynamics.LARGE_CENTRIFUGE_INPUT.get().defaultBlockState(), 3);
             // Controller at the middle center.
             level.setBlock(center,
                     MysteryDynamics.LARGE_CENTRIFUGE_CONTROLLER.get().defaultBlockState()
@@ -218,5 +218,30 @@ public final class LargeCentrifugeStructure {
             }
         }
         return center.offset(rx, y, rz);
+    }
+
+    /** 局部水平方向 → 世界方向。 */
+    public static Direction directionForLocal(int x, int z, int rotation) {
+        int rx;
+        int rz;
+        switch (rotation & 3) {
+            case 1 -> {
+                rx = -z;
+                rz = x;
+            }
+            case 2 -> {
+                rx = -x;
+                rz = -z;
+            }
+            case 3 -> {
+                rx = z;
+                rz = -x;
+            }
+            default -> {
+                rx = x;
+                rz = z;
+            }
+        }
+        return Direction.getNearest(rx, 0, rz);
     }
 }

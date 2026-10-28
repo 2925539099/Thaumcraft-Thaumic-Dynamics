@@ -68,5 +68,6 @@
   "mystery_dynamics.large_centrifuge.formed": "大型奥法离心机已成型",
   "mystery_dynamics.large_centrifuge.no_vis": "Vis 不足：需要六种 Vis 各 50",
   "block.mystery_dynamics.large_centrifuge_controller": "大型奥法离心机控制器",
-  "block.mystery_dynamics.large_centrifuge_casing": "大型奥法离心机外壳"
+  "block.mystery_dynamics.large_centrifuge_casing": "大型奥法离心机外壳",
+  "block.mystery_dynamics.large_centrifuge_input": "大型奥法离心机应力输入口"
 }

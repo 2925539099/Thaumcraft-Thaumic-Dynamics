@@ -1,5 +1,6 @@
 package com.mysterydynamics.compat;
 
+import com.mysterydynamics.MysteryDynamics;
 import com.simibubi.create.AllBlocks;
 
 import net.minecraft.core.Direction;
@@ -8,8 +9,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.EventPriority;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import thaumcraft.api.aspects.EssentiaCapabilities;
+import thaumcraft.api.aspects.IEssentiaTransport;
 import thaumcraft.api.wands.WandTriggerRegistry;
 import thaumcraft.common.items.TCFunctionalItems;
 import thaumcraft.common.registry.TCBlocks;
@@ -25,6 +29,12 @@ public final class LargeCentrifugeCompat {
                 LargeCentrifugeCompat::isStructureBlock, "large_centrifuge");
         NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, true,
                 LargeCentrifugeCompat::onRightClickBlock);
+    }
+
+    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
+        event.registerBlock(EssentiaCapabilities.TRANSPORT,
+                (level, pos, state, blockEntity, side) -> LargeCentrifugeTransport.get(level, pos, side),
+                MysteryDynamics.LARGE_CENTRIFUGE_CASING.get());
     }
 
     private static boolean isStructureBlock(BlockState state) {
