@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "rotation=0": {
+      "model": "mystery_dynamics:block/large_centrifuge_invisible"
+    },
+    "rotation=1": {
+      "model": "mystery_dynamics:block/large_centrifuge_invisible"
+    },
+    "rotation=2": {
+      "model": "mystery_dynamics:block/large_centrifuge_invisible"
+    },
+    "rotation=3": {
+      "model": "mystery_dynamics:block/large_centrifuge_invisible"
+    }
+  }
+}

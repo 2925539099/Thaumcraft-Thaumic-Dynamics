@@ -9,6 +9,9 @@ import com.mysterydynamics.block.InfernalBoilerCasingBlock;
 import com.mysterydynamics.block.InfernalBoilerCasingBlockEntity;
 import com.mysterydynamics.block.InfernalBoilerFaceBlock;
 import com.mysterydynamics.block.InfernalBoilerShellBlock;
+import com.mysterydynamics.block.LargeCentrifugeCasingBlock;
+import com.mysterydynamics.block.LargeCentrifugeControllerBlock;
+import com.mysterydynamics.block.LargeCentrifugeControllerBlockEntity;
 import com.mysterydynamics.block.RedstoneEngineBlock;
 import com.mysterydynamics.block.RedstoneEngineBlockEntity;
 import com.mysterydynamics.compat.InfernalBoilerConstruct;
@@ -129,6 +132,16 @@ public class MysteryDynamics {
     public static final DeferredBlock<InfernalBoilerShellBlock> INFERNAL_BOILER_SHELL = BLOCKS.register(
             "infernal_boiler_shell", () -> new InfernalBoilerShellBlock(infernalBoilerShellProperties()));
 
+    /** 大型奥法离心机：3×3×3 中间层中心控制器。 */
+    public static final DeferredBlock<LargeCentrifugeControllerBlock> LARGE_CENTRIFUGE_CONTROLLER =
+            BLOCKS.register("large_centrifuge_controller",
+                    () -> new LargeCentrifugeControllerBlock(largeCentrifugeProperties()));
+
+    /** 大型奥法离心机不可见填充块。 */
+    public static final DeferredBlock<LargeCentrifugeCasingBlock> LARGE_CENTRIFUGE_CASING =
+            BLOCKS.register("large_centrifuge_casing",
+                    () -> new LargeCentrifugeCasingBlock(largeCentrifugeProperties()));
+
     // ---- 物品 ----
     public static final DeferredItem<BlockItem> STRAW_ITEM = ITEMS.registerSimpleBlockItem(STRAW_GOLEM_POWER);
     public static final DeferredItem<BlockItem> WOOD_ITEM = ITEMS.registerSimpleBlockItem(WOOD_GOLEM_POWER);
@@ -184,6 +197,12 @@ public class MysteryDynamics {
             BLOCK_ENTITY_TYPES.register("infernal_boiler_casing", () -> BlockEntityType.Builder.of(
                     (pos, state) -> new InfernalBoilerCasingBlockEntity(infernalBoilerCasingType(), pos, state),
                     INFERNAL_BOILER_CASING.get()).build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<LargeCentrifugeControllerBlockEntity>> LARGE_CENTRIFUGE_CONTROLLER_BE =
+            BLOCK_ENTITY_TYPES.register("large_centrifuge_controller", () -> BlockEntityType.Builder.of(
+                    (pos, state) -> new LargeCentrifugeControllerBlockEntity(
+                            largeCentrifugeControllerType(), pos, state),
+                    LARGE_CENTRIFUGE_CONTROLLER.get()).build(null));
 
     /** 独立创造模式标签页。 */
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = CREATIVE_TABS.register("main",
@@ -254,6 +273,19 @@ public class MysteryDynamics {
 
     private static BlockEntityType<?> infernalBoilerCasingType() {
         return INFERNAL_BOILER_CASING_BE.get();
+    }
+
+    private static BlockEntityType<?> largeCentrifugeControllerType() {
+        return LARGE_CENTRIFUGE_CONTROLLER_BE.get();
+    }
+
+    private static BlockBehaviour.Properties largeCentrifugeProperties() {
+        return BlockBehaviour.Properties.of()
+                .mapColor(MapColor.METAL)
+                .strength(3.0F, 12.0F)
+                .sound(SoundType.METAL)
+                .noOcclusion()
+                .noLootTable();
     }
 
     private static BlockBehaviour.Properties infernalBoilerProperties() {
@@ -329,6 +361,7 @@ public class MysteryDynamics {
             if (net.neoforged.fml.ModList.get().isLoaded("thaumcraft")) {
                 com.mysterydynamics.compat.ThaumcraftRecipes.register();
                 com.mysterydynamics.compat.InfernalBoilerCompat.register();
+                com.mysterydynamics.compat.LargeCentrifugeCompat.register();
             }
             // 让工程师护目镜的信息覆盖层也识别本物品：头盔栏或 Curio 头部栏。
             GogglesItem.addIsWearingPredicate(player ->

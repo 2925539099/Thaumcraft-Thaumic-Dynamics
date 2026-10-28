@@ -64,5 +64,7 @@
   "tc.research_name.REVEALING_ENGINEER_GOGGLES": "Goggles of the Revealing Engineer",
   "tc.research_text.REVEALING_ENGINEER_GOGGLES": "Thaumaturge Big Mek",
   "mystery_dynamics.research.revealing_engineer_goggles.text": "A little bit of tinkering, some odds and ends to stick them together, or just something to tie them up with, and you have a brand new piece of equipment.",
-  "tooltip.mystery_dynamics.revealing_engineer_goggles": "Combines the Goggles of Revealing and Engineer's Goggles"
+  "tooltip.mystery_dynamics.revealing_engineer_goggles": "Combines the Goggles of Revealing and Engineer's Goggles",
+  "mystery_dynamics.large_centrifuge.formed": "Large Alchemical Centrifuge formed",
+  "mystery_dynamics.large_centrifuge.no_vis": "Not enough vis: 50 of each aspect required"
 }
