@@ -1,15 +1,20 @@
 package com.mysterydynamics.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.mysterydynamics.block.LargeCentrifugeControllerBlockEntity;
+import com.simibubi.create.content.equipment.goggles.GogglesItem;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.AABB;
@@ -65,6 +70,7 @@ public final class LargeCentrifugeWorldRenderer {
                     LargeCentrifugeRenderer.renderAt(controller,
                             event.getPartialTick().getGameTimeDeltaPartialTick(false),
                             pose, cameraPos, bufferSource, light);
+                    drawGoggleLabel(controller, pose, camera, bufferSource, light);
                 }
             }
         }
@@ -72,5 +78,35 @@ public final class LargeCentrifugeWorldRenderer {
         bufferSource.endBatch(RenderType.entityCutoutNoCull(InventoryMenu.BLOCK_ATLAS));
         bufferSource.endBatch(RenderType.entityTranslucent(InventoryMenu.BLOCK_ATLAS));
         LargeCentrifugeRenderer.clearFrameCache();
+    }
+
+    /** 与神秘时代源质罐/揭示护目镜类似：戴护目镜时在控制器上方显示内部源质。 */
+    private static void drawGoggleLabel(LargeCentrifugeControllerBlockEntity controller, PoseStack pose,
+                                        Camera camera, MultiBufferSource buffers, int light) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.player == null || !GogglesItem.isWearingGoggles(minecraft.player)) {
+            return;
+        }
+        BlockPos pos = controller.getBlockPos();
+        Vec3 cameraPos = camera.getPosition();
+        Component text = Component.literal("源质 " + controller.storedInput() + " / 24")
+                .withStyle(ChatFormatting.AQUA);
+        Component sub = Component.literal(controller.isProcessing()
+                        ? "离心中 · 输出 " + controller.storedOutput()
+                        : controller.storedOutput() > 0 ? "输出中 " + controller.storedOutput() : "待输入")
+                .withStyle(ChatFormatting.GRAY);
+        pose.pushPose();
+        pose.translate(pos.getX() + 0.5D - cameraPos.x,
+                pos.getY() + 1.95D - cameraPos.y,
+                pos.getZ() + 0.5D - cameraPos.z);
+        pose.mulPose(camera.rotation());
+        pose.scale(-0.022F, -0.022F, 0.022F);
+        var font = minecraft.font;
+        var matrix = pose.last().pose();
+        font.drawInBatch(text, -font.width(text) / 2.0F, 0, 0xFFFFFFFF, false,
+                matrix, buffers, Font.DisplayMode.SEE_THROUGH, 0x66000000, light);
+        font.drawInBatch(sub, -font.width(sub) / 2.0F, 11, 0xFFFFFFFF, false,
+                matrix, buffers, Font.DisplayMode.SEE_THROUGH, 0x66000000, light);
+        pose.popPose();
     }
 }

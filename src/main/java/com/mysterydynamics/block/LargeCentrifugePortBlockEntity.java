@@ -70,12 +70,24 @@ public class LargeCentrifugePortBlockEntity extends BlockEntity implements IEsse
     @Override
     public Aspect getSuctionType(Direction side) {
         LargeCentrifugeControllerBlockEntity c = controller();
-        return !input && portSide(side) && c != null ? c.outputAspect() : null;
+        if (c == null || !portSide(side)) {
+            return null;
+        }
+        if (!input) {
+            return c.outputAspect();
+        }
+        // 输入口为空时不绑定类型，由管道/过滤器决定送什么；
+        // 已有内容时只吸附同种源质。
+        return c.inputAspect();
     }
 
     @Override
     public int getSuctionAmount(Direction side) {
-        return portSide(side) ? 64 : 0;
+        LargeCentrifugeControllerBlockEntity c = controller();
+        if (c == null || !portSide(side)) {
+            return 0;
+        }
+        return input ? (c.canInputEssentia() ? 64 : 0) : 64;
     }
 
     @Override

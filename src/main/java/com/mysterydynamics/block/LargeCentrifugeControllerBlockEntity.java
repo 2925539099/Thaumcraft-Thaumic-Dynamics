@@ -44,6 +44,7 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
     private AspectList output = new AspectList();
     private boolean processingActive;
     private float progress;
+    private Aspect decision;
 
     public LargeCentrifugeControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -81,8 +82,6 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
     }
 
     private void serverTick() {
-        pullFromInputPipe();
-        pushToOutputPipe();
         float speed = inputSpeed();
         if (!processingActive && speed >= MIN_RPM && input.totalAmount() > 0) {
             boolean redstone = level.hasNeighborSignal(worldPosition);
@@ -102,21 +101,24 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
         }
         int rotation = rotation();
         BlockPos port = LargeCentrifugeStructure.world(worldPosition, -1, -1, 0, rotation);
-        Direction outward = LargeCentrifugeStructure.directionForLocal(-1, 0, rotation);
-        BlockPos pipePos = port.relative(outward);
-        IEssentiaTransport pipe = EssentiaCapabilities.find(level, pipePos, outward.getOpposite());
-        if (pipe == null) {
-            return;
-        }
-        Direction access = outward.getOpposite();
-        Aspect aspect = pipe.getEssentiaType(access);
-        if (aspect == null) {
-            aspect = pipe.getSuctionType(access);
-        }
-        if (aspect != null) {
-            int taken = pipe.takeEssentia(aspect, 1, access);
+        // 不限定单一朝向：端口六面都尝试一次，兼容管道正/反向查询。
+        for (Direction dir : Direction.values()) {
+            BlockPos pipePos = port.relative(dir);
+            IEssentiaTransport pipe = EssentiaCapabilities.find(level, pipePos, dir.getOpposite());
+            if (pipe == null) {
+                continue;
+            }
+            Aspect aspect = pipe.getEssentiaType(dir.getOpposite());
+            if (aspect == null) {
+                aspect = pipe.getSuctionType(dir.getOpposite());
+            }
+            if (aspect == null || !canAcceptAspect(aspect)) {
+                continue;
+            }
+            int taken = pipe.takeEssentia(aspect, 1, dir.getOpposite());
             if (taken > 0) {
                 addEssentia(aspect, taken);
+                return;
             }
         }
     }
@@ -128,26 +130,37 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
         }
         int rotation = rotation();
         BlockPos port = LargeCentrifugeStructure.world(worldPosition, 1, -1, 0, rotation);
-        Direction outward = LargeCentrifugeStructure.directionForLocal(1, 0, rotation);
-        BlockPos pipePos = port.relative(outward);
-        IEssentiaTransport pipe = EssentiaCapabilities.find(level, pipePos, outward.getOpposite());
-        if (pipe == null) {
-            return;
-        }
-        Direction access = outward.getOpposite();
-        Aspect aspect = outputAspect();
-        if (aspect == null) {
-            return;
-        }
-        int accepted = pipe.addEssentia(aspect, 1, access);
-        if (accepted > 0) {
-            takeEssentia(aspect, accepted);
+        for (Direction dir : Direction.values()) {
+            BlockPos pipePos = port.relative(dir);
+            IEssentiaTransport pipe = EssentiaCapabilities.find(level, pipePos, dir.getOpposite());
+            if (pipe == null) {
+                continue;
+            }
+            Aspect aspect = outputAspect();
+            if (aspect == null) {
+                return;
+            }
+            int accepted = pipe.addEssentia(aspect, 1, dir.getOpposite());
+            if (accepted > 0) {
+                takeEssentia(aspect, accepted);
+                return;
+            }
         }
     }
 
     private void startProcessing() {
         if (input.isEmpty()) {
             return;
+        }
+        decision = null;
+        for (Aspect aspect : input.aspects()) {
+            if (input.amount(aspect) > 0) {
+                List<Aspect> components = aspect.components();
+                if (!components.isEmpty()) {
+                    decision = components.get(level.random.nextInt(components.size()));
+                }
+                break;
+            }
         }
         processing = input.copy();
         input = new AspectList();
@@ -194,10 +207,8 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
                 continue;
             }
             processing.reduce(aspect, 1);
-            List<Aspect> components = aspect.components();
-            if (!components.isEmpty()) {
-                Aspect component = components.get(level.random.nextInt(components.size()));
-                output.add(component, 1);
+            if (decision != null) {
+                output.add(decision, 1);
             }
             return;
         }
@@ -218,8 +229,13 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
         return !processingActive && output.isEmpty() && input.totalAmount() < CAPACITY;
     }
 
+    /** 一次只能输入一种类型；已有类型后只能补同种源质。 */
+    public boolean canAcceptAspect(Aspect aspect) {
+        return aspect != null && (input.totalAmount() == 0 || input.amount(aspect) > 0);
+    }
+
     public int addEssentia(Aspect aspect, int amount) {
-        if (!canInputEssentia() || aspect == null || amount <= 0) {
+        if (!canInputEssentia() || !canAcceptAspect(aspect) || amount <= 0) {
             return 0;
         }
         int accepted = Math.min(amount, CAPACITY - input.totalAmount());
@@ -265,6 +281,15 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
 
     public int storedInput() {
         return input.totalAmount();
+    }
+
+    public Aspect inputAspect() {
+        for (Aspect aspect : input.aspects()) {
+            if (input.amount(aspect) > 0) {
+                return aspect;
+            }
+        }
+        return null;
     }
 
     public int storedOutput() {
@@ -325,6 +350,7 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
         tag.put("Output", output.save());
         tag.putBoolean("ProcessingActive", processingActive);
         tag.putFloat("Progress", progress);
+        tag.putString("Decision", decision == null ? "" : decision.getTag());
     }
 
     @Override
@@ -336,5 +362,6 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
         output = tag.contains("Output") ? AspectList.load(tag.getCompound("Output")) : new AspectList();
         processingActive = tag.getBoolean("ProcessingActive");
         progress = tag.getFloat("Progress");
+        decision = tag.getString("Decision").isEmpty() ? null : Aspect.get(tag.getString("Decision"));
     }
 }
