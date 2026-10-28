@@ -80,6 +80,8 @@ public final class LargeCentrifugeWorldRenderer {
 
         bufferSource.endBatch(RenderType.entityCutoutNoCull(InventoryMenu.BLOCK_ATLAS));
         bufferSource.endBatch(RenderType.entityTranslucent(InventoryMenu.BLOCK_ATLAS));
+        // 字体使用 textSeeThrough，必须在这里刷掉，否则标签会一直留在批处理里。
+        bufferSource.endBatch();
         LargeCentrifugeRenderer.clearFrameCache();
     }
 
