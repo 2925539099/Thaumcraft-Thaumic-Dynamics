@@ -248,22 +248,13 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
                 ? Math.abs(input.getSpeed()) : 0.0F;
     }
 
-    /** 强启信号：控制器北面/四周贴的拉杆、火把、红石线都算。 */
+    /** 强启只认正面底层中央这一个方块。 */
     private boolean redstonePowered() {
         if (level == null) {
             return false;
         }
-        if (level.hasNeighborSignal(worldPosition)) {
-            return true;
-        }
-        for (Direction direction : Direction.values()) {
-            BlockPos neighbor = worldPosition.relative(direction);
-            if (level.hasSignal(neighbor, direction.getOpposite())
-                    || level.hasNeighborSignal(neighbor)) {
-                return true;
-            }
-        }
-        return false;
+        BlockPos control = LargeCentrifugeStructure.world(worldPosition, 0, -1, -1, rotation());
+        return level.hasNeighborSignal(control);
     }
 
     // ---- essentia storage / transport ----
