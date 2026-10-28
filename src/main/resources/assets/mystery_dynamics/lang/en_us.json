@@ -72,5 +72,6 @@
   "block.mystery_dynamics.large_centrifuge_input": "Large Alchemical Centrifuge Kinetic Input",
   "block.mystery_dynamics.large_centrifuge_input_port": "Large Alchemical Centrifuge Essentia Input",
   "block.mystery_dynamics.large_centrifuge_output_port": "Large Alchemical Centrifuge Essentia Output",
-  "death.attack.mystery_dynamics.centrifuge": "%1 was flung by the Alchemical Centrifuge"
+  "death.attack.mystery_dynamics.centrifuge": "%1$s was flung by the Alchemical Centrifuge",
+  "death.attack.mystery_dynamics.centrifuge.player": "%1$s was thrown into the Alchemical Centrifuge by %2$s"
 }
