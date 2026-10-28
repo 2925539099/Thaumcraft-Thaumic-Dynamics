@@ -3,7 +3,6 @@ package com.mysterydynamics.compat;
 import com.simibubi.create.AllBlocks;
 
 import net.minecraft.world.item.ItemStack;
-import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.research.ResearchBookApi;
 import thaumcraft.common.registry.TCBlocks;
@@ -37,14 +36,8 @@ public final class LargeCentrifugeConstruct {
             }
         }
 
-        // 与研究笔记需求的 aspects 保持一致。
-        AspectList cost = new AspectList()
-                .add(Aspect.MECHANISM, 8)
-                .add(Aspect.MOTION, 8)
-                .add(Aspect.MAGIC, 6)
-                .add(Aspect.TOOL, 6)
-                .add(Aspect.CRAFT, 4)
-                .add(Aspect.EXCHANGE, 4);
+        // 结构页底部显示的就是法杖激活消耗，与实际触发共用同一份数据。
+        AspectList cost = LargeCentrifugeTrigger.activationCost();
         return new ResearchBookApi.Construct(cost, List.copyOf(blocks), width, height, depth);
     }
 

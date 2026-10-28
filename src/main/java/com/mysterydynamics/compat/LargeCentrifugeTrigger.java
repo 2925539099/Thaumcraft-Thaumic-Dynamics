@@ -10,11 +10,25 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.research.ResearchApi;
 import thaumcraft.api.wands.IWandTriggerManager;
 import thaumcraft.common.items.TCFunctionalItems;
 
-/** 法杖右击大型离心机结构，消耗六种 Vis 各 50 成型。 */
+/** 法杖右击大型离心机结构，消耗结构页显示的 Vis 并成型。 */
 public final class LargeCentrifugeTrigger implements IWandTriggerManager {
+
+    public static final String RESEARCH_KEY = "LARGE_CENTRIFUGE";
+
+    /** 结构页底部显示的法杖激活需求；实际消耗必须与它共用同一份数据。 */
+    public static AspectList activationCost() {
+        return new AspectList()
+                .add(Aspect.FIRE, 50)
+                .add(Aspect.EARTH, 50)
+                .add(Aspect.AIR, 50)
+                .add(Aspect.ENTROPY, 50)
+                .add(Aspect.WATER, 50)
+                .add(Aspect.ORDER, 50);
+    }
 
     @Override
     public boolean performTrigger(Level level, ItemStack stack, Player player, BlockPos pos,
@@ -23,18 +37,14 @@ public final class LargeCentrifugeTrigger implements IWandTriggerManager {
                 || !(stack.getItem() instanceof TCFunctionalItems.WandCastingItem wand)) {
             return false;
         }
+        if (!ResearchApi.isComplete(player, RESEARCH_KEY)) {
+            return false;
+        }
         LargeCentrifugeStructure.Match match = LargeCentrifugeStructure.find(level, pos);
         if (match == null) {
             return false;
         }
-        AspectList cost = new AspectList()
-                .add(Aspect.FIRE, 50)
-                .add(Aspect.EARTH, 50)
-                .add(Aspect.AIR, 50)
-                .add(Aspect.ENTROPY, 50)
-                .add(Aspect.WATER, 50)
-                .add(Aspect.ORDER, 50);
-        if (!wand.consumeVisCost(stack, player, cost, true)) {
+        if (!wand.consumeVisCost(stack, player, activationCost(), true)) {
             player.displayClientMessage(
                     Component.translatable("mystery_dynamics.large_centrifuge.no_vis"), false);
             return false;

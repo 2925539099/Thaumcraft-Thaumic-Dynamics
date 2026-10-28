@@ -39,6 +39,7 @@ public final class LargeCentrifugeCompat {
     private static boolean isStructureBlock(BlockState state) {
         return state.is(TCBlocks.ARCANE_STONE_BRICKS.get())
                 || state.is(TCBlocks.ALCHEMICAL_CONSTRUCT.get())
+                || state.is(AllBlocks.MECHANICAL_BEARING.get())
                 || state.is(AllBlocks.WINDMILL_BEARING.get())
                 || state.is(AllBlocks.CLUTCH.get());
     }
