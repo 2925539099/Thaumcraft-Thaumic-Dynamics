@@ -263,18 +263,6 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
                 return true;
             }
         }
-        // 也接受贴在结构任意一面上的拉杆/火把。
-        int rotation = rotation();
-        for (int y = -1; y <= 1; y++) {
-            for (int x = -1; x <= 1; x++) {
-                for (int z = -1; z <= 1; z++) {
-                    if (level.hasNeighborSignal(
-                            LargeCentrifugeStructure.world(worldPosition, x, y, z, rotation))) {
-                        return true;
-                    }
-                }
-            }
-        }
         return false;
     }
 
