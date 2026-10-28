@@ -75,12 +75,13 @@ public class LargeCentrifugePortBlockEntity extends BlockEntity
         if (c == null || !portSide(side)) {
             return null;
         }
-        if (!input) {
-            return c.outputAspect();
+        if (input) {
+            // 输入口为空时不绑定类型，由管道/过滤器决定送什么；
+            // 已有内容时只吸附同种源质。
+            return c.inputAspect();
         }
-        // 输入口为空时不绑定类型，由管道/过滤器决定送什么；
-        // 已有内容时只吸附同种源质。
-        return c.inputAspect();
+        // 输出口是源容器，不该提供吸力；让相邻管道按储罐的吸力来抽。
+        return null;
     }
 
     @Override
@@ -89,7 +90,7 @@ public class LargeCentrifugePortBlockEntity extends BlockEntity
         if (c == null || !portSide(side)) {
             return 0;
         }
-        return input ? (c.canInputEssentia() ? 64 : 0) : 64;
+        return input ? (c.canInputEssentia() ? 64 : 0) : 0;
     }
 
     @Override

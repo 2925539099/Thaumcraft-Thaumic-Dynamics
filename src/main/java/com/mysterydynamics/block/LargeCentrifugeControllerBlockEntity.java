@@ -87,11 +87,10 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
         if (--transferCooldown <= 0) {
             transferCooldown = 2;
             pullFromInputPipe();
-            pushToOutputPipe();
         }
         float speed = inputSpeed();
         if (!processingActive && speed >= MIN_RPM && input.totalAmount() > 0) {
-            boolean redstone = level.hasNeighborSignal(worldPosition);
+            boolean redstone = redstonePowered();
             if (input.totalAmount() >= CAPACITY || redstone) {
                 startProcessing();
             }
@@ -247,6 +246,36 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
         BlockEntity above = level.getBlockEntity(worldPosition.above());
         return above instanceof LargeCentrifugeInputBlockEntity input
                 ? Math.abs(input.getSpeed()) : 0.0F;
+    }
+
+    /** 强启信号：控制器北面/四周贴的拉杆、火把、红石线都算。 */
+    private boolean redstonePowered() {
+        if (level == null) {
+            return false;
+        }
+        if (level.hasNeighborSignal(worldPosition)) {
+            return true;
+        }
+        for (Direction direction : Direction.values()) {
+            BlockPos neighbor = worldPosition.relative(direction);
+            if (level.hasSignal(neighbor, direction.getOpposite())
+                    || level.hasNeighborSignal(neighbor)) {
+                return true;
+            }
+        }
+        // 也接受贴在结构任意一面上的拉杆/火把。
+        int rotation = rotation();
+        for (int y = -1; y <= 1; y++) {
+            for (int x = -1; x <= 1; x++) {
+                for (int z = -1; z <= 1; z++) {
+                    if (level.hasNeighborSignal(
+                            LargeCentrifugeStructure.world(worldPosition, x, y, z, rotation))) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     // ---- essentia storage / transport ----
