@@ -129,7 +129,8 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
                 worldPosition.getX() + 1.625D, worldPosition.getY() + 1.75D,
                 worldPosition.getZ() + 1.625D);
         var source = ModDamageTypes.centrifuge(level);
-        Vec3 center = Vec3.atCenterOf(worldPosition);
+        // 以旋转区/中央多方块的几何中心作为击退原点。
+        Vec3 center = area.getCenter();
 
         // LivingEntity 查询对普通生物有效；玩家显式补扫，避免玩家实体不在
         // 区块实体索引里时漏判。
@@ -161,12 +162,17 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
                 dx = offset.x / horizontal;
                 dz = offset.z / horizontal;
             }
-            // 明确向外击退；击退抗性按原版属性削减。
+            // 明确向外击退；直接覆盖水平速度，避免玩家原本的移动方向把击退带偏。
             double resistance = entity.getAttributeValue(
                     net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE);
             float factor = (float) Math.max(0.0D, 1.0D - resistance);
             double strength = (0.5D * knockbackLevel + 0.2D) * factor;
-            entity.push(dx * strength, 0.35D + 0.02D * knockbackLevel, dz * strength);
+            Vec3 motion = entity.getDeltaMovement();
+            entity.setDeltaMovement(
+                    dx * strength,
+                    Math.max(motion.y, 0.35D + 0.02D * knockbackLevel),
+                    dz * strength);
+            entity.hasImpulse = true;
             entity.hurtMarked = true;
         }
     }
