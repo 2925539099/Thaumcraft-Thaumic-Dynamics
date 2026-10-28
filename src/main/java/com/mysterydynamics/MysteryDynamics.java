@@ -21,6 +21,7 @@ import com.mysterydynamics.block.RedstoneEngineBlock;
 import com.mysterydynamics.block.RedstoneEngineBlockEntity;
 import com.mysterydynamics.compat.InfernalBoilerConstruct;
 import com.mysterydynamics.compat.InfernalBoilerStructure;
+import com.mysterydynamics.compat.LargeCentrifugeConstruct;
 import com.mysterydynamics.item.RevealingEngineerGogglesItem;
 import com.simibubi.create.api.stress.BlockStressValues;
 import com.simibubi.create.content.equipment.goggles.GogglesItem;
@@ -76,10 +77,17 @@ public class MysteryDynamics {
 
     static {
         // 结构页必须双端可见，否则服务端加载研究会丢弃 CONSTRUCT 页面。
-        ResearchBookApi.addConstructSource(key ->
-                "InfernalBoiler".equalsIgnoreCase(key) || "INFERNAL_BOILER".equalsIgnoreCase(key)
-                        ? java.util.List.of(InfernalBoilerConstruct.create())
-                        : java.util.List.of());
+        ResearchBookApi.addConstructSource(key -> {
+            if ("InfernalBoiler".equalsIgnoreCase(key)
+                    || "INFERNAL_BOILER".equalsIgnoreCase(key)) {
+                return java.util.List.of(InfernalBoilerConstruct.create());
+            }
+            if ("LargeCentrifuge".equalsIgnoreCase(key)
+                    || "LARGE_CENTRIFUGE".equalsIgnoreCase(key)) {
+                return java.util.List.of(LargeCentrifugeConstruct.create());
+            }
+            return java.util.List.of();
+        });
     }
 
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(MODID);

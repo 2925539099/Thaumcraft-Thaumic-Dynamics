@@ -46,6 +46,10 @@
       "type": "TEXT",
       "text": "mystery_dynamics.research.large_centrifuge.text",
       "source": "mystery_dynamics.research.large_centrifuge.text"
+    },
+    {
+      "type": "CONSTRUCT",
+      "source": "LargeCentrifuge"
     }
   ],
   "icon": "mystery_dynamics:textures/misc/r_large_centrifuge.png"
