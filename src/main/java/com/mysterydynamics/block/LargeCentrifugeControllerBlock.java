@@ -57,7 +57,7 @@ public class LargeCentrifugeControllerBlock extends Block implements EntityBlock
                          boolean movedByPiston) {
         if (!level.isClientSide && !newState.is(state.getBlock())
                 && !LargeCentrifugeStructure.isRestoring()) {
-            LargeCentrifugeStructure.requestDismantle(level, pos, state.getValue(ROTATION), pos);
+            LargeCentrifugeStructure.requestDismantle(level, pos, state.getValue(ROTATION));
         }
     }
 }
