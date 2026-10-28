@@ -20,19 +20,18 @@ import net.minecraft.resources.ResourceLocation;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
-/** 实装大型奥法离心机模型的 BER：static/rotor 分两套 quad，rotor 单独绕中心旋转。 */
+/** 实装大型奥法离心机模型的 BER：每张原贴图独立绑定，static/rotor 分开绘制。 */
 public final class LargeCentrifugeRenderer implements BlockEntityRenderer<LargeCentrifugeControllerBlockEntity> {
-
-    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(
-            MysteryDynamics.MODID, "textures/block/large_centrifuge_atlas.png");
-    private static final float ATLAS_SIZE = 512.0F;
 
     private record Vertex(float x, float y, float z, float u, float v) {
     }
 
-    private record Quad(Vertex[] vertices, float nx, float ny, float nz, boolean translucent) {
+    private record Quad(Vertex[] vertices, float nx, float ny, float nz, boolean translucent,
+                        ResourceLocation texture, float tw, float th) {
     }
 
     private record ModelData(List<Quad> quads) {
@@ -52,10 +51,9 @@ public final class LargeCentrifugeRenderer implements BlockEntityRenderer<LargeC
         if (statics.quads().isEmpty() && rotor.quads().isEmpty()) {
             return;
         }
-        ensureTextureLoaded();
 
         pose.pushPose();
-        // Model is authored around the controller block center (8,8,8).
+        // The model is authored around the controller block center (8,8,8).
         pose.translate(0.5D, 0.5D, 0.5D);
         pose.mulPose(Axis.YP.rotationDegrees(controller.rotation() * 90.0F));
         pose.translate(-0.5D, -0.5D, -0.5D);
@@ -70,41 +68,35 @@ public final class LargeCentrifugeRenderer implements BlockEntityRenderer<LargeC
         pose.popPose();
     }
 
-    private static void ensureTextureLoaded() {
-        Minecraft.getInstance().getTextureManager().getTexture(TEXTURE);
-    }
-
     private static void draw(ModelData model, PoseStack pose, MultiBufferSource buffers, int packedLight) {
-        drawPass(model, false, RenderType.entityCutoutNoCull(TEXTURE), pose, buffers, packedLight);
-        drawPass(model, true, RenderType.entityTranslucent(TEXTURE), pose, buffers, packedLight);
+        Map<ResourceLocation, List<Quad>> opaque = new LinkedHashMap<>();
+        Map<ResourceLocation, List<Quad>> translucent = new LinkedHashMap<>();
+        for (Quad quad : model.quads()) {
+            (quad.translucent() ? translucent : opaque)
+                    .computeIfAbsent(quad.texture(), key -> new ArrayList<>()).add(quad);
+        }
+        drawGroups(opaque, false, pose, buffers, packedLight);
+        drawGroups(translucent, true, pose, buffers, packedLight);
     }
 
-    private static void drawPass(ModelData model, boolean translucent, RenderType renderType,
-                                 PoseStack pose, MultiBufferSource buffers, int packedLight) {
-        boolean any = false;
-        for (Quad quad : model.quads()) {
-            if (quad.translucent() == translucent) {
-                any = true;
-                break;
-            }
-        }
-        if (!any) {
-            return;
-        }
-        VertexConsumer consumer = buffers.getBuffer(renderType);
-        for (Quad quad : model.quads()) {
-            if (quad.translucent() != translucent) {
-                continue;
-            }
-            int light = packedLight;
-            for (Vertex vertex : quad.vertices()) {
-                consumer.addVertex(pose.last(), vertex.x() / 16.0F, vertex.y() / 16.0F,
-                                vertex.z() / 16.0F)
-                        .setColor(255, 255, 255, 255)
-                        .setUv(vertex.u() / ATLAS_SIZE, vertex.v() / ATLAS_SIZE)
-                        .setLight(light)
-                        .setOverlay(OverlayTexture.NO_OVERLAY)
-                        .setNormal(pose.last(), quad.nx(), quad.ny(), quad.nz());
+    private static void drawGroups(Map<ResourceLocation, List<Quad>> groups, boolean translucent,
+                                   PoseStack pose, MultiBufferSource buffers, int packedLight) {
+        for (var entry : groups.entrySet()) {
+            ResourceLocation texture = entry.getKey();
+            Minecraft.getInstance().getTextureManager().getTexture(texture);
+            VertexConsumer consumer = buffers.getBuffer(translucent
+                    ? RenderType.entityTranslucent(texture)
+                    : RenderType.entityCutoutNoCull(texture));
+            for (Quad quad : entry.getValue()) {
+                for (Vertex vertex : quad.vertices()) {
+                    consumer.addVertex(pose.last(), vertex.x() / 16.0F, vertex.y() / 16.0F,
+                                    vertex.z() / 16.0F)
+                            .setColor(255, 255, 255, 255)
+                            .setUv(vertex.u() / quad.tw(), vertex.v() / quad.th())
+                            .setLight(packedLight)
+                            .setOverlay(OverlayTexture.NO_OVERLAY)
+                            .setNormal(pose.last(), quad.nx(), quad.ny(), quad.nz());
+                }
             }
         }
     }
@@ -140,8 +132,17 @@ public final class LargeCentrifugeRenderer implements BlockEntityRenderer<LargeC
                             value.get(4).getAsFloat());
                 }
                 JsonArray normal = object.getAsJsonArray("n");
+                String texture = object.get("tex").getAsString();
+                int colon = texture.indexOf(':');
+                String namespace = colon > 0 ? texture.substring(0, colon) : MysteryDynamics.MODID;
+                String texturePath = colon > 0 ? texture.substring(colon + 1) : texture;
+                if (!texturePath.startsWith("textures/")) {
+                    texturePath = "textures/" + texturePath + ".png";
+                }
+                ResourceLocation textureId = ResourceLocation.fromNamespaceAndPath(namespace, texturePath);
                 quads.add(new Quad(corners, normal.get(0).getAsFloat(), normal.get(1).getAsFloat(),
-                        normal.get(2).getAsFloat(), object.get("t").getAsBoolean()));
+                        normal.get(2).getAsFloat(), object.get("t").getAsBoolean(),
+                        textureId, object.get("tw").getAsFloat(), object.get("th").getAsFloat()));
             }
             return new ModelData(List.copyOf(quads));
         } catch (Exception exception) {

@@ -66,5 +66,7 @@
   "mystery_dynamics.research.revealing_engineer_goggles.text": "A little bit of tinkering, some odds and ends to stick them together, or just something to tie them up with, and you have a brand new piece of equipment.",
   "tooltip.mystery_dynamics.revealing_engineer_goggles": "Combines the Goggles of Revealing and Engineer's Goggles",
   "mystery_dynamics.large_centrifuge.formed": "Large Alchemical Centrifuge formed",
-  "mystery_dynamics.large_centrifuge.no_vis": "Not enough vis: 50 of each aspect required"
+  "mystery_dynamics.large_centrifuge.no_vis": "Not enough vis: 50 of each aspect required",
+  "block.mystery_dynamics.large_centrifuge_controller": "Large Alchemical Centrifuge Controller",
+  "block.mystery_dynamics.large_centrifuge_casing": "Large Alchemical Centrifuge Casing"
 }

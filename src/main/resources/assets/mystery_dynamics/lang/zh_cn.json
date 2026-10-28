@@ -66,5 +66,7 @@
   "mystery_dynamics.research.revealing_engineer_goggles.text": "只需要一点点的寻思，然后用一些玩意将他俩粘起来，或者随便用什么东西捆起来就可以做出一个新的装备了。",
   "tooltip.mystery_dynamics.revealing_engineer_goggles": "同时具备揭示之护目镜与工程师护目镜的功能",
   "mystery_dynamics.large_centrifuge.formed": "大型奥法离心机已成型",
-  "mystery_dynamics.large_centrifuge.no_vis": "Vis 不足：需要六种 Vis 各 50"
+  "mystery_dynamics.large_centrifuge.no_vis": "Vis 不足：需要六种 Vis 各 50",
+  "block.mystery_dynamics.large_centrifuge_controller": "大型奥法离心机控制器",
+  "block.mystery_dynamics.large_centrifuge_casing": "大型奥法离心机外壳"
 }
