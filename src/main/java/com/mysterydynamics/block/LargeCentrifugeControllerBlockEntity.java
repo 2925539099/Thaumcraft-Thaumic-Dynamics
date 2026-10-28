@@ -3,6 +3,7 @@ package com.mysterydynamics.block;
 import com.mysterydynamics.compat.LargeCentrifugeStructure;
 import com.mysterydynamics.damage.ModDamageTypes;
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
+import com.simibubi.create.content.kinetics.drill.DrillBlock;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -13,7 +14,6 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -110,8 +110,8 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
     }
 
     /**
-     * 只对旋转组实际占据的区域造成伤害：
-     * 水平 ±1.125 格，垂直 -0.25 ~ +1.75 格（相对控制器）。
+     * 与动力锯/动力钻头一致：服务端接触判定、跳过物品、按转速取伤害。
+     * 旋转部件没有实体碰撞方块，所以在控制器 tick 里扫描旋转组 AABB。
      */
     private void applySpinDamage(float speed) {
         if (level == null || speed < MIN_RPM) {
@@ -119,9 +119,9 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
         }
         float clamped = Math.min(speed, MAX_RPM);
         float t = (clamped - MIN_RPM) / (float) (MAX_RPM - MIN_RPM);
-        float damage = 4.0F + 36.0F * t;
+        // 动力锯/钻头公式最高 10 点，这里 ×4 得到最高 40 点。
+        float damage = 4.0F * (float) DrillBlock.getDamage(Math.abs(speed));
         int knockbackLevel = 1 + Math.round(9.0F * t);
-        float knockback = 0.5F * knockbackLevel;
 
         AABB area = new AABB(
                 worldPosition.getX() - 0.625D, worldPosition.getY() - 0.25D,
@@ -131,8 +131,7 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
         var source = ModDamageTypes.centrifuge(level);
         Vec3 center = Vec3.atCenterOf(worldPosition);
 
-        for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, area,
-                e -> e.isAlive() && e.hurtTime <= 0)) {
+        for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, area)) {
             if (!entity.hurt(source, damage)) {
                 continue;
             }
@@ -150,11 +149,8 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
                 dx = offset.x / horizontal;
                 dz = offset.z / horizontal;
             }
-            double resistance = entity.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE);
-            float factor = (float) Math.max(0.0D, 1.0D - resistance);
-            entity.push(dx * knockback * factor,
-                    0.25D + 0.03D * knockbackLevel,
-                    dz * knockback * factor);
+            // 与原版击退附魔同强度：每级额外 0.5 格/秒，最高 X 级。
+            entity.knockback(0.5D * knockbackLevel, dx, dz);
             entity.hurtMarked = true;
         }
     }
