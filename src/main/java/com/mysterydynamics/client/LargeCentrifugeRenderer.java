@@ -124,8 +124,9 @@ public final class LargeCentrifugeRenderer implements BlockEntityRenderer<LargeC
             for (var element : root.getAsJsonArray("quads")) {
                 JsonObject object = element.getAsJsonObject();
                 JsonArray vertices = object.getAsJsonArray("v");
-                Vertex[] corners = new Vertex[4];
-                for (int i = 0; i < 4; i++) {
+                int vertexCount = vertices.size();
+                Vertex[] corners = new Vertex[vertexCount];
+                for (int i = 0; i < vertexCount; i++) {
                     JsonArray value = vertices.get(i).getAsJsonArray();
                     corners[i] = new Vertex(value.get(0).getAsFloat(), value.get(1).getAsFloat(),
                             value.get(2).getAsFloat(), value.get(3).getAsFloat(),
