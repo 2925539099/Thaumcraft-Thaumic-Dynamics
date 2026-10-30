@@ -22,6 +22,7 @@ import com.mysterydynamics.block.RedstoneEngineBlockEntity;
 import com.mysterydynamics.compat.InfernalBoilerConstruct;
 import com.mysterydynamics.compat.InfernalBoilerStructure;
 import com.mysterydynamics.compat.LargeCentrifugeConstruct;
+import com.mysterydynamics.item.NeriidsProtectionItem;
 import com.mysterydynamics.item.RevealingEngineerGogglesItem;
 import com.simibubi.create.api.stress.BlockStressValues;
 import com.simibubi.create.content.equipment.goggles.GogglesItem;
@@ -61,6 +62,7 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import thaumcraft.api.research.ResearchBookApi;
 import thaumcraft.api.research.ResearchRecipePageRegistry;
+import thaumcraft.common.registry.TCItems;
 import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.List;
@@ -205,6 +207,27 @@ public class MysteryDynamics {
                     () -> new RevealingEngineerGogglesItem(
                             new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
 
+    // ---- 涅里伊德之庇：3 点护甲，耐久与神秘头盔一致 ----
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> NERIIDS_PROTECTION_MATERIAL =
+            ARMOR_MATERIALS.register("neriids_protection", () -> new ArmorMaterial(
+                    java.util.Map.of(
+                            ArmorItem.Type.BOOTS, 1,
+                            ArmorItem.Type.LEGGINGS, 2,
+                            ArmorItem.Type.CHESTPLATE, 3,
+                            ArmorItem.Type.HELMET, 3),
+                    25,
+                    SoundEvents.ARMOR_EQUIP_IRON,
+                    () -> Ingredient.of(TCItems.THAUMIUM_INGOT.get()),
+                    List.of(new ArmorMaterial.Layer(
+                            ResourceLocation.fromNamespaceAndPath(MODID, "neriids_protection"), "", false)),
+                    0.0F,
+                    0.0F));
+
+    public static final DeferredItem<NeriidsProtectionItem> NERIIDS_PROTECTION =
+            ITEMS.register("neriids_protection",
+                    () -> new NeriidsProtectionItem(
+                            new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+
     // ---- 方块实体（8 台设备共用） ----
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GolemPowerBlockEntity>> GOLEM_POWER_BE =
             BLOCK_ENTITY_TYPES.register("golem_power", () -> BlockEntityType.Builder.of(
@@ -263,6 +286,7 @@ public class MysteryDynamics {
                         output.accept(INFERNAL_BOILER.get());
                         output.accept(INFERNAL_BOILER_FACE.get());
                         output.accept(REVEALING_ENGINEER_GOGGLES.get());
+                        output.accept(NERIIDS_PROTECTION.get());
                     })
                     .build());
 
