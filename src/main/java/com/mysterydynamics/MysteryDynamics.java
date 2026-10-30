@@ -22,6 +22,7 @@ import com.mysterydynamics.block.RedstoneEngineBlockEntity;
 import com.mysterydynamics.compat.InfernalBoilerConstruct;
 import com.mysterydynamics.compat.InfernalBoilerStructure;
 import com.mysterydynamics.compat.LargeCentrifugeConstruct;
+import com.mysterydynamics.item.HighPressureLauncherItem;
 import com.mysterydynamics.item.NeriidsProtectionItem;
 import com.mysterydynamics.item.RevealingEngineerGogglesItem;
 import com.simibubi.create.api.stress.BlockStressValues;
@@ -228,6 +229,12 @@ public class MysteryDynamics {
                     () -> new NeriidsProtectionItem(
                             new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
 
+    // ---- 高压动力发射器：暂用土豆加农炮的全部数据 ----
+    public static final DeferredItem<HighPressureLauncherItem> HIGH_PRESSURE_LAUNCHER =
+            ITEMS.register("high_pressure_launcher",
+                    () -> new HighPressureLauncherItem(
+                            new Item.Properties().stacksTo(1).durability(100).rarity(Rarity.UNCOMMON)));
+
     // ---- 方块实体（8 台设备共用） ----
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GolemPowerBlockEntity>> GOLEM_POWER_BE =
             BLOCK_ENTITY_TYPES.register("golem_power", () -> BlockEntityType.Builder.of(
@@ -287,6 +294,7 @@ public class MysteryDynamics {
                         output.accept(INFERNAL_BOILER_FACE.get());
                         output.accept(REVEALING_ENGINEER_GOGGLES.get());
                         output.accept(NERIIDS_PROTECTION.get());
+                        output.accept(HIGH_PRESSURE_LAUNCHER.get());
                     })
                     .build());
 
