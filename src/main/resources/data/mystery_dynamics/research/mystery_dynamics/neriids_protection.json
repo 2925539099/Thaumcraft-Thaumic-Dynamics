@@ -9,9 +9,13 @@
   "parents": [
     "INFUSION"
   ],
-  "parents_hidden": [],
+  "parents_hidden": [
+    "INFUSION"
+  ],
   "siblings": [],
-  "flags": [],
+  "flags": [
+    "concealed"
+  ],
   "text_pages": [
     "mystery_dynamics.research.neriids_protection.text"
   ],
