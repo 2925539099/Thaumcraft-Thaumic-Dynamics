@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(PotatoCannonItem.class)
 public abstract class PotatoCannonAmmoMixin {
 
-    @Inject(method = "getAmmo", at = @At("RETURN"))
+    @Inject(method = "getAmmo", at = @At("RETURN"), cancellable = true)
     private static void mystery$hideHighPressureAmmo(Player player, ItemStack cannon,
                                                      CallbackInfoReturnable<PotatoCannonItem.Ammo> cir) {
         PotatoCannonItem.Ammo ammo = cir.getReturnValue();
