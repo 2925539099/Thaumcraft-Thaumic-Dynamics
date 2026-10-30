@@ -88,5 +88,8 @@
   "item.mystery_dynamics.high_pressure_launcher.tooltip.condition1": "When right-clicked",
   "item.mystery_dynamics.high_pressure_launcher.tooltip.behaviour1": "Launches any valid ammo from your inventory",
   "item.mystery_dynamics.high_pressure_launcher.tooltip.condition2": "When wearing a Backtank",
-  "item.mystery_dynamics.high_pressure_launcher.tooltip.behaviour2": "Uses compressed air to negate durability loss"
+  "item.mystery_dynamics.high_pressure_launcher.tooltip.behaviour2": "Uses compressed air to negate durability loss",
+  "tc.research_name.HIGH_PRESSURE_LAUNCHER": "High-Pressure Launch System",
+  "tc.research_text.HIGH_PRESSURE_LAUNCHER": "Firearms Regulation No. 72",
+  "mystery_dynamics.research.high_pressure_launcher.text": "Issuing firearms en masse to factory security and field survey teams is practically an invitation to rebellion. Fortunately, non-powder weapons face far looser regulation and licensing—an excellent opening.<BR><BR>You heavily modified the potato cannon, greatly improving air compression and instantaneous release, causing its power to surge. At the same time, you specially treated the barrel and chamber so that it is no longer limited to potatoes and carrots, allowing far more items to be used as ammunition.<BR><BR>Even before the strictest magistrate it is merely a high-pressure injector; but when loaded with metal or Alumentum, it is enough to remind anyone facing it what the law means."
 }

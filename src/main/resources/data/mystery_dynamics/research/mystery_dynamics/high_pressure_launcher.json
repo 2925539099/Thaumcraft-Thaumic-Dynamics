@@ -1,0 +1,58 @@
+{
+  "key": "HIGH_PRESSURE_LAUNCHER",
+  "order": 16,
+  "category": "MYSTERY_DYNAMICS",
+  "col": 4,
+  "row": 0,
+  "complexity": 5,
+  "warp": 0,
+  "parents": [
+    "INFUSION",
+    "BELLOWS"
+  ],
+  "parents_hidden": [
+    "INFUSION",
+    "BELLOWS"
+  ],
+  "siblings": [],
+  "flags": [
+    "concealed"
+  ],
+  "text_pages": [
+    "mystery_dynamics.research.high_pressure_launcher.text"
+  ],
+  "item": "mystery_dynamics:high_pressure_launcher",
+  "aspects": [
+    {
+      "aspect": "machina",
+      "amount": 8
+    },
+    {
+      "aspect": "telum",
+      "amount": 8
+    },
+    {
+      "aspect": "metallum",
+      "amount": 6
+    },
+    {
+      "aspect": "aer",
+      "amount": 6
+    },
+    {
+      "aspect": "ignis",
+      "amount": 4
+    }
+  ],
+  "pages": [
+    {
+      "type": "TEXT",
+      "text": "mystery_dynamics.research.high_pressure_launcher.text",
+      "source": "mystery_dynamics.research.high_pressure_launcher.text"
+    },
+    {
+      "type": "INFUSION",
+      "source": "HIGH_PRESSURE_LAUNCHER"
+    }
+  ]
+}

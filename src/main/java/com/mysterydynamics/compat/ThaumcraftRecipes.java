@@ -197,6 +197,28 @@ public final class ThaumcraftRecipes {
                 new ItemStack(Items.OAK_DOOR),
                 new ItemStack(Items.TURTLE_HELMET),
                 waterBreathingPotion);
+
+        // 高压动力发射系统：注魔祭坛
+        ThaumcraftApi.addInfusionCraftingRecipe(
+                "HIGH_PRESSURE_LAUNCHER",
+                new ItemStack(MysteryDynamics.HIGH_PRESSURE_LAUNCHER.get()),
+                8,
+                new AspectList()
+                        .add(Aspect.WEAPON, 12)
+                        .add(Aspect.TOOL, 24)
+                        .add(Aspect.MECHANISM, 24)
+                        .add(Aspect.AIR, 32)
+                        .add(Aspect.FIRE, 32)
+                        .add(Aspect.METAL, 32),
+                stack("create", "potato_cannon"),
+                stack("thaumcraft", "alchemical_construct"),
+                stack("thaumcraft", "bellows"),
+                stack("thaumcraft", "air_shard"),
+                stack("thaumcraft", "fire_shard"),
+                stack("thaumcraft", "thaumium_ingot"),
+                stack("thaumcraft", "thaumium_ingot"),
+                stack("thaumcraft", "thaumium_ingot"),
+                stack("thaumcraft", "thaumium_ingot"));
     }
 
     /** 书页居中显示（图案补到 3 格宽），合成时仍允许左右平移。 */
