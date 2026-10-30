@@ -1,5 +1,5 @@
 {
-  "items": "minecraft:copper_nugget",
+  "items": "create:copper_nugget",
   "damage": 5,
   "knockback": 1.0,
   "reload_ticks": 5,
