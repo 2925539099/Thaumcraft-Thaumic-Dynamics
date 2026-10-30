@@ -1,0 +1,56 @@
+{
+  "key": "NERIIDS_PROTECTION",
+  "order": 15,
+  "category": "MYSTERY_DYNAMICS",
+  "col": 4,
+  "row": -2,
+  "complexity": 4,
+  "warp": 0,
+  "parents": [
+    "INFUSION"
+  ],
+  "parents_hidden": [],
+  "siblings": [],
+  "flags": [],
+  "text_pages": [
+    "mystery_dynamics.research.neriids_protection.text"
+  ],
+  "item": "mystery_dynamics:neriids_protection",
+  "aspects": [
+    {
+      "aspect": "aqua",
+      "amount": 8
+    },
+    {
+      "aspect": "aer",
+      "amount": 6
+    },
+    {
+      "aspect": "praecantatio",
+      "amount": 6
+    },
+    {
+      "aspect": "tutamen",
+      "amount": 4
+    },
+    {
+      "aspect": "instrumentum",
+      "amount": 4
+    },
+    {
+      "aspect": "motus",
+      "amount": 4
+    }
+  ],
+  "pages": [
+    {
+      "type": "TEXT",
+      "text": "mystery_dynamics.research.neriids_protection.text",
+      "source": "mystery_dynamics.research.neriids_protection.text"
+    },
+    {
+      "type": "INFUSION",
+      "source": "NERIIDS_PROTECTION"
+    }
+  ]
+}

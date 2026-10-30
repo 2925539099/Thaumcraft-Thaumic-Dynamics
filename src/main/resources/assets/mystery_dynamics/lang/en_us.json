@@ -79,5 +79,8 @@
   "mystery_dynamics.research.large_centrifuge.text": "Those centrifuges are decent, but far too slow, and you have a batch of goods that needs to be finished urgently.<BR><BR>So you built a large version of the centrifuge. It can process a large amount of essentia at once, but due to some as-yet-unexplained issue, one batch can only produce a single type of essentia.<BR><BR>Fortunately, it can accept a much higher rotation speed to run faster. The price is a few small safety hazards.<BR><BR>And it seems quite a few people are interested in purchasing one, so you had better pry those golems out of the wall before they visit.",
   "item.mystery_dynamics.neriids_protection": "Neriid's Protection",
   "tooltip.mystery_dynamics.neriids_protection": "Provides water breathing",
-  "tooltip.mystery_dynamics.neriids_protection.mining": "Accelerated underwater excavation"
+  "tooltip.mystery_dynamics.neriids_protection.mining": "Accelerated underwater excavation",
+  "tc.research_name.NERIIDS_PROTECTION": "Neriid's Protection",
+  "tc.research_text.NERIIDS_PROTECTION": "Heaven's Blessing",
+  "mystery_dynamics.research.neriids_protection.text": "Deep-sea work is highly profitable, but the underwater part is always limited by breathing.<BR><BR>Bulky diving suits are too slow, while water breathing potions are too expensive as a long-term consumable. There was no relatively cheap alternative between the two, which made for a huge opportunity, so you designed this equipment to supply oxygen underwater.<BR><BR>You originally intended to call it the 'Integrated Underwater Oxygen Supply System', but market considerations led you to give it this name instead."
 }

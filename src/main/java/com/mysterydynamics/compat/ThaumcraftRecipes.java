@@ -2,11 +2,14 @@ package com.mysterydynamics.compat;
 
 import com.mysterydynamics.MysteryDynamics;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
 
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
@@ -169,6 +172,31 @@ public final class ThaumcraftRecipes {
                 'C', precisionMechanism,
                 'S', shaft,
                 'M', thaumiumBlock);
+
+        // 涅里伊德之庇：注魔祭坛
+        ItemStack copperDivingHelmet = stack("create", "copper_diving_helmet");
+        ItemStack waterBreathingPotion = new ItemStack(Items.POTION);
+        waterBreathingPotion.set(DataComponents.POTION_CONTENTS,
+                new PotionContents(Potions.LONG_WATER_BREATHING));
+
+        ThaumcraftApi.addInfusionCraftingRecipe(
+                "NERIIDS_PROTECTION",
+                new ItemStack(MysteryDynamics.NERIIDS_PROTECTION.get()),
+                3,
+                new AspectList()
+                        .add(Aspect.AESTUS, 16)
+                        .add(Aspect.WATER, 24)
+                        .add(Aspect.TOOL, 4)
+                        .add(Aspect.MOTION, 16),
+                copperDivingHelmet,
+                stack("thaumcraft", "thaumium_helm"),
+                stack("thaumcraft", "thaumium_ingot"),
+                stack("thaumcraft", "thaumium_ingot"),
+                stack("thaumcraft", "thaumium_ingot"),
+                stack("thaumcraft", "air_crystal_cluster"),
+                new ItemStack(Items.OAK_DOOR),
+                new ItemStack(Items.TURTLE_HELMET),
+                waterBreathingPotion);
     }
 
     /** 书页居中显示（图案补到 3 格宽），合成时仍允许左右平移。 */

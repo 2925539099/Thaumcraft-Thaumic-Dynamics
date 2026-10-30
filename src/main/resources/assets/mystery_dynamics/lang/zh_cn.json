@@ -79,5 +79,8 @@
   "mystery_dynamics.research.large_centrifuge.text": "那些离心机确实不错，但是效率太低了，而你又有一批货物急着赶工。<BR><BR>所以你做出了离心机的大型版本，也就是这个玩意，它可以一次性处理大量源质，只不过因为一些暂时没探明的问题，它同一批只能离心出同一种源质出来。<BR><BR>好在它可以接入更快的转速来使得它运转的更快，而代价则是一些小小的安全隐患。<BR><BR>而且这玩意看起来有不少人有采购的意向，所以你最好在在他们拜访之前把嵌墙上的傀儡给扣下来。",
   "item.mystery_dynamics.neriids_protection": "涅里伊德之庇",
   "tooltip.mystery_dynamics.neriids_protection": "提供水下呼吸",
-  "tooltip.mystery_dynamics.neriids_protection.mining": "加速水下掘进能力"
+  "tooltip.mystery_dynamics.neriids_protection.mining": "加速水下掘进能力",
+  "tc.research_name.NERIIDS_PROTECTION": "涅里伊德之庇",
+  "tc.research_text.NERIIDS_PROTECTION": "天官赐福",
+  "mystery_dynamics.research.neriids_protection.text": "远洋作业的利润确实非常可观，但水下部分却始终受制于呼吸问题。<BR><BR>笨重的潜水服动作过于迟缓，而水下呼吸药水作为长期消耗品的成本又过于高昂。他们两者之间并没有相对廉价的替代品，这是一个巨大的商机，于是你设计出了这件装备来为水下活动提供氧气。<BR><BR>虽然你最初打算叫它“集成式水下氧气供给系统”，但考虑到市场因素，你最终还是给它取了这个名字。"
 }
