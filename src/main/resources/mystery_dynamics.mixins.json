@@ -5,7 +5,8 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "SteamEngineBlockEntityMixin",
-    "PotatoCannonItemMixin"
+    "PotatoCannonItemMixin",
+    "PotatoCannonAmmoMixin"
   ],
   "client": [
     "ThaumonomiconPagePlanMixin"
