@@ -82,7 +82,9 @@ public final class HighPressureProjectileEvents {
     }
 
     private static void lightning(Level level, Entity target) {
-        if (level instanceof ServerLevel server && server.canSeeSky(target.blockPosition())) {
+        if (level instanceof ServerLevel server
+                && server.canSeeSky(target.blockPosition())
+                && server.isThundering()) {
             LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(server);
             if (bolt != null) {
                 bolt.moveTo(target.position());
