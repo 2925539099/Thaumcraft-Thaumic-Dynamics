@@ -1,6 +1,7 @@
 package com.mysterydynamics.client;
 
 import com.mysterydynamics.MysteryDynamics;
+import com.simibubi.create.content.equipment.potatoCannon.PotatoCannonItemRenderer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
@@ -8,6 +9,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
 import thaumcraft.api.research.ResearchBookApi;
@@ -26,6 +28,12 @@ public final class ClientEvents {
     }
 
     private ClientEvents() {
+    }
+
+    @SubscribeEvent
+    public static void registerItemDecorations(RegisterItemDecorationsEvent event) {
+        event.register(MysteryDynamics.HIGH_PRESSURE_LAUNCHER.get(),
+                PotatoCannonItemRenderer.DECORATOR);
     }
 
     @SubscribeEvent
