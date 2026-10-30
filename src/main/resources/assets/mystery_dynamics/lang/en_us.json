@@ -78,5 +78,6 @@
   "tc.research_text.LARGE_CENTRIFUGE": "I said, are you deaf to balancing?!",
   "mystery_dynamics.research.large_centrifuge.text": "Those centrifuges are decent, but far too slow, and you have a batch of goods that needs to be finished urgently.<BR><BR>So you built a large version of the centrifuge. It can process a large amount of essentia at once, but due to some as-yet-unexplained issue, one batch can only produce a single type of essentia.<BR><BR>Fortunately, it can accept a much higher rotation speed to run faster. The price is a few small safety hazards.<BR><BR>And it seems quite a few people are interested in purchasing one, so you had better pry those golems out of the wall before they visit.",
   "item.mystery_dynamics.neriids_protection": "Neriid's Protection",
-  "tooltip.mystery_dynamics.neriids_protection": "Provides water breathing"
+  "tooltip.mystery_dynamics.neriids_protection": "Provides water breathing",
+  "tooltip.mystery_dynamics.neriids_protection.mining": "Accelerated underwater excavation"
 }
