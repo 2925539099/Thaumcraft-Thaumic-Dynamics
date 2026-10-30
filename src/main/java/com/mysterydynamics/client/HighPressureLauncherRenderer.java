@@ -19,7 +19,7 @@ import net.minecraft.world.item.ItemStack;
 /** 高压动力发射器：主体静态，齿轮按土豆加农炮的速度持续旋转。 */
 public class HighPressureLauncherRenderer extends CustomRenderedItemModelRenderer {
 
-    private static final ModelResourceLocation COG = ModelResourceLocation.inventory(
+    private static final ModelResourceLocation COG = ModelResourceLocation.standalone(
             ResourceLocation.fromNamespaceAndPath(MysteryDynamics.MODID,
                     "item/high_pressure_launcher_cog"));
 
