@@ -1,0 +1,21 @@
+{
+  "items": "thaumcraft:void_seed",
+  "damage": 8,
+  "knockback": 2.0,
+  "reload_ticks": 5,
+  "gravity": 0.8,
+  "velocity_multiplier": 1.0,
+  "render_mode": {
+    "type": "create:tumble"
+  },
+  "on_entity_hit": {
+    "type": "mystery_dynamics:potion_no_drop",
+    "effect": "minecraft:wither",
+    "level": 3,
+    "ticks": 200
+  },
+  "drop_stack": {
+    "id": "thaumcraft:void_seed",
+    "count": 1
+  }
+}

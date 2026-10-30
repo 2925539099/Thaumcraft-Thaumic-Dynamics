@@ -22,6 +22,7 @@ import com.mysterydynamics.block.RedstoneEngineBlockEntity;
 import com.mysterydynamics.compat.InfernalBoilerConstruct;
 import com.mysterydynamics.compat.InfernalBoilerStructure;
 import com.mysterydynamics.compat.LargeCentrifugeConstruct;
+import com.mysterydynamics.compat.HighPressureAmmoActions;
 import com.mysterydynamics.item.HighPressureLauncherItem;
 import com.mysterydynamics.item.NeriidsProtectionItem;
 import com.mysterydynamics.item.RevealingEngineerGogglesItem;
@@ -233,7 +234,7 @@ public class MysteryDynamics {
     public static final DeferredItem<HighPressureLauncherItem> HIGH_PRESSURE_LAUNCHER =
             ITEMS.register("high_pressure_launcher",
                     () -> new HighPressureLauncherItem(
-                            new Item.Properties().stacksTo(1).durability(100).rarity(Rarity.UNCOMMON)));
+                            new Item.Properties().stacksTo(1).durability(400).rarity(Rarity.UNCOMMON)));
 
     // ---- 方块实体（8 台设备共用） ----
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GolemPowerBlockEntity>> GOLEM_POWER_BE =
@@ -304,6 +305,7 @@ public class MysteryDynamics {
         ARMOR_MATERIALS.register(modEventBus);
         BLOCK_ENTITY_TYPES.register(modEventBus);
         CREATIVE_TABS.register(modEventBus);
+        HighPressureAmmoActions.register();
         modEventBus.addListener(MysteryDynamics::commonSetup);
         modEventBus.addListener(MysteryDynamics::registerCapabilities);
     }
@@ -438,6 +440,9 @@ public class MysteryDynamics {
 
     private static void commonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
+            // 高压动力发射器沿用土豆加农炮的 Shift 概要，但移除蔬菜那句。
+            com.simibubi.create.foundation.item.ItemDescription.useKey(
+                    HIGH_PRESSURE_LAUNCHER.get(), "item.mystery_dynamics.high_pressure_launcher");
             for (DeferredBlock<GolemPowerBlock> holder : GENERATORS) {
                 GolemPowerBlock block = holder.get();
                 BlockStressValues.CAPACITIES.register(block, () -> (double) block.capacityPerRpm());

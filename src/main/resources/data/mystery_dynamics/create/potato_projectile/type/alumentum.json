@@ -1,0 +1,19 @@
+{
+  "items": "thaumcraft:alumentum",
+  "damage": 6,
+  "knockback": 1.0,
+  "reload_ticks": 5,
+  "gravity": 0.8,
+  "velocity_multiplier": 1.0,
+  "render_mode": {
+    "type": "create:tumble"
+  },
+  "on_entity_hit": {
+    "type": "mystery_dynamics:explode",
+    "power": 2.0
+  },
+  "on_block_hit": {
+    "type": "mystery_dynamics:explode",
+    "power": 2.0
+  }
+}

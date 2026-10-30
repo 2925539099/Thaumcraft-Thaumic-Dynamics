@@ -1,0 +1,21 @@
+{
+  "items": "thaumcraft:quicksilver_drop",
+  "damage": 3,
+  "knockback": 0.1,
+  "reload_ticks": 5,
+  "gravity": 0.8,
+  "velocity_multiplier": 1.0,
+  "render_mode": {
+    "type": "create:tumble"
+  },
+  "on_entity_hit": {
+    "type": "mystery_dynamics:potion_no_drop",
+    "effect": "minecraft:poison",
+    "level": 3,
+    "ticks": 200
+  },
+  "drop_stack": {
+    "id": "thaumcraft:quicksilver_drop",
+    "count": 1
+  }
+}

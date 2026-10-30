@@ -15,6 +15,12 @@ public class HighPressureLauncherItem extends PotatoCannonItem {
         super(properties);
     }
 
+    /** 与神秘剑一致：神秘材质附魔亲和度 22。 */
+    @Override
+    public int getEnchantmentValue() {
+        return 22;
+    }
+
     @Override
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
         consumer.accept(SimpleCustomRenderer.create(this, new HighPressureLauncherRenderer()));

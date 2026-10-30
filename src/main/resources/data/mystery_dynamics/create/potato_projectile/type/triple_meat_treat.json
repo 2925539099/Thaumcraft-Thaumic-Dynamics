@@ -1,0 +1,21 @@
+{
+  "items": "thaumcraft:triple_meat_treat",
+  "damage": 1,
+  "knockback": 0.0,
+  "reload_ticks": 5,
+  "gravity": 0.8,
+  "velocity_multiplier": 1.0,
+  "render_mode": {
+    "type": "create:tumble"
+  },
+  "on_entity_hit": {
+    "type": "mystery_dynamics:potion_no_drop",
+    "effect": "minecraft:regeneration",
+    "level": 1,
+    "ticks": 100
+  },
+  "drop_stack": {
+    "id": "thaumcraft:triple_meat_treat",
+    "count": 1
+  }
+}

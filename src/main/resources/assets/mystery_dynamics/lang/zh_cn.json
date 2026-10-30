@@ -83,5 +83,10 @@
   "tc.research_name.NERIIDS_PROTECTION": "涅里伊德之庇",
   "tc.research_text.NERIIDS_PROTECTION": "正月十五日元夕节，乃上元天官赐福之辰",
   "mystery_dynamics.research.neriids_protection.text": "远洋作业的利润确实非常可观，但水下部分却始终受制于呼吸问题。<BR><BR>笨重的潜水服动作过于迟缓，而水下呼吸药水作为长期消耗品的成本又过于高昂。他们两者之间并没有相对廉价的替代品，这是一个巨大的商机，于是你设计出了这件装备来为水下活动提供氧气。<BR><BR>虽然你最初打算叫它“集成式水下氧气供给系统”，但考虑到市场因素，你最终还是给它取了这个名字。",
-  "item.mystery_dynamics.high_pressure_launcher": "高压动力发射器"
+  "item.mystery_dynamics.high_pressure_launcher": "高压动力发射器",
+  "item.mystery_dynamics.high_pressure_launcher.tooltip.summary": "可以使用_背罐_供能。",
+  "item.mystery_dynamics.high_pressure_launcher.tooltip.condition1": "右击时",
+  "item.mystery_dynamics.high_pressure_launcher.tooltip.behaviour1": "发射你物品栏中任一可作为弹药的物品",
+  "item.mystery_dynamics.high_pressure_launcher.tooltip.condition2": "装备背罐时",
+  "item.mystery_dynamics.high_pressure_launcher.tooltip.behaviour2": "使用罐中气压来抵消高压动力发射器的耐久损耗"
 }

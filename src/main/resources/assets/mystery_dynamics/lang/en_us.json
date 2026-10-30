@@ -83,5 +83,10 @@
   "tc.research_name.NERIIDS_PROTECTION": "Neriid's Protection",
   "tc.research_text.NERIIDS_PROTECTION": "The fifteenth day of the first lunar month is the Lantern Festival, the hour when the Heavenly Official of the Upper Prime bestows blessings.",
   "mystery_dynamics.research.neriids_protection.text": "Deep-sea work is highly profitable, but the underwater part is always limited by breathing.<BR><BR>Bulky diving suits are too slow, while water breathing potions are too expensive as a long-term consumable. There was no relatively cheap alternative between the two, which made for a huge opportunity, so you designed this equipment to supply oxygen underwater.<BR><BR>You originally intended to call it the 'Integrated Underwater Oxygen Supply System', but market considerations led you to give it this name instead.",
-  "item.mystery_dynamics.high_pressure_launcher": "High-Pressure Launcher"
+  "item.mystery_dynamics.high_pressure_launcher": "High-Pressure Launcher",
+  "item.mystery_dynamics.high_pressure_launcher.tooltip.summary": "Can be powered by a _Backtank_.",
+  "item.mystery_dynamics.high_pressure_launcher.tooltip.condition1": "When right-clicked",
+  "item.mystery_dynamics.high_pressure_launcher.tooltip.behaviour1": "Launches any valid ammo from your inventory",
+  "item.mystery_dynamics.high_pressure_launcher.tooltip.condition2": "When wearing a Backtank",
+  "item.mystery_dynamics.high_pressure_launcher.tooltip.behaviour2": "Uses compressed air to negate durability loss"
 }

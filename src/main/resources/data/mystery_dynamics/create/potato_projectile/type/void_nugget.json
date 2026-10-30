@@ -1,0 +1,21 @@
+{
+  "items": "thaumcraft:void_metal_nugget",
+  "damage": 8,
+  "knockback": 1.0,
+  "reload_ticks": 5,
+  "gravity": 0.8,
+  "velocity_multiplier": 1.0,
+  "render_mode": {
+    "type": "create:tumble"
+  },
+  "on_entity_hit": {
+    "type": "mystery_dynamics:potion_no_drop",
+    "effect": "minecraft:weakness",
+    "level": 2,
+    "ticks": 200
+  },
+  "drop_stack": {
+    "id": "thaumcraft:void_metal_nugget",
+    "count": 1
+  }
+}
