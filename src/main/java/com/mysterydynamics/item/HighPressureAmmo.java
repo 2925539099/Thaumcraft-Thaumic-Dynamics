@@ -19,6 +19,7 @@ public final class HighPressureAmmo {
             item("thaumcraft", "thaumium_nugget"),
             item("thaumcraft", "void_metal_nugget"),
             item("thaumcraft", "quicksilver_drop"),
+            item("thaumcraft", "tainted_goo"),
             item("thaumcraft", "nitor"),
             item("thaumcraft", "alumentum"),
             item("thaumcraft", "chicken_nugget"),

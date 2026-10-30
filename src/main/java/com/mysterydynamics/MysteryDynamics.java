@@ -441,6 +441,11 @@ public class MysteryDynamics {
             // 高压动力发射器沿用土豆加农炮的 Shift 概要，但移除蔬菜那句。
             com.simibubi.create.foundation.item.ItemDescription.useKey(
                     HIGH_PRESSURE_LAUNCHER.get(), "item.mystery_dynamics.high_pressure_launcher");
+            com.simibubi.create.foundation.item.TooltipModifier.REGISTRY.register(
+                    HIGH_PRESSURE_LAUNCHER.get(),
+                    new com.simibubi.create.foundation.item.ItemDescription.Modifier(
+                            HIGH_PRESSURE_LAUNCHER.get(),
+                            net.createmod.catnip.lang.FontHelper.Palette.STANDARD_CREATE));
             for (DeferredBlock<GolemPowerBlock> holder : GENERATORS) {
                 GolemPowerBlock block = holder.get();
                 BlockStressValues.CAPACITIES.register(block, () -> (double) block.capacityPerRpm());
