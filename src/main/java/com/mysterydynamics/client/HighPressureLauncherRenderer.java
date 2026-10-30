@@ -3,14 +3,19 @@ package com.mysterydynamics.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.mysterydynamics.MysteryDynamics;
+import com.simibubi.create.CreateClient;
 import com.simibubi.create.foundation.item.render.CustomRenderedItemModel;
 import com.simibubi.create.foundation.item.render.CustomRenderedItemModelRenderer;
 import com.simibubi.create.foundation.item.render.PartialItemModelRenderer;
 
 import dev.engine_room.flywheel.lib.model.baked.PartialModel;
 import net.createmod.catnip.animation.AnimationTickHolder;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
@@ -27,7 +32,19 @@ public class HighPressureLauncherRenderer extends CustomRenderedItemModelRendere
                           PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
         partial.render(model.getOriginalModel(), light);
 
-        float angle = AnimationTickHolder.getRenderTime() * -2.5F % 360.0F;
+        LocalPlayer player = Minecraft.getInstance().player;
+        float angle = AnimationTickHolder.getRenderTime() * -2.5F;
+
+        if (player != null
+                && (player.getMainHandItem() == stack || player.getOffhandItem() == stack)) {
+            boolean mainHand = player.getMainHandItem() == stack;
+            boolean leftHanded = player.getMainArm() == HumanoidArm.LEFT;
+            float animation = CreateClient.POTATO_CANNON_RENDER_HANDLER.getAnimation(
+                    mainHand ^ leftHanded, AnimationTickHolder.getPartialTicks());
+            angle += 360.0F * Mth.clamp(animation * 5.0F, 0.0F, 1.0F);
+        }
+
+        angle %= 360.0F;
 
         ms.pushPose();
         ms.translate(0.0F, 0.03125F, 0.0F);
