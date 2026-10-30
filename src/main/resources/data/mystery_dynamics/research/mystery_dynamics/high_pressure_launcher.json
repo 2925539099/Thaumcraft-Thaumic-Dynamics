@@ -53,6 +53,11 @@
     {
       "type": "INFUSION",
       "source": "HIGH_PRESSURE_LAUNCHER"
+    },
+    {
+      "type": "TEXT",
+      "text": "mystery_dynamics.research.high_pressure_launcher.ammo",
+      "source": "mystery_dynamics.research.high_pressure_launcher.ammo"
     }
   ]
 }
