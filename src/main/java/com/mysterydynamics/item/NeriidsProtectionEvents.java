@@ -7,7 +7,6 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingBreatheEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 /** 涅里伊德之庇的服务器侧效果。 */
 @EventBusSubscriber(modid = MysteryDynamics.MODID)
@@ -32,17 +31,5 @@ public final class NeriidsProtectionEvents {
         }
         event.setCanBreathe(true);
         event.setRefillAirAmount(player.getMaxAirSupply());
-    }
-
-    @SubscribeEvent
-    public static void onBreakSpeed(PlayerEvent.BreakSpeed event) {
-        Player player = event.getEntity();
-        if (!player.isUnderWater()) {
-            return;
-        }
-        if (player.getItemBySlot(EquipmentSlot.HEAD)
-                .is(MysteryDynamics.NERIIDS_PROTECTION.get())) {
-            event.setNewSpeed(event.getNewSpeed() * 10.0F);
-        }
     }
 }

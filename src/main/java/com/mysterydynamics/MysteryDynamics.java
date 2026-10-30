@@ -34,6 +34,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.BlockItem;
@@ -42,6 +45,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -226,7 +230,16 @@ public class MysteryDynamics {
     public static final DeferredItem<NeriidsProtectionItem> NERIIDS_PROTECTION =
             ITEMS.register("neriids_protection",
                     () -> new NeriidsProtectionItem(
-                            new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+                            new Item.Properties().stacksTo(1).rarity(Rarity.RARE)
+                                    .attributes(ItemAttributeModifiers.builder()
+                                            .add(Attributes.SUBMERGED_MINING_SPEED,
+                                                    new AttributeModifier(
+                                                            ResourceLocation.fromNamespaceAndPath(
+                                                                    MODID, "neriids_submerged_mining"),
+                                                            9.0D,
+                                                            AttributeModifier.Operation.ADD_MULTIPLIED_BASE),
+                                                    EquipmentSlotGroup.HEAD)
+                                            .build())));
 
     // ---- 方块实体（8 台设备共用） ----
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GolemPowerBlockEntity>> GOLEM_POWER_BE =
