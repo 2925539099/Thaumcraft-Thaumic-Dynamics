@@ -3,16 +3,9 @@
   "damage": 5,
   "knockback": 3.0,
   "reload_ticks": 5,
-  "gravity": 0.8,
   "velocity_multiplier": 1.0,
   "render_mode": {
     "type": "create:tumble"
   },
-  "on_entity_hit": {
-    "type": "mystery_dynamics:no_drop"
-  },
-  "drop_stack": {
-    "id": "minecraft:gold_nugget",
-    "count": 1
-  }
+  "gravity_multiplier": 0.8
 }

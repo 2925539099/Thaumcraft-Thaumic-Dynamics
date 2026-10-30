@@ -3,16 +3,9 @@
   "damage": 5,
   "knockback": 3.0,
   "reload_ticks": 5,
-  "gravity": 0.8,
   "velocity_multiplier": 1.0,
   "render_mode": {
     "type": "create:tumble"
   },
-  "on_entity_hit": {
-    "type": "mystery_dynamics:piglin_anger"
-  },
-  "drop_stack": {
-    "id": "thaumcraft:gold_coin",
-    "count": 1
-  }
+  "gravity_multiplier": 0.8
 }

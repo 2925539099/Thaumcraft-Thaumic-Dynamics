@@ -3,23 +3,24 @@
   "damage": 5,
   "knockback": 0.5,
   "reload_ticks": 5,
-  "gravity": 0.8,
   "velocity_multiplier": 1.0,
   "render_mode": {
     "type": "create:tumble"
-  },
-  "on_entity_hit": {
-    "type": "mystery_dynamics:potion_no_drop",
-    "effect": "minecraft:glowing",
-    "level": 1,
-    "ticks": 300
   },
   "pre_entity_hit": {
     "type": "create:set_on_fire",
     "ticks": 200
   },
+  "on_entity_hit": {
+    "type": "create:potion_effect",
+    "effect": "minecraft:glowing",
+    "level": 1,
+    "ticks": 300,
+    "recoverable": false
+  },
   "on_block_hit": {
     "type": "create:place_block_on_ground",
     "block": "thaumcraft:nitor"
-  }
+  },
+  "gravity_multiplier": 0.8
 }

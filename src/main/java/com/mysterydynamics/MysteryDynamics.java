@@ -22,7 +22,6 @@ import com.mysterydynamics.block.RedstoneEngineBlockEntity;
 import com.mysterydynamics.compat.InfernalBoilerConstruct;
 import com.mysterydynamics.compat.InfernalBoilerStructure;
 import com.mysterydynamics.compat.LargeCentrifugeConstruct;
-import com.mysterydynamics.compat.HighPressureAmmoActions;
 import com.mysterydynamics.item.HighPressureLauncherItem;
 import com.mysterydynamics.item.NeriidsProtectionItem;
 import com.mysterydynamics.item.RevealingEngineerGogglesItem;
@@ -305,7 +304,6 @@ public class MysteryDynamics {
         ARMOR_MATERIALS.register(modEventBus);
         BLOCK_ENTITY_TYPES.register(modEventBus);
         CREATIVE_TABS.register(modEventBus);
-        HighPressureAmmoActions.register();
         modEventBus.addListener(MysteryDynamics::commonSetup);
         modEventBus.addListener(MysteryDynamics::registerCapabilities);
     }
