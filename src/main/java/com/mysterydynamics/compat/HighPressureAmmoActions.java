@@ -20,7 +20,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.NeutralMob;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -115,20 +115,23 @@ public final class HighPressureAmmoActions {
         }
     }
 
-    /** 让命中的猪灵类生物仇恨最近的玩家。 */
+    /** 让附近猪灵仇恨被命中的生物。 */
     public record PiglinAnger() implements PotatoProjectileEntityHitAction {
         public static final MapCodec<PiglinAnger> CODEC = MapCodec.unit(new PiglinAnger());
 
         @Override
         public boolean execute(ItemStack stack, EntityHitResult result, Type type) {
             Entity entity = result.getEntity();
-            if (!(entity instanceof LivingEntity living) || !(entity instanceof NeutralMob neutral)) {
+            if (!(entity instanceof LivingEntity target) || target.level().isClientSide) {
                 return false;
             }
-            Player player = living.level().getNearestPlayer(living, 32.0D);
-            if (player != null) {
-                neutral.setPersistentAngerTarget(player.getUUID());
-                neutral.startPersistentAngerTimer();
+            for (Piglin piglin : target.level().getEntitiesOfClass(
+                    Piglin.class, target.getBoundingBox().inflate(32.0D))) {
+                if (piglin instanceof NeutralMob neutral) {
+                    neutral.setPersistentAngerTarget(target.getUUID());
+                    neutral.startPersistentAngerTimer();
+                }
+                piglin.setTarget(target);
             }
             return false;
         }
