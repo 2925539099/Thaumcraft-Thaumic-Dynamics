@@ -7,5 +7,5 @@
   "render_mode": {
     "type": "create:tumble"
   },
-  "gravity_multiplier": -1.6
+  "gravity_multiplier": 0.4
 }

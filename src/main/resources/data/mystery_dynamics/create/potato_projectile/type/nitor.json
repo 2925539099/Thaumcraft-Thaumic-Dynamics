@@ -22,5 +22,5 @@
     "type": "create:place_block_on_ground",
     "block": "thaumcraft:nitor"
   },
-  "gravity_multiplier": -1.6
+  "gravity_multiplier": 0.4
 }
