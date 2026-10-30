@@ -3,7 +3,7 @@
   "damage": 3,
   "knockback": 0.1,
   "reload_ticks": 5,
-  "gravity_multiplier": 1.6,
+  "gravity_multiplier": -1.6,
   "velocity_multiplier": 2.0,
   "render_mode": {
     "type": "create:tumble"
