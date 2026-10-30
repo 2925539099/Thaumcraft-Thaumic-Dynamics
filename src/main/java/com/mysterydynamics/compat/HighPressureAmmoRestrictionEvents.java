@@ -21,14 +21,6 @@ public final class HighPressureAmmoRestrictionEvents {
     public static void onRightClick(PlayerInteractEvent.RightClickItem event) {
         ItemStack held = event.getItemStack();
 
-        if (held.is(MysteryDynamics.HIGH_PRESSURE_LAUNCHER.get())) {
-            PotatoCannonItem.Ammo ammo = PotatoCannonItem.getAmmo(event.getEntity(), held);
-            if (ammo == null || !HighPressureAmmo.isAmmo(ammo.stack())) {
-                event.setCanceled(true);
-            }
-            return;
-        }
-
         if (held.is(AllItems.POTATO_CANNON.get())) {
             PotatoCannonItem.Ammo ammo = PotatoCannonItem.getAmmo(event.getEntity(), held);
             if (ammo != null && HighPressureAmmo.isAmmo(ammo.stack())) {

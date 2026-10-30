@@ -17,10 +17,11 @@ public class HighPressureLauncherItem extends PotatoCannonItem {
         super(properties);
     }
 
-    /** 只识别专属弹药，普通土豆加农炮弹药不进入选择列表。 */
+    /** 专属弹药与土豆加农炮弹药都可以识别。 */
     @Override
     public Predicate<ItemStack> getAllSupportedProjectiles() {
-        return HighPressureAmmo::isAmmo;
+        Predicate<ItemStack> createAmmo = super.getAllSupportedProjectiles();
+        return stack -> HighPressureAmmo.isAmmo(stack) || createAmmo.test(stack);
     }
 
     /** 与神秘剑一致：神秘材质附魔亲和度 22。 */

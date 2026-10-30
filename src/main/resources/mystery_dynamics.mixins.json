@@ -4,7 +4,8 @@
   "package": "com.mysterydynamics.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "SteamEngineBlockEntityMixin"
+    "SteamEngineBlockEntityMixin",
+    "PotatoCannonItemMixin"
   ],
   "client": [
     "ThaumonomiconPagePlanMixin"

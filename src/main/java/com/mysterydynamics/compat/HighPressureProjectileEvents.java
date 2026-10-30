@@ -1,6 +1,7 @@
 package com.mysterydynamics.compat;
 
 import com.mysterydynamics.MysteryDynamics;
+import com.mysterydynamics.item.HighPressureAmmo;
 import com.simibubi.create.content.equipment.potatoCannon.PotatoProjectileEntity;
 
 import net.minecraft.server.level.ServerLevel;
@@ -11,6 +12,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.piglin.Piglin;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -19,6 +21,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
 
 import thaumcraft.common.registry.TCItems;
@@ -28,6 +31,21 @@ import thaumcraft.common.registry.TCItems;
 public final class HighPressureProjectileEvents {
 
     private HighPressureProjectileEvents() {
+    }
+
+    /** 土豆加农炮的普通弹药也按高压发射器的两倍初速飞行。 */
+    @SubscribeEvent
+    public static void onProjectileJoin(EntityJoinLevelEvent event) {
+        if (event.getLevel().isClientSide
+                || !(event.getEntity() instanceof PotatoProjectileEntity projectile)
+                || !(projectile.getOwner() instanceof Player player)
+                || HighPressureAmmo.isAmmo(projectile.getItem())) {
+            return;
+        }
+        if (player.getMainHandItem().is(MysteryDynamics.HIGH_PRESSURE_LAUNCHER.get())
+                || player.getOffhandItem().is(MysteryDynamics.HIGH_PRESSURE_LAUNCHER.get())) {
+            projectile.setDeltaMovement(projectile.getDeltaMovement().scale(2.0D));
+        }
     }
 
     @SubscribeEvent
