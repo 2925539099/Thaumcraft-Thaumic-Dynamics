@@ -4,10 +4,15 @@ import com.mysterydynamics.MysteryDynamics;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 
 import java.util.List;
 
@@ -16,6 +21,19 @@ public class NeriidsProtectionItem extends ArmorItem {
 
     public NeriidsProtectionItem(Item.Properties properties) {
         super(MysteryDynamics.NERIIDS_PROTECTION_MATERIAL, Type.HELMET, properties);
+    }
+
+    @Override
+    public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
+        return super.getDefaultAttributeModifiers(stack)
+                .withModifierAdded(
+                        Attributes.SUBMERGED_MINING_SPEED,
+                        new AttributeModifier(
+                                ResourceLocation.fromNamespaceAndPath(
+                                        MysteryDynamics.MODID, "neriids_submerged_mining"),
+                                9.0D,
+                                AttributeModifier.Operation.ADD_MULTIPLIED_BASE),
+                        EquipmentSlotGroup.HEAD);
     }
 
     @Override
