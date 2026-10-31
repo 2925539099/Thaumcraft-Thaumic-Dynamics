@@ -16,11 +16,14 @@ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
 
     public static final float MAX_STRESS = 147_456.0F;
+    /** 满热锅炉的总应力；多台涡轮机共享这个上限。 */
+    public static final float BOILER_TOTAL_STRESS = 294_912.0F;
 
     private int movementDirection = 1;
     private float lastEfficiency = -1.0F;
     private float lastGeneratedSpeed = 0.0F;
     private float lastCapacity = 0.0F;
+    private int currentEngineCount = 1;
 
     public ArcaneTurbineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -75,8 +78,9 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
             return 0.0F;
         }
         int speedModifier = 1 + (int) Math.min(3.0D, Math.floor(2.0D + efficiency * 4.0D));
-        // 单台满效率最大 147456 SU；多台时按蒸汽引擎的 heat / engines 效率衰减。
-        return MAX_STRESS * efficiency / (16.0F * speedModifier);
+        float perEngineMax = Math.min(MAX_STRESS,
+                BOILER_TOTAL_STRESS / Math.max(1, currentEngineCount));
+        return perEngineMax * efficiency / (16.0F * speedModifier);
     }
 
     /** 下半部分四个水平面贴着的锅炉，取最高效率。 */
@@ -86,6 +90,7 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
             return 0.0F;
         }
         float best = 0.0F;
+        currentEngineCount = 1;
         for (Direction direction : Direction.Plane.HORIZONTAL) {
             BlockEntity blockEntity = level.getBlockEntity(worldPosition.relative(direction));
             if (!(blockEntity instanceof FluidTankBlockEntity tank)) {
@@ -107,6 +112,7 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
                     controller.sendData();
                 }
             }
+            currentEngineCount = Math.max(1, controller.boiler.attachedEngines);
             if (!controller.boiler.isActive()) {
                 continue;
             }
@@ -120,6 +126,7 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         if (infernal != null && infernal.boiler != null
                 && infernal.boiler.activeHeat > 0
                 && infernal.getTankInventory().getFluidAmount() > 0) {
+            currentEngineCount = Math.max(1, infernal.boiler.attachedEngines);
             float efficiency = infernal.boiler.getEngineEfficiency(infernal.getTotalTankSize());
             if (efficiency <= 0.0F) {
                 int engines = Math.max(1, infernal.boiler.attachedEngines);
