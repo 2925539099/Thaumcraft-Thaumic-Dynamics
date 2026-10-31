@@ -1,32 +1,36 @@
 {
   "variants": {
     "facing=north,half=lower": {
-      "model": "mystery_dynamics:block/arcane_turbine",
+      "model": "mystery_dynamics:block/arcane_turbine_lower",
       "y": 0
     },
     "facing=north,half=upper": {
-      "model": "mystery_dynamics:block/arcane_turbine_upper"
+      "model": "mystery_dynamics:block/arcane_turbine_upper",
+      "y": 0
     },
     "facing=east,half=lower": {
-      "model": "mystery_dynamics:block/arcane_turbine",
+      "model": "mystery_dynamics:block/arcane_turbine_lower",
       "y": 90
     },
     "facing=east,half=upper": {
-      "model": "mystery_dynamics:block/arcane_turbine_upper"
+      "model": "mystery_dynamics:block/arcane_turbine_upper",
+      "y": 90
     },
     "facing=south,half=lower": {
-      "model": "mystery_dynamics:block/arcane_turbine",
+      "model": "mystery_dynamics:block/arcane_turbine_lower",
       "y": 180
     },
     "facing=south,half=upper": {
-      "model": "mystery_dynamics:block/arcane_turbine_upper"
+      "model": "mystery_dynamics:block/arcane_turbine_upper",
+      "y": 180
     },
     "facing=west,half=lower": {
-      "model": "mystery_dynamics:block/arcane_turbine",
+      "model": "mystery_dynamics:block/arcane_turbine_lower",
       "y": 270
     },
     "facing=west,half=upper": {
-      "model": "mystery_dynamics:block/arcane_turbine_upper"
+      "model": "mystery_dynamics:block/arcane_turbine_upper",
+      "y": 270
     }
   }
 }
