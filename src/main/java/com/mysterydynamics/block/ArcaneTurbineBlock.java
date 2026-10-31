@@ -1,33 +1,43 @@
 package com.mysterydynamics.block;
 
-import com.mojang.serialization.MapCodec;
+import com.mysterydynamics.MysteryDynamics;
+import com.simibubi.create.content.equipment.wrench.IWrenchable;
+import com.simibubi.create.content.kinetics.base.KineticBlock;
+import com.simibubi.create.foundation.block.IBE;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 
+/** 奥法涡轮机：两格高、可接入 Create 应力网络的旋转方块。 */
+public class ArcaneTurbineBlock extends KineticBlock
+        implements EntityBlock, IBE<ArcaneTurbineBlockEntity> {
 
-import java.util.List;
-
-/** 奥法涡轮机：一次放置成型的两格高方块。 */
-public class ArcaneTurbineBlock extends HorizontalDirectionalBlock {
-
-    public static final MapCodec<ArcaneTurbineBlock> CODEC = simpleCodec(ArcaneTurbineBlock::new);
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final EnumProperty<DoubleBlockHalf> HALF = BlockStateProperties.DOUBLE_BLOCK_HALF;
 
     public ArcaneTurbineBlock(Properties properties) {
@@ -35,11 +45,6 @@ public class ArcaneTurbineBlock extends HorizontalDirectionalBlock {
         registerDefaultState(stateDefinition.any()
                 .setValue(FACING, Direction.NORTH)
                 .setValue(HALF, DoubleBlockHalf.LOWER));
-    }
-
-    @Override
-    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
-        return CODEC;
     }
 
     @Override
@@ -84,10 +89,7 @@ public class ArcaneTurbineBlock extends HorizontalDirectionalBlock {
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         if (!level.isClientSide) {
             BlockPos otherPos = state.getValue(HALF) == DoubleBlockHalf.LOWER ? pos.above() : pos.below();
-            BlockState other = level.getBlockState(otherPos);
-            if (other.is(this)) {
-                // UPDATE_CLIENTS：同步移除另一端，但不触发邻块 updateShape，
-                // 避免下半部分先被替换掉而丢失掉落物。
+            if (level.getBlockState(otherPos).is(this)) {
                 level.setBlock(otherPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
             }
         }
@@ -96,12 +98,65 @@ public class ArcaneTurbineBlock extends HorizontalDirectionalBlock {
 
     @Override
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state,
-                              net.minecraft.world.level.block.entity.BlockEntity blockEntity,
-                              ItemStack tool) {
-        // 和门一致：创造模式不产生掉落物。
+                              BlockEntity blockEntity, ItemStack tool) {
         if (!player.isCreative()) {
             Block.popResource(level, pos, new ItemStack(asItem()));
         }
+    }
+
+    @Override
+    public InteractionResult onSneakWrenched(BlockState state, UseOnContext context) {
+        Level level = context.getLevel();
+        if (!(level instanceof ServerLevel)) {
+            return InteractionResult.SUCCESS;
+        }
+        BlockPos pos = context.getClickedPos();
+        BlockPos otherPos = state.getValue(HALF) == DoubleBlockHalf.LOWER ? pos.above() : pos.below();
+        if (level.getBlockState(otherPos).is(this)) {
+            level.setBlock(otherPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+        level.removeBlock(pos, false);
+        Player player = context.getPlayer();
+        if (player != null && !player.isCreative()) {
+            player.getInventory().placeItemBackInInventory(new ItemStack(asItem()));
+        }
+        IWrenchable.playRemoveSound(level, pos);
+        return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    public Direction.Axis getRotationAxis(BlockState state) {
+        return Direction.Axis.Y;
+    }
+
+    @Override
+    public boolean hasShaftTowards(LevelReader level, BlockPos pos, BlockState state, Direction face) {
+        return face.getAxis() == Direction.Axis.Y;
+    }
+
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new ArcaneTurbineBlockEntity(MysteryDynamics.ARCANE_TURBINE_BE.get(), pos, state);
+    }
+
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
+                                                                  BlockEntityType<T> type) {
+        return (tickLevel, pos, tickState, blockEntity) -> {
+            if (blockEntity instanceof ArcaneTurbineBlockEntity turbine) {
+                turbine.tick();
+            }
+        };
+    }
+
+    @Override
+    public Class<ArcaneTurbineBlockEntity> getBlockEntityClass() {
+        return ArcaneTurbineBlockEntity.class;
+    }
+
+    @Override
+    public BlockEntityType<? extends ArcaneTurbineBlockEntity> getBlockEntityType() {
+        return MysteryDynamics.ARCANE_TURBINE_BE.get();
     }
 
     @Override

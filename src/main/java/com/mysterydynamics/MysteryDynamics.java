@@ -1,6 +1,7 @@
 package com.mysterydynamics;
 
 import com.mysterydynamics.block.ArcaneTurbineBlock;
+import com.mysterydynamics.block.ArcaneTurbineBlockEntity;
 import com.mysterydynamics.block.GolemPowerBlock;
 import com.mysterydynamics.block.GolemPowerBlockEntity;
 import com.mysterydynamics.block.GolemPowerFrameBlock;
@@ -263,6 +264,11 @@ public class MysteryDynamics {
                     (pos, state) -> new InfernalBoilerCasingBlockEntity(infernalBoilerCasingType(), pos, state),
                     INFERNAL_BOILER_CASING.get()).build(null));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ArcaneTurbineBlockEntity>> ARCANE_TURBINE_BE =
+            BLOCK_ENTITY_TYPES.register("arcane_turbine", () -> BlockEntityType.Builder.of(
+                    (pos, state) -> new ArcaneTurbineBlockEntity(arcaneTurbineType(), pos, state),
+                    ARCANE_TURBINE.get()).build(null));
+
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<LargeCentrifugeControllerBlockEntity>> LARGE_CENTRIFUGE_CONTROLLER_BE =
             BLOCK_ENTITY_TYPES.register("large_centrifuge_controller", () -> BlockEntityType.Builder.of(
                     (pos, state) -> new LargeCentrifugeControllerBlockEntity(
@@ -364,6 +370,10 @@ public class MysteryDynamics {
 
     private static BlockEntityType<?> largeCentrifugeControllerType() {
         return LARGE_CENTRIFUGE_CONTROLLER_BE.get();
+    }
+
+    private static BlockEntityType<?> arcaneTurbineType() {
+        return ARCANE_TURBINE_BE.get();
     }
 
     private static BlockEntityType<?> largeCentrifugeInputType() {

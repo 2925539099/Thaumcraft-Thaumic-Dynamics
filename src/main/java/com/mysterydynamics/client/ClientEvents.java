@@ -41,6 +41,8 @@ public final class ClientEvents {
         event.registerBlockEntityRenderer(MysteryDynamics.REDSTONE_ENGINE_BE.get(), RedstoneEngineRenderer::new);
         event.registerBlockEntityRenderer(MysteryDynamics.INFERNAL_BOILER_BE.get(),
                 InfernalBoilerRenderer::new);
+        event.registerBlockEntityRenderer(MysteryDynamics.ARCANE_TURBINE_BE.get(),
+                ArcaneTurbineRenderer::new);
         NeoForge.EVENT_BUS.addListener(InfernalBoilerWorldRenderer::onRenderLevel);
         preloadResearchIcons();
     }
