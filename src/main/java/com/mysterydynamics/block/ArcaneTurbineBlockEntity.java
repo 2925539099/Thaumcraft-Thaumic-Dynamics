@@ -71,18 +71,24 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         if (efficiency <= 0.0F) {
             return 0.0F;
         }
-        int speedModifier = 1 + (int) Math.min(3.0D, Math.floor(2.0D + efficiency * 4.0D));
-        return movementDirection * 16.0F * speedModifier;
+        return movementDirection * 16.0F * speedModifierFor(efficiency);
+    }
+
+    /** 与 Create PoweredShaftBlockEntity.getSpeedModifier 完全一致。 */
+    private int speedModifierFor(float efficiency) {
+        if (efficiency >= 1.0F) {
+            return 4;
+        }
+        return 1 + (int) Math.min(2.0D, Math.floor(efficiency * 4.0F));
     }
 
     private float capacityFor(float efficiency) {
         if (efficiency <= 0.0F) {
             return 0.0F;
         }
-        int speedModifier = 1 + (int) Math.min(3.0D, Math.floor(2.0D + efficiency * 4.0D));
         float perEngineMax = Math.min(currentPerTurbineMax,
                 currentBoilerTotalStress / Math.max(1, currentEngineCount));
-        return perEngineMax * efficiency / (16.0F * speedModifier);
+        return perEngineMax * efficiency / (16.0F * speedModifierFor(efficiency));
     }
 
     /** 下半部分四个水平面贴着的锅炉，取最高效率。 */
