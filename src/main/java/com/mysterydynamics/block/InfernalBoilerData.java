@@ -133,7 +133,7 @@ public class InfernalBoilerData extends BoilerData {
         int last = tooltip.size() - 1;
         if (last >= 0) {
             tooltip.set(last, Component.literal(
-                    "应力量: 589,824 su  通过 " + attachedEngines + " 个引擎"));
+                    "589,824 su  通过 " + attachedEngines + " 个引擎"));
         }
         return result;
     }
