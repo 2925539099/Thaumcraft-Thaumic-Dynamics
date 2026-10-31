@@ -91,33 +91,34 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         }
         float best = 0.0F;
         currentEngineCount = 1;
-        // 与蒸汽引擎一致：只看贴着 FACING 背面的那一格。
-        Direction boilerSide = getBlockState().getValue(ArcaneTurbineBlock.FACING).getOpposite();
-        BlockEntity adjacent = level.getBlockEntity(worldPosition.relative(boilerSide));
-        if (adjacent instanceof FluidTankBlockEntity tank) {
+        for (Direction direction : Direction.Plane.HORIZONTAL) {
+            BlockEntity blockEntity = level.getBlockEntity(worldPosition.relative(direction));
+            if (!(blockEntity instanceof FluidTankBlockEntity tank)) {
+                continue;
+            }
             FluidTankBlockEntity controller = tank.getControllerBE();
-            if (controller != null && controller.boiler != null) {
-                if (!level.isClientSide && controller.boiler.attachedEngines <= 0) {
-                    controller.updateBoilerState();
-                }
-                if (!level.isClientSide) {
-                    int turbines = countTurbinesForTank(controller);
-                    if (controller.boiler.attachedEngines < turbines) {
-                        controller.boiler.attachedEngines = turbines;
-                        controller.setChanged();
-                        controller.sendData();
-                    }
-                }
-                currentEngineCount = Math.max(1, controller.boiler.attachedEngines);
-                if (controller.boiler.isActive()) {
-                    best = Math.max(best,
-                            controller.boiler.getEngineEfficiency(controller.getTotalTankSize()));
+            if (controller == null || controller.boiler == null) {
+                continue;
+            }
+            if (!level.isClientSide && controller.boiler.attachedEngines <= 0) {
+                controller.updateBoilerState();
+            }
+            if (!level.isClientSide) {
+                int turbines = countTurbinesForTank(controller);
+                if (controller.boiler.attachedEngines < turbines) {
+                    controller.boiler.attachedEngines = turbines;
+                    controller.setChanged();
+                    controller.sendData();
                 }
             }
+            currentEngineCount = Math.max(1, controller.boiler.attachedEngines);
+            if (controller.boiler.isActive()) {
+                best = Math.max(best,
+                        controller.boiler.getEngineEfficiency(controller.getTotalTankSize()));
+            }
         }
-        // 炼狱锅炉成型后，外壳/底座会替换主体方块；按背面相邻位置查找 controller。
-        InfernalBoilerBlockEntity infernal = InfernalBoilerStructure.findController(
-                level, worldPosition.relative(boilerSide));
+        // 炼狱锅炉成型后，外壳/底座会替换主体方块；按结构查找 controller。
+        InfernalBoilerBlockEntity infernal = InfernalBoilerStructure.findController(level, worldPosition);
         if (infernal != null && infernal.boiler != null
                 && infernal.boiler.activeHeat > 0
                 && infernal.getTankInventory().getFluidAmount() > 0) {
@@ -152,9 +153,7 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
                         BlockPos neighbor = tankPos.relative(direction);
                         BlockState state = level.getBlockState(neighbor);
                         if (state.is(com.mysterydynamics.MysteryDynamics.ARCANE_TURBINE.get())
-                                && state.getValue(ArcaneTurbineBlock.HALF) == DoubleBlockHalf.LOWER
-                                && neighbor.relative(state.getValue(ArcaneTurbineBlock.FACING).getOpposite())
-                                .equals(tankPos)) {
+                                && state.getValue(ArcaneTurbineBlock.HALF) == DoubleBlockHalf.LOWER) {
                             found.add(neighbor.immutable());
                         }
                     }
@@ -192,18 +191,14 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         return super.addToGoggleTooltip(tooltip, isPlayerSneaking);
     }
 
-    /** 转向冲突时不要让 Create 把方块直接销毁成掉落物；保持静止，等玩家用扳手换向。 */
+    /** 与蒸汽引擎一致：转向冲突时自动调整输出方向，避免被 Create 顶成掉落物。 */
     @Override
     public void updateGeneratedRotation() {
         float generated = getGeneratedSpeed();
         float current = getSpeed();
         if (hasSource() && Math.abs(current) > 0.001F && Math.abs(generated) > 0.001F
                 && Math.signum(current) != Math.signum(generated)) {
-            detachKinetics();
-            setSpeed(0.0F);
-            setNetwork(null);
-            reActivateSource = true;
-            return;
+            movementDirection = current > 0.0F ? 1 : -1;
         }
         super.updateGeneratedRotation();
     }
