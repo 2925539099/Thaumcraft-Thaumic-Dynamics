@@ -106,7 +106,17 @@ public class ArcaneTurbineBlock extends KineticBlock
 
     @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
-        // 普通右键不旋转朝向；只有潜行右键用于拆除。
+        Level level = context.getLevel();
+        if (!level.isClientSide) {
+            BlockPos pos = context.getClickedPos();
+            if (state.getValue(HALF) == DoubleBlockHalf.UPPER) {
+                pos = pos.below();
+            }
+            if (level.getBlockEntity(pos) instanceof ArcaneTurbineBlockEntity turbine) {
+                turbine.toggleDirection();
+                IWrenchable.playRotateSound(level, pos);
+            }
+        }
         return InteractionResult.SUCCESS;
     }
 
@@ -137,7 +147,8 @@ public class ArcaneTurbineBlock extends KineticBlock
 
     @Override
     public boolean hasShaftTowards(LevelReader level, BlockPos pos, BlockState state, Direction face) {
-        return face.getAxis() == Direction.Axis.Y;
+        // 仅下半部分底面输出应力。
+        return state.getValue(HALF) == DoubleBlockHalf.LOWER && face == Direction.DOWN;
     }
 
     @Override
