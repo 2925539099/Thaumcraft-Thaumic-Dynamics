@@ -16,16 +16,12 @@ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
 
     public static final float MAX_STRESS = 147_456.0F;
-    /** 满热锅炉的总应力；多台涡轮机共享这个上限。 */
-    public static final float BOILER_TOTAL_STRESS = 294_912.0F;
 
     private int movementDirection = 1;
     private float lastEfficiency = -1.0F;
     private float lastGeneratedSpeed = 0.0F;
     private float lastCapacity = 0.0F;
-    private int currentEngineCount = 1;
-    private float currentBoilerTotalStress = BOILER_TOTAL_STRESS;
-    private float currentPerTurbineMax = MAX_STRESS;
+    private FluidTankBlockEntity currentController;
 
     public ArcaneTurbineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -71,24 +67,17 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         if (efficiency <= 0.0F) {
             return 0.0F;
         }
-        return movementDirection * 16.0F * speedModifierFor(efficiency);
-    }
-
-    /** 与 Create PoweredShaftBlockEntity.getSpeedModifier 完全一致。 */
-    private int speedModifierFor(float efficiency) {
-        if (efficiency >= 1.0F) {
-            return 4;
-        }
-        return 1 + (int) Math.min(2.0D, Math.floor(efficiency * 4.0F));
+        int speedModifier = 1 + (int) Math.min(3.0D, Math.floor(2.0D + efficiency * 4.0D));
+        return movementDirection * 16.0F * speedModifier;
     }
 
     private float capacityFor(float efficiency) {
         if (efficiency <= 0.0F) {
             return 0.0F;
         }
-        float perEngineMax = Math.min(currentPerTurbineMax,
-                currentBoilerTotalStress / Math.max(1, currentEngineCount));
-        return perEngineMax * efficiency / (16.0F * speedModifierFor(efficiency));
+        int speedModifier = 1 + (int) Math.min(3.0D, Math.floor(2.0D + efficiency * 4.0D));
+        // 单台满效率最大 147456 SU；多台时按蒸汽引擎的 heat / engines 效率衰减。
+        return MAX_STRESS * efficiency / (16.0F * speedModifier);
     }
 
     /** 下半部分四个水平面贴着的锅炉，取最高效率。 */
@@ -98,9 +87,7 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
             return 0.0F;
         }
         float best = 0.0F;
-        currentEngineCount = 1;
-        currentBoilerTotalStress = BOILER_TOTAL_STRESS;
-        currentPerTurbineMax = MAX_STRESS;
+        currentController = null;
         for (Direction direction : Direction.Plane.HORIZONTAL) {
             BlockEntity blockEntity = level.getBlockEntity(worldPosition.relative(direction));
             if (!(blockEntity instanceof FluidTankBlockEntity tank)) {
@@ -110,31 +97,38 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
             if (controller == null || controller.boiler == null) {
                 continue;
             }
-            if (!level.isClientSide && controller.boiler.attachedEngines <= 0) {
-                controller.updateBoilerState();
-            }
+            currentController = controller;
+            // 普通流体储罐没有主动寻找引擎；由涡轮机触发一次锅炉评估，
+            // BoilerDataMixin 会在这时把本涡轮机计入 attachedEngines。
             if (!level.isClientSide) {
-                int turbines = countTurbinesForTank(controller);
+                int turbines = Math.max(1, countNearbyTurbines(controller));
+                if (controller.boiler.attachedEngines <= 0) {
+                    controller.updateBoilerState();
+                }
                 if (controller.boiler.attachedEngines < turbines) {
                     controller.boiler.attachedEngines = turbines;
-                    controller.setChanged();
-                    controller.sendData();
                 }
             }
-            currentEngineCount = Math.max(1, controller.boiler.attachedEngines);
-            if (controller.boiler.isActive()) {
-                best = Math.max(best,
-                        controller.boiler.getEngineEfficiency(controller.getTotalTankSize()));
+            if (!controller.boiler.isActive()) {
+                continue;
+            }
+            float efficiency = controller.boiler.getEngineEfficiency(controller.getTotalTankSize());
+            if (efficiency > best) {
+                best = efficiency;
             }
         }
-        // 炼狱锅炉成型后，外壳/底座会替换主体方块；按结构查找 controller。
+        // 炼狱锅炉成型后，外壳/底座会替换主体方块；直接按结构查找 controller。
         InfernalBoilerBlockEntity infernal = InfernalBoilerStructure.findController(level, worldPosition);
         if (infernal != null && infernal.boiler != null
                 && infernal.boiler.activeHeat > 0
                 && infernal.getTankInventory().getFluidAmount() > 0) {
-            currentBoilerTotalStress = BOILER_TOTAL_STRESS;
-            currentPerTurbineMax = MAX_STRESS;
-            currentEngineCount = Math.max(1, infernal.boiler.attachedEngines);
+            currentController = infernal;
+            if (!level.isClientSide) {
+                int turbines = Math.max(1, countNearbyTurbines(infernal));
+                if (infernal.boiler.attachedEngines < turbines) {
+                    infernal.boiler.attachedEngines = turbines;
+                }
+            }
             float efficiency = infernal.boiler.getEngineEfficiency(infernal.getTotalTankSize());
             if (efficiency <= 0.0F) {
                 int engines = Math.max(1, infernal.boiler.attachedEngines);
@@ -147,41 +141,15 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         return Math.min(1.0F, best);
     }
 
-    public static int countTurbinesForTank(FluidTankBlockEntity tank) {
-        if (tank == null || tank.getLevel() == null) {
-            return 0;
-        }
-        var level = tank.getLevel();
-        BlockPos origin = tank.getBlockPos();
-        java.util.Set<BlockPos> found = new java.util.HashSet<>();
-        for (int y = 0; y < tank.getHeight(); y++) {
-            for (int x = 0; x < tank.getWidth(); x++) {
-                for (int z = 0; z < tank.getWidth(); z++) {
-                    BlockPos tankPos = origin.offset(x, y, z);
-                    if (!(level.getBlockEntity(tankPos) instanceof FluidTankBlockEntity)) {
-                        continue;
-                    }
-                    for (Direction direction : Direction.Plane.HORIZONTAL) {
-                        BlockPos neighbor = tankPos.relative(direction);
-                        BlockState state = level.getBlockState(neighbor);
-                        if (state.is(com.mysterydynamics.MysteryDynamics.ARCANE_TURBINE.get())
-                                && state.getValue(ArcaneTurbineBlock.HALF) == DoubleBlockHalf.LOWER) {
-                            found.add(neighbor.immutable());
-                        }
-                    }
-                }
-            }
-        }
-        return found.size();
-    }
-
-    public static int countTurbines(net.minecraft.world.level.Level level, BlockPos center, int radius) {
+    /** 统计锅炉附近已放置的涡轮机下半部分。 */
+    private int countNearbyTurbines(FluidTankBlockEntity controller) {
         if (level == null) {
-            return 0;
+            return 1;
         }
+        BlockPos center = controller.getBlockPos();
         java.util.Set<BlockPos> found = new java.util.HashSet<>();
         for (BlockPos pos : BlockPos.betweenClosed(
-                center.offset(-radius, -1, -radius), center.offset(radius, 2, radius))) {
+                center.offset(-4, -1, -4), center.offset(4, 2, 4))) {
             BlockState state = level.getBlockState(pos);
             if (state.is(com.mysterydynamics.MysteryDynamics.ARCANE_TURBINE.get())
                     && state.getValue(ArcaneTurbineBlock.HALF) == DoubleBlockHalf.LOWER) {
@@ -200,29 +168,7 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
                 && level.getBlockEntity(worldPosition.below()) instanceof ArcaneTurbineBlockEntity lower) {
             return lower.addToGoggleTooltip(tooltip, isPlayerSneaking);
         }
-        boolean added = super.addToGoggleTooltip(tooltip, isPlayerSneaking);
-        if (level != null) {
-            InfernalBoilerBlockEntity infernal = InfernalBoilerStructure.findController(level, worldPosition);
-            if (infernal != null) {
-                tooltip.add(net.minecraft.network.chat.Component.literal(
-                        "超频判定: " + (infernal.isOverclock() ? "是" : "否")));
-                tooltip.add(net.minecraft.network.chat.Component.literal(
-                        "总应力上限: 294,912 SU"));
-            }
-        }
-        return added;
-    }
-
-    /** 与蒸汽引擎一致：转向冲突时自动调整输出方向，避免被 Create 顶成掉落物。 */
-    @Override
-    public void updateGeneratedRotation() {
-        float generated = getGeneratedSpeed();
-        float current = getSpeed();
-        if (hasSource() && Math.abs(current) > 0.001F && Math.abs(generated) > 0.001F
-                && Math.signum(current) != Math.signum(generated)) {
-            movementDirection = current > 0.0F ? 1 : -1;
-        }
-        super.updateGeneratedRotation();
+        return super.addToGoggleTooltip(tooltip, isPlayerSneaking);
     }
 
     public void toggleDirection() {

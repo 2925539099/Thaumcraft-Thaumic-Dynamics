@@ -109,33 +109,18 @@ public class ArcaneTurbineBlock extends KineticBlock
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState,
                          boolean movedByPiston) {
         if (!level.isClientSide && !newState.is(this)) {
-            boolean anyTurbineLeft = ArcaneTurbineBlockEntity.countTurbines(level, pos, 8) > 0;
             // 涡轮机移除后让相邻储罐重新评估锅炉状态，流体储罐会恢复原状。
             for (Direction direction : Direction.Plane.HORIZONTAL) {
                 if (level.getBlockEntity(pos.relative(direction)) instanceof FluidTankBlockEntity tank) {
                     FluidTankBlockEntity controller = tank.getControllerBE();
                     if (controller != null) {
-                        if (!anyTurbineLeft) {
-                            controller.boiler.attachedEngines = 0;
-                            controller.boiler.needsHeatLevelUpdate = true;
-                        }
                         controller.updateBoilerState();
-                        controller.updateBoilerTemperature();
-                        controller.setChanged();
-                        controller.sendData();
                     }
                 }
             }
             var infernal = com.mysterydynamics.compat.InfernalBoilerStructure.findController(level, pos);
             if (infernal != null) {
-                if (!anyTurbineLeft) {
-                    infernal.boiler.attachedEngines = 0;
-                    infernal.boiler.needsHeatLevelUpdate = true;
-                }
                 infernal.updateBoilerState();
-                infernal.updateBoilerTemperature();
-                infernal.setChanged();
-                infernal.sendData();
             }
         }
         super.onRemove(state, level, pos, newState, movedByPiston);
