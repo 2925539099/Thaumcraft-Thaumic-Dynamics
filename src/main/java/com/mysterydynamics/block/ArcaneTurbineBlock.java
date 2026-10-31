@@ -105,6 +105,12 @@ public class ArcaneTurbineBlock extends KineticBlock
     }
 
     @Override
+    public InteractionResult onWrenched(BlockState state, UseOnContext context) {
+        // 普通右键不旋转朝向；只有潜行右键用于拆除。
+        return InteractionResult.SUCCESS;
+    }
+
+    @Override
     public InteractionResult onSneakWrenched(BlockState state, UseOnContext context) {
         Level level = context.getLevel();
         if (!(level instanceof ServerLevel)) {
