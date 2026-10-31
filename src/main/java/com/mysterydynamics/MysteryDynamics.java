@@ -1,5 +1,6 @@
 package com.mysterydynamics;
 
+import com.mysterydynamics.block.ArcaneTurbineBlock;
 import com.mysterydynamics.block.GolemPowerBlock;
 import com.mysterydynamics.block.GolemPowerBlockEntity;
 import com.mysterydynamics.block.GolemPowerFrameBlock;
@@ -173,6 +174,11 @@ public class MysteryDynamics {
             BLOCKS.register("large_centrifuge_output_port",
                     () -> new LargeCentrifugePortBlock(largeCentrifugeProperties(), false));
 
+    /** 奥法涡轮机：两格高，一次放置成型。 */
+    public static final DeferredBlock<ArcaneTurbineBlock> ARCANE_TURBINE =
+            BLOCKS.register("arcane_turbine",
+                    () -> new ArcaneTurbineBlock(arcaneTurbineProperties()));
+
     // ---- 物品 ----
     public static final DeferredItem<BlockItem> STRAW_ITEM = ITEMS.registerSimpleBlockItem(STRAW_GOLEM_POWER);
     public static final DeferredItem<BlockItem> WOOD_ITEM = ITEMS.registerSimpleBlockItem(WOOD_GOLEM_POWER);
@@ -186,6 +192,7 @@ public class MysteryDynamics {
     public static final DeferredItem<BlockItem> REDSTONE_ENGINE_ITEM = ITEMS.registerSimpleBlockItem(REDSTONE_ENGINE);
     public static final DeferredItem<BlockItem> INFERNAL_BOILER_ITEM = ITEMS.registerSimpleBlockItem(INFERNAL_BOILER);
     public static final DeferredItem<BlockItem> INFERNAL_BOILER_FACE_ITEM = ITEMS.registerSimpleBlockItem(INFERNAL_BOILER_FACE);
+    public static final DeferredItem<BlockItem> ARCANE_TURBINE_ITEM = ITEMS.registerSimpleBlockItem(ARCANE_TURBINE);
 
     // ---- 揭示之工程师护目镜：护甲值继承揭示之护目镜，无耐久 ----
     public static final DeferredHolder<ArmorMaterial, ArmorMaterial> REVEALING_ENGINEER_GOGGLES_MATERIAL =
@@ -295,6 +302,7 @@ public class MysteryDynamics {
                         output.accept(REVEALING_ENGINEER_GOGGLES.get());
                         output.accept(NERIIDS_PROTECTION.get());
                         output.accept(HIGH_PRESSURE_LAUNCHER.get());
+                        output.accept(ARCANE_TURBINE_ITEM.get());
                     })
                     .build());
 
@@ -368,6 +376,16 @@ public class MysteryDynamics {
 
     private static BlockEntityType<?> largeCentrifugeCasingType() {
         return LARGE_CENTRIFUGE_CASING_BE.get();
+    }
+
+    private static BlockBehaviour.Properties arcaneTurbineProperties() {
+        return BlockBehaviour.Properties.of()
+                .mapColor(MapColor.COLOR_PURPLE)
+                .strength(4.0F, 12.0F)
+                .sound(SoundType.METAL)
+                .requiresCorrectToolForDrops()
+                .noOcclusion()
+                .dynamicShape();
     }
 
     private static BlockBehaviour.Properties largeCentrifugeProperties() {

@@ -1,0 +1,32 @@
+{
+  "variants": {
+    "facing=north,half=lower": {
+      "model": "mystery_dynamics:block/arcane_turbine",
+      "y": 0
+    },
+    "facing=north,half=upper": {
+      "model": "mystery_dynamics:block/arcane_turbine_upper"
+    },
+    "facing=east,half=lower": {
+      "model": "mystery_dynamics:block/arcane_turbine",
+      "y": 90
+    },
+    "facing=east,half=upper": {
+      "model": "mystery_dynamics:block/arcane_turbine_upper"
+    },
+    "facing=south,half=lower": {
+      "model": "mystery_dynamics:block/arcane_turbine",
+      "y": 180
+    },
+    "facing=south,half=upper": {
+      "model": "mystery_dynamics:block/arcane_turbine_upper"
+    },
+    "facing=west,half=lower": {
+      "model": "mystery_dynamics:block/arcane_turbine",
+      "y": 270
+    },
+    "facing=west,half=upper": {
+      "model": "mystery_dynamics:block/arcane_turbine_upper"
+    }
+  }
+}
