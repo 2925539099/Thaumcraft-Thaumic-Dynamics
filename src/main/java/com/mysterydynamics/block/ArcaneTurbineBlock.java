@@ -98,17 +98,14 @@ public class ArcaneTurbineBlock extends KineticBlock
     }
 
     @Override
-    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state,
-                              BlockEntity blockEntity, ItemStack tool) {
-        if (!player.isCreative()) {
-            Block.popResource(level, pos, new ItemStack(asItem()));
-        }
-    }
-
-    @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState,
                          boolean movedByPiston) {
         if (!level.isClientSide && !newState.is(this)) {
+            // 钻头、动态结构、爆炸等非玩家破坏也要拆掉另一半。
+            BlockPos otherPos = state.getValue(HALF) == DoubleBlockHalf.LOWER ? pos.above() : pos.below();
+            if (level.getBlockState(otherPos).is(this)) {
+                level.setBlock(otherPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+            }
             boolean anyTurbineLeft = ArcaneTurbineBlockEntity.countTurbines(level, pos, 8) > 0;
             // 涡轮机移除后让相邻储罐重新评估锅炉状态，流体储罐会恢复原状。
             for (Direction direction : Direction.Plane.HORIZONTAL) {

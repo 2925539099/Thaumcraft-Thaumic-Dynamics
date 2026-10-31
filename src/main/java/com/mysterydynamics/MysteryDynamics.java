@@ -395,7 +395,6 @@ public class MysteryDynamics {
                 .sound(SoundType.COPPER)
                 .requiresCorrectToolForDrops()
                 .noOcclusion()
-                .noLootTable()
                 .dynamicShape();
     }
 
@@ -486,6 +485,9 @@ public class MysteryDynamics {
                     () -> (double) (RedstoneEngineBlockEntity.MAX_STRESS / RedstoneEngineBlockEntity.MAX_RPM));
             BlockStressValues.RPM.register(REDSTONE_ENGINE.get(),
                     new BlockStressValues.GeneratedRpm(Math.round(RedstoneEngineBlockEntity.MAX_RPM), false));
+            com.simibubi.create.api.contraption.ContraptionMovementSetting.REGISTRY.register(
+                    ARCANE_TURBINE.get(),
+                    () -> com.simibubi.create.api.contraption.ContraptionMovementSetting.UNMOVABLE);
             // 安装了神秘时代时才注册奥术工作台配方（未安装时不加载 compat 类）
             if (net.neoforged.fml.ModList.get().isLoaded("thaumcraft")) {
                 com.mysterydynamics.compat.ThaumcraftRecipes.register();
