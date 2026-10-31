@@ -99,6 +99,12 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
             if (!level.isClientSide && controller.boiler.attachedEngines <= 0) {
                 controller.updateBoilerState();
             }
+            if (!level.isClientSide) {
+                int turbines = countTurbinesForTank(controller);
+                if (controller.boiler.attachedEngines < turbines) {
+                    controller.boiler.attachedEngines = turbines;
+                }
+            }
             if (!controller.boiler.isActive()) {
                 continue;
             }
@@ -122,6 +128,34 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
             }
         }
         return Math.min(1.0F, best);
+    }
+
+    public static int countTurbinesForTank(FluidTankBlockEntity tank) {
+        if (tank == null || tank.getLevel() == null) {
+            return 0;
+        }
+        var level = tank.getLevel();
+        BlockPos origin = tank.getBlockPos();
+        java.util.Set<BlockPos> found = new java.util.HashSet<>();
+        for (int y = 0; y < tank.getHeight(); y++) {
+            for (int x = 0; x < tank.getWidth(); x++) {
+                for (int z = 0; z < tank.getWidth(); z++) {
+                    BlockPos tankPos = origin.offset(x, y, z);
+                    if (!(level.getBlockEntity(tankPos) instanceof FluidTankBlockEntity)) {
+                        continue;
+                    }
+                    for (Direction direction : Direction.Plane.HORIZONTAL) {
+                        BlockPos neighbor = tankPos.relative(direction);
+                        BlockState state = level.getBlockState(neighbor);
+                        if (state.is(com.mysterydynamics.MysteryDynamics.ARCANE_TURBINE.get())
+                                && state.getValue(ArcaneTurbineBlock.HALF) == DoubleBlockHalf.LOWER) {
+                            found.add(neighbor.immutable());
+                        }
+                    }
+                }
+            }
+        }
+        return found.size();
     }
 
     public static int countTurbines(net.minecraft.world.level.Level level, BlockPos center, int radius) {
