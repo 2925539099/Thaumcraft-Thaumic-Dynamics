@@ -26,6 +26,8 @@ public final class StressTooltipEvents {
             addStressTooltip(event, golem.rpm(), golem.rpm() * golem.capacityPerRpm());
         } else if (block == MysteryDynamics.REDSTONE_ENGINE.get()) {
             addStressTooltip(event, RedstoneEngineBlockEntity.MAX_RPM, RedstoneEngineBlockEntity.MAX_STRESS);
+        } else if (block == MysteryDynamics.ARCANE_TURBINE.get()) {
+            addStressTooltip(event, 64.0F, com.mysterydynamics.block.ArcaneTurbineBlockEntity.MAX_STRESS);
         }
     }
 

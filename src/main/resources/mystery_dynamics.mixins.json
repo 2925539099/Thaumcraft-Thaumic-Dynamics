@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "SteamEngineBlockEntityMixin",
+    "BoilerDataMixin",
     "PotatoCannonItemMixin",
     "PotatoCannonAmmoMixin"
   ],
