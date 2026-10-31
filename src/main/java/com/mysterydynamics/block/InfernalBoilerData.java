@@ -102,6 +102,10 @@ public class InfernalBoilerData extends BoilerData {
 
     @Override
     public MutableComponent getHeatLevelTextComponent() {
+        if (controller != null && controller.isOverclock()) {
+            return Component.empty().append(
+                    Component.literal("超频").withStyle(net.minecraft.ChatFormatting.AQUA));
+        }
         int heat = Math.min(18, Math.max(0, activeHeat));
         if (isPassive()) {
             return CreateLang.translateDirect("boiler.passive");
