@@ -35,6 +35,9 @@ public abstract class ThaumonomiconPagePlanMixin {
         mutable.put("REVEALING_ENGINEER_GOGGLES", List.of(
                 ThaumonomiconPagePlan.Kind.TEXT,
                 ThaumonomiconPagePlan.Kind.NORMAL));
+        mutable.put("ARCANE_TURBINE", List.of(
+                ThaumonomiconPagePlan.Kind.TEXT,
+                ThaumonomiconPagePlan.Kind.ARCANE));
         CANONICAL = mutable;
     }
 }

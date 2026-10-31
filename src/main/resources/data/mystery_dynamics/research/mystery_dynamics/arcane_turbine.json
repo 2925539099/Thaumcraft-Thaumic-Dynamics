@@ -1,0 +1,46 @@
+{
+  "key": "ARCANE_TURBINE",
+  "order": 17,
+  "category": "MYSTERY_DYNAMICS",
+  "col": 3,
+  "row": 6,
+  "complexity": 3,
+  "warp": 0,
+  "parents": [
+    "INFERNAL_BOILER"
+  ],
+  "parents_hidden": [
+    "INFERNAL_BOILER"
+  ],
+  "siblings": [],
+  "flags": [],
+  "text_pages": [
+    "mystery_dynamics.research.arcane_turbine.text"
+  ],
+  "item": "mystery_dynamics:arcane_turbine",
+  "aspects": [
+    {
+      "aspect": "machina",
+      "amount": 8
+    },
+    {
+      "aspect": "fabrico",
+      "amount": 8
+    },
+    {
+      "aspect": "instrumentum",
+      "amount": 8
+    }
+  ],
+  "pages": [
+    {
+      "type": "TEXT",
+      "text": "mystery_dynamics.research.arcane_turbine.text",
+      "source": "mystery_dynamics.research.arcane_turbine.text"
+    },
+    {
+      "type": "ARCANE",
+      "source": "ARCANE_TURBINE"
+    }
+  ]
+}

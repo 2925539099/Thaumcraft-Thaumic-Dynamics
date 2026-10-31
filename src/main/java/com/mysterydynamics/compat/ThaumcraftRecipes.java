@@ -219,6 +219,26 @@ public final class ThaumcraftRecipes {
                 stack("thaumcraft", "thaumium_ingot"),
                 stack("thaumcraft", "thaumium_ingot"),
                 stack("thaumcraft", "thaumium_ingot"));
+
+        // 动力系统改良：奥法涡轮机
+        // 神秘锭 / 鼓风机 / 神秘锭
+        // 宏伟之树木板 / 炼金构材 / 宏伟之树木板
+        // 神秘锭 / 鼓风机 / 神秘锭
+        ThaumcraftApi.addArcaneCraftingRecipe(
+                "ARCANE_TURBINE",
+                new ItemStack(MysteryDynamics.ARCANE_TURBINE.get()),
+                new AspectList()
+                        .add(Aspect.ENTROPY, 25)
+                        .add(Aspect.ORDER, 25)
+                        .add(Aspect.WATER, 25)
+                        .add(Aspect.EARTH, 25)
+                        .add(Aspect.FIRE, 25)
+                        .add(Aspect.AIR, 25),
+                "TFT", "GAG", "TFT",
+                'T', thaumium,
+                'F', stack("create", "encased_fan"),
+                'G', stack("thaumcraft", "greatwood_planks"),
+                'A', alchemicalConstruct);
     }
 
     /** 书页居中显示（图案补到 3 格宽），合成时仍允许左右平移。 */
