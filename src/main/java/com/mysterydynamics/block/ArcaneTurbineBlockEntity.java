@@ -88,7 +88,7 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         }
         float perEngineMax = Math.min(currentPerTurbineMax,
                 currentBoilerTotalStress / Math.max(1, currentEngineCount));
-        return perEngineMax * efficiency / (16.0F * speedModifierFor(efficiency));
+        return perEngineMax / (16.0F * speedModifierFor(efficiency));
     }
 
     /** 下半部分四个水平面贴着的锅炉，取最高效率。 */
@@ -123,6 +123,11 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
             }
             currentEngineCount = Math.max(1, controller.boiler.attachedEngines);
             if (controller.boiler.isActive()) {
+                int level = Math.min(controller.boiler.activeHeat,
+                        Math.min(controller.boiler.getMaxHeatLevelForBoilerSize(
+                                        controller.getTotalTankSize()),
+                                controller.boiler.getMaxHeatLevelForWaterSupply()));
+                currentBoilerTotalStress = Math.max(0, level) * 16_384.0F;
                 best = Math.max(best,
                         controller.boiler.getEngineEfficiency(controller.getTotalTankSize()));
             }
@@ -132,7 +137,8 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         if (infernal != null && infernal.boiler != null
                 && infernal.boiler.activeHeat > 0
                 && infernal.getTankInventory().getFluidAmount() > 0) {
-            currentBoilerTotalStress = BOILER_TOTAL_STRESS;
+            currentBoilerTotalStress = infernal.isOverclock()
+                    ? BOILER_TOTAL_STRESS * 2.0F : BOILER_TOTAL_STRESS;
             currentPerTurbineMax = MAX_STRESS;
             currentEngineCount = Math.max(1, infernal.boiler.attachedEngines);
             float efficiency = infernal.boiler.getEngineEfficiency(infernal.getTotalTankSize());
@@ -207,7 +213,7 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
                 tooltip.add(net.minecraft.network.chat.Component.literal(
                         "超频判定: " + (infernal.isOverclock() ? "是" : "否")));
                 tooltip.add(net.minecraft.network.chat.Component.literal(
-                        "总应力上限: 294,912 SU"));
+                        "总应力上限: " + (infernal.isOverclock() ? "589,824" : "294,912") + " SU"));
             }
         }
         return added;
