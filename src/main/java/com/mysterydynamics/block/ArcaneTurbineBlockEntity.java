@@ -32,8 +32,7 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         super.tick();
         float efficiency = boilerEfficiency();
         float speed = generatedSpeedFor(efficiency);
-        int turbineCount = currentController == null ? 1 : Math.max(1, countNearbyTurbines(currentController));
-        float capacity = capacityFor(efficiency, turbineCount);
+        float capacity = capacityFor(efficiency);
         if (Math.abs(efficiency - lastEfficiency) > 0.001F
                 || Math.abs(speed - lastGeneratedSpeed) > 0.001F
                 || Math.abs(capacity - lastCapacity) > 0.001F) {
@@ -60,9 +59,7 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         if (getBlockState().getValue(ArcaneTurbineBlock.HALF) != DoubleBlockHalf.LOWER) {
             return 0.0F;
         }
-        float efficiency = boilerEfficiency();
-        int count = currentController == null ? 1 : Math.max(1, countNearbyTurbines(currentController));
-        return capacityFor(efficiency, count);
+        return capacityFor(boilerEfficiency());
     }
 
     /** 与蒸汽引擎一致：效率越高，转速档位越高；最大应力固定为 147456 SU。 */
@@ -74,13 +71,13 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         return movementDirection * 16.0F * speedModifier;
     }
 
-    private float capacityFor(float efficiency, int turbineCount) {
+    private float capacityFor(float efficiency) {
         if (efficiency <= 0.0F) {
             return 0.0F;
         }
         int speedModifier = 1 + (int) Math.min(3.0D, Math.floor(2.0D + efficiency * 4.0D));
-        // 147456 SU 是整个锅炉结构的总输出，多台涡轮机均分。
-        return MAX_STRESS / (16.0F * speedModifier * Math.max(1, turbineCount));
+        // 单台满效率最大 147456 SU；多台时按蒸汽引擎的 heat / engines 效率衰减。
+        return MAX_STRESS * efficiency / (16.0F * speedModifier);
     }
 
     /** 下半部分四个水平面贴着的锅炉，取最高效率。 */
@@ -132,7 +129,11 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
                     infernal.boiler.attachedEngines = turbines;
                 }
             }
-            float efficiency = infernal.isOverclock() ? 2.0F : 1.0F;
+            float efficiency = infernal.boiler.getEngineEfficiency(infernal.getTotalTankSize());
+            if (efficiency <= 0.0F) {
+                int engines = Math.max(1, infernal.boiler.attachedEngines);
+                efficiency = Math.min(1.0F, infernal.boiler.activeHeat / (float) engines);
+            }
             if (efficiency > best) {
                 best = efficiency;
             }
