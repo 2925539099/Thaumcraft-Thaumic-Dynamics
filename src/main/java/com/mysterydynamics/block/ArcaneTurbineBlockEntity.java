@@ -24,6 +24,7 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
     private float lastGeneratedSpeed = 0.0F;
     private float lastCapacity = 0.0F;
     private int currentEngineCount = 1;
+    private float currentBoilerTotalStress = BOILER_TOTAL_STRESS;
 
     public ArcaneTurbineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -79,7 +80,7 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         }
         int speedModifier = 1 + (int) Math.min(3.0D, Math.floor(2.0D + efficiency * 4.0D));
         float perEngineMax = Math.min(MAX_STRESS,
-                BOILER_TOTAL_STRESS / Math.max(1, currentEngineCount));
+                currentBoilerTotalStress / Math.max(1, currentEngineCount));
         return perEngineMax * efficiency / (16.0F * speedModifier);
     }
 
@@ -91,6 +92,7 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         }
         float best = 0.0F;
         currentEngineCount = 1;
+        currentBoilerTotalStress = BOILER_TOTAL_STRESS;
         for (Direction direction : Direction.Plane.HORIZONTAL) {
             BlockEntity blockEntity = level.getBlockEntity(worldPosition.relative(direction));
             if (!(blockEntity instanceof FluidTankBlockEntity tank)) {
@@ -122,6 +124,8 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         if (infernal != null && infernal.boiler != null
                 && infernal.boiler.activeHeat > 0
                 && infernal.getTankInventory().getFluidAmount() > 0) {
+            currentBoilerTotalStress = infernal.isOverclock()
+                    ? BOILER_TOTAL_STRESS * 2.0F : BOILER_TOTAL_STRESS;
             currentEngineCount = Math.max(1, infernal.boiler.attachedEngines);
             float efficiency = infernal.boiler.getEngineEfficiency(infernal.getTotalTankSize());
             if (efficiency <= 0.0F) {
