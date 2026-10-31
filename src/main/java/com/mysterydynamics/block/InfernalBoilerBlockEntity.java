@@ -254,7 +254,9 @@ public class InfernalBoilerBlockEntity extends FluidTankBlockEntity implements I
                         BlockState state = level.getBlockState(neighbor);
                         if (state.is(MysteryDynamics.ARCANE_TURBINE.get())
                                 && state.getValue(ArcaneTurbineBlock.HALF)
-                                == net.minecraft.world.level.block.state.properties.DoubleBlockHalf.LOWER) {
+                                == net.minecraft.world.level.block.state.properties.DoubleBlockHalf.LOWER
+                                && neighbor.relative(state.getValue(ArcaneTurbineBlock.FACING).getOpposite())
+                                .equals(shellPos)) {
                             turbines.add(neighbor);
                         }
                     }

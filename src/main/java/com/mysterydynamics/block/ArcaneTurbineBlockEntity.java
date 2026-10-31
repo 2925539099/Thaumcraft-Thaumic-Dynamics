@@ -91,38 +91,33 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         }
         float best = 0.0F;
         currentEngineCount = 1;
-        for (Direction direction : Direction.Plane.HORIZONTAL) {
-            BlockEntity blockEntity = level.getBlockEntity(worldPosition.relative(direction));
-            if (!(blockEntity instanceof FluidTankBlockEntity tank)) {
-                continue;
-            }
+        // 与蒸汽引擎一致：只看贴着 FACING 背面的那一格。
+        Direction boilerSide = getBlockState().getValue(ArcaneTurbineBlock.FACING).getOpposite();
+        BlockEntity adjacent = level.getBlockEntity(worldPosition.relative(boilerSide));
+        if (adjacent instanceof FluidTankBlockEntity tank) {
             FluidTankBlockEntity controller = tank.getControllerBE();
-            if (controller == null || controller.boiler == null) {
-                continue;
-            }
-            // 让普通流体储罐重新执行 BoilerData.evaluate；Mixin 会把涡轮机计入引擎。
-            if (!level.isClientSide && controller.boiler.attachedEngines <= 0) {
-                controller.updateBoilerState();
-            }
-            if (!level.isClientSide) {
-                int turbines = countTurbinesForTank(controller);
-                if (controller.boiler.attachedEngines < turbines) {
-                    controller.boiler.attachedEngines = turbines;
-                    controller.setChanged();
-                    controller.sendData();
+            if (controller != null && controller.boiler != null) {
+                if (!level.isClientSide && controller.boiler.attachedEngines <= 0) {
+                    controller.updateBoilerState();
+                }
+                if (!level.isClientSide) {
+                    int turbines = countTurbinesForTank(controller);
+                    if (controller.boiler.attachedEngines < turbines) {
+                        controller.boiler.attachedEngines = turbines;
+                        controller.setChanged();
+                        controller.sendData();
+                    }
+                }
+                currentEngineCount = Math.max(1, controller.boiler.attachedEngines);
+                if (controller.boiler.isActive()) {
+                    best = Math.max(best,
+                            controller.boiler.getEngineEfficiency(controller.getTotalTankSize()));
                 }
             }
-            currentEngineCount = Math.max(1, controller.boiler.attachedEngines);
-            if (!controller.boiler.isActive()) {
-                continue;
-            }
-            float efficiency = controller.boiler.getEngineEfficiency(controller.getTotalTankSize());
-            if (efficiency > best) {
-                best = efficiency;
-            }
         }
-        // 炼狱锅炉成型后，外壳/底座会替换主体方块；直接按结构查找 controller。
-        InfernalBoilerBlockEntity infernal = InfernalBoilerStructure.findController(level, worldPosition);
+        // 炼狱锅炉成型后，外壳/底座会替换主体方块；按背面相邻位置查找 controller。
+        InfernalBoilerBlockEntity infernal = InfernalBoilerStructure.findController(
+                level, worldPosition.relative(boilerSide));
         if (infernal != null && infernal.boiler != null
                 && infernal.boiler.activeHeat > 0
                 && infernal.getTankInventory().getFluidAmount() > 0) {
@@ -157,7 +152,9 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
                         BlockPos neighbor = tankPos.relative(direction);
                         BlockState state = level.getBlockState(neighbor);
                         if (state.is(com.mysterydynamics.MysteryDynamics.ARCANE_TURBINE.get())
-                                && state.getValue(ArcaneTurbineBlock.HALF) == DoubleBlockHalf.LOWER) {
+                                && state.getValue(ArcaneTurbineBlock.HALF) == DoubleBlockHalf.LOWER
+                                && neighbor.relative(state.getValue(ArcaneTurbineBlock.FACING).getOpposite())
+                                .equals(tankPos)) {
                             found.add(neighbor.immutable());
                         }
                     }
@@ -193,6 +190,22 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
             return lower.addToGoggleTooltip(tooltip, isPlayerSneaking);
         }
         return super.addToGoggleTooltip(tooltip, isPlayerSneaking);
+    }
+
+    /** 转向冲突时不要让 Create 把方块直接销毁成掉落物；保持静止，等玩家用扳手换向。 */
+    @Override
+    public void updateGeneratedRotation() {
+        float generated = getGeneratedSpeed();
+        float current = getSpeed();
+        if (hasSource() && Math.abs(current) > 0.001F && Math.abs(generated) > 0.001F
+                && Math.signum(current) != Math.signum(generated)) {
+            detachKinetics();
+            setSpeed(0.0F);
+            setNetwork(null);
+            reActivateSource = true;
+            return;
+        }
+        super.updateGeneratedRotation();
     }
 
     public void toggleDirection() {
