@@ -25,6 +25,7 @@ public final class ClientEvents {
             case "INFERNALFURNACE_LINK" -> "INFERNALFURNACE";
             default -> key;
         });
+        NeoForge.EVENT_BUS.addListener(StressTooltipEvents::onItemTooltip);
     }
 
     private ClientEvents() {
