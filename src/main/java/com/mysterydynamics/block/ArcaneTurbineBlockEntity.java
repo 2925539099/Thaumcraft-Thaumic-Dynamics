@@ -159,6 +159,18 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         return found.size();
     }
 
+    /** 上半部分没有独立动力网络，护目镜信息直接读取下半部分。 */
+    @Override
+    public boolean addToGoggleTooltip(java.util.List<net.minecraft.network.chat.Component> tooltip,
+                                      boolean isPlayerSneaking) {
+        if (getBlockState().getValue(ArcaneTurbineBlock.HALF) == DoubleBlockHalf.UPPER
+                && level != null
+                && level.getBlockEntity(worldPosition.below()) instanceof ArcaneTurbineBlockEntity lower) {
+            return lower.addToGoggleTooltip(tooltip, isPlayerSneaking);
+        }
+        return super.addToGoggleTooltip(tooltip, isPlayerSneaking);
+    }
+
     public void toggleDirection() {
         movementDirection *= -1;
         lastEfficiency = -1.0F;
