@@ -2,6 +2,7 @@ package com.mysterydynamics.block;
 
 import com.mysterydynamics.MysteryDynamics;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
+import com.simibubi.create.content.fluids.tank.FluidTankBlockEntity;
 import com.simibubi.create.content.kinetics.base.KineticBlock;
 import com.simibubi.create.foundation.block.IBE;
 
@@ -102,6 +103,27 @@ public class ArcaneTurbineBlock extends KineticBlock
         if (!player.isCreative()) {
             Block.popResource(level, pos, new ItemStack(asItem()));
         }
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState,
+                         boolean movedByPiston) {
+        if (!level.isClientSide && !newState.is(this)) {
+            // 涡轮机移除后让相邻储罐重新评估锅炉状态，流体储罐会恢复原状。
+            for (Direction direction : Direction.Plane.HORIZONTAL) {
+                if (level.getBlockEntity(pos.relative(direction)) instanceof FluidTankBlockEntity tank) {
+                    FluidTankBlockEntity controller = tank.getControllerBE();
+                    if (controller != null) {
+                        controller.updateBoilerState();
+                    }
+                }
+            }
+            var infernal = com.mysterydynamics.compat.InfernalBoilerStructure.findController(level, pos);
+            if (infernal != null) {
+                infernal.updateBoilerState();
+            }
+        }
+        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
     @Override

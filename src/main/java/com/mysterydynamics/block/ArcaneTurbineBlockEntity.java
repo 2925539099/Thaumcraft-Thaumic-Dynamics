@@ -21,6 +21,7 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
     private float lastEfficiency = -1.0F;
     private float lastGeneratedSpeed = 0.0F;
     private float lastCapacity = 0.0F;
+    private FluidTankBlockEntity currentController;
 
     public ArcaneTurbineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -31,7 +32,8 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         super.tick();
         float efficiency = boilerEfficiency();
         float speed = generatedSpeedFor(efficiency);
-        float capacity = capacityFor(efficiency);
+        int turbineCount = currentController == null ? 1 : Math.max(1, countNearbyTurbines(currentController));
+        float capacity = capacityFor(efficiency, turbineCount);
         if (Math.abs(efficiency - lastEfficiency) > 0.001F
                 || Math.abs(speed - lastGeneratedSpeed) > 0.001F
                 || Math.abs(capacity - lastCapacity) > 0.001F) {
@@ -58,7 +60,9 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         if (getBlockState().getValue(ArcaneTurbineBlock.HALF) != DoubleBlockHalf.LOWER) {
             return 0.0F;
         }
-        return capacityFor(boilerEfficiency());
+        float efficiency = boilerEfficiency();
+        int count = currentController == null ? 1 : Math.max(1, countNearbyTurbines(currentController));
+        return capacityFor(efficiency, count);
     }
 
     /** 与蒸汽引擎一致：效率越高，转速档位越高；最大应力固定为 147456 SU。 */
@@ -70,12 +74,13 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         return movementDirection * 16.0F * speedModifier;
     }
 
-    private float capacityFor(float efficiency) {
+    private float capacityFor(float efficiency, int turbineCount) {
         if (efficiency <= 0.0F) {
             return 0.0F;
         }
         int speedModifier = 1 + (int) Math.min(3.0D, Math.floor(2.0D + efficiency * 4.0D));
-        return MAX_STRESS / (16.0F * speedModifier);
+        // 147456 SU 是整个锅炉结构的总输出，多台涡轮机均分。
+        return MAX_STRESS / (16.0F * speedModifier * Math.max(1, turbineCount));
     }
 
     /** 下半部分四个水平面贴着的锅炉，取最高效率。 */
@@ -85,6 +90,7 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
             return 0.0F;
         }
         float best = 0.0F;
+        currentController = null;
         for (Direction direction : Direction.Plane.HORIZONTAL) {
             BlockEntity blockEntity = level.getBlockEntity(worldPosition.relative(direction));
             if (!(blockEntity instanceof FluidTankBlockEntity tank)) {
@@ -94,13 +100,16 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
             if (controller == null || controller.boiler == null) {
                 continue;
             }
+            currentController = controller;
             // 普通流体储罐没有主动寻找引擎；由涡轮机触发一次锅炉评估，
             // BoilerDataMixin 会在这时把本涡轮机计入 attachedEngines。
-            if (!level.isClientSide && controller.boiler.attachedEngines <= 0) {
-                controller.updateBoilerState();
-                // 兼容未加载 BoilerDataMixin 的情况：至少把本涡轮机算作一台引擎。
+            if (!level.isClientSide) {
+                int turbines = Math.max(1, countNearbyTurbines(controller));
                 if (controller.boiler.attachedEngines <= 0) {
-                    controller.boiler.attachedEngines = 1;
+                    controller.updateBoilerState();
+                }
+                if (controller.boiler.attachedEngines < turbines) {
+                    controller.boiler.attachedEngines = turbines;
                 }
             }
             if (!controller.boiler.isActive()) {
@@ -116,12 +125,37 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         if (infernal != null && infernal.boiler != null
                 && infernal.boiler.activeHeat > 0
                 && infernal.getTankInventory().getFluidAmount() > 0) {
+            currentController = infernal;
+            if (!level.isClientSide) {
+                int turbines = Math.max(1, countNearbyTurbines(infernal));
+                if (infernal.boiler.attachedEngines < turbines) {
+                    infernal.boiler.attachedEngines = turbines;
+                }
+            }
             float efficiency = infernal.isOverclock() ? 2.0F : 1.0F;
             if (efficiency > best) {
                 best = efficiency;
             }
         }
         return Math.min(1.0F, best);
+    }
+
+    /** 统计锅炉附近已放置的涡轮机下半部分。 */
+    private int countNearbyTurbines(FluidTankBlockEntity controller) {
+        if (level == null) {
+            return 1;
+        }
+        BlockPos center = controller.getBlockPos();
+        java.util.Set<BlockPos> found = new java.util.HashSet<>();
+        for (BlockPos pos : BlockPos.betweenClosed(
+                center.offset(-4, -1, -4), center.offset(4, 2, 4))) {
+            BlockState state = level.getBlockState(pos);
+            if (state.is(com.mysterydynamics.MysteryDynamics.ARCANE_TURBINE.get())
+                    && state.getValue(ArcaneTurbineBlock.HALF) == DoubleBlockHalf.LOWER) {
+                found.add(pos.immutable());
+            }
+        }
+        return found.size();
     }
 
     public void toggleDirection() {
