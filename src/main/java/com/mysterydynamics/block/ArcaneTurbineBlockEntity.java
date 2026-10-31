@@ -103,6 +103,8 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
                 int turbines = countTurbinesForTank(controller);
                 if (controller.boiler.attachedEngines < turbines) {
                     controller.boiler.attachedEngines = turbines;
+                    controller.setChanged();
+                    controller.sendData();
                 }
             }
             if (!controller.boiler.isActive()) {

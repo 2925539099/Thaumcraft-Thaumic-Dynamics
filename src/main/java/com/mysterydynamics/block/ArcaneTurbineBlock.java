@@ -121,6 +121,8 @@ public class ArcaneTurbineBlock extends KineticBlock
                         }
                         controller.updateBoilerState();
                         controller.updateBoilerTemperature();
+                        controller.setChanged();
+                        controller.sendData();
                     }
                 }
             }
@@ -132,6 +134,8 @@ public class ArcaneTurbineBlock extends KineticBlock
                 }
                 infernal.updateBoilerState();
                 infernal.updateBoilerTemperature();
+                infernal.setChanged();
+                infernal.sendData();
             }
         }
         super.onRemove(state, level, pos, newState, movedByPiston);

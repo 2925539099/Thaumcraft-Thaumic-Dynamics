@@ -231,6 +231,8 @@ public class InfernalBoilerBlockEntity extends FluidTankBlockEntity implements I
         if (boiler != null && boiler.attachedEngines != count) {
             boiler.attachedEngines = count;
             // 让客户端护目镜拿到同一个引擎数，避免显示值来回闪。
+            setChanged();
+            sendData();
             notifyUpdate();
         }
         this.linkedEngineCount = count;
