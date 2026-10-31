@@ -2,6 +2,7 @@ package com.mysterydynamics.block;
 
 import com.simibubi.create.content.fluids.tank.FluidTankBlockEntity;
 import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
+import com.mysterydynamics.compat.InfernalBoilerStructure;
 
 import net.createmod.catnip.animation.AnimationTickHolder;
 import net.minecraft.core.BlockPos;
@@ -90,10 +91,32 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
                 continue;
             }
             FluidTankBlockEntity controller = tank.getControllerBE();
-            if (controller == null || controller.boiler == null || !controller.boiler.isActive()) {
+            if (controller == null || controller.boiler == null) {
+                continue;
+            }
+            // 普通流体储罐没有主动寻找引擎；由涡轮机触发一次锅炉评估，
+            // BoilerDataMixin 会在这时把本涡轮机计入 attachedEngines。
+            if (!level.isClientSide && controller.boiler.attachedEngines <= 0) {
+                controller.updateBoilerState();
+                // 兼容未加载 BoilerDataMixin 的情况：至少把本涡轮机算作一台引擎。
+                if (controller.boiler.attachedEngines <= 0) {
+                    controller.boiler.attachedEngines = 1;
+                }
+            }
+            if (!controller.boiler.isActive()) {
                 continue;
             }
             float efficiency = controller.boiler.getEngineEfficiency(controller.getTotalTankSize());
+            if (efficiency > best) {
+                best = efficiency;
+            }
+        }
+        // 炼狱锅炉成型后，外壳/底座会替换主体方块；直接按结构查找 controller。
+        InfernalBoilerBlockEntity infernal = InfernalBoilerStructure.findController(level, worldPosition);
+        if (infernal != null && infernal.boiler != null
+                && infernal.boiler.activeHeat > 0
+                && infernal.getTankInventory().getFluidAmount() > 0) {
+            float efficiency = infernal.isOverclock() ? 2.0F : 1.0F;
             if (efficiency > best) {
                 best = efficiency;
             }
