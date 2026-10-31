@@ -5,7 +5,10 @@ import com.simibubi.create.content.fluids.tank.BoilerData;
 import com.simibubi.create.content.fluids.tank.FluidTankBlockEntity;
 import com.simibubi.create.foundation.utility.CreateLang;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+
+import java.util.List;
 
 
 import net.neoforged.fml.ModList;
@@ -115,6 +118,20 @@ public class InfernalBoilerData extends BoilerData {
     @Override
     public int getTheoreticalHeatLevel() {
         return activeHeat;
+    }
+
+    @Override
+    public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking, int boilerSize) {
+        boolean result = super.addToGoggleTooltip(tooltip, isPlayerSneaking, boilerSize);
+        if (!result || controller == null || !controller.isOverclock() || tooltip.isEmpty()) {
+            return result;
+        }
+        int last = tooltip.size() - 1;
+        if (last >= 0) {
+            tooltip.set(last, Component.literal(
+                    "应力量: 589,824 su  通过 " + attachedEngines + " 个引擎"));
+        }
+        return result;
     }
 
     @Override
