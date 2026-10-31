@@ -38,7 +38,9 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
             lastGeneratedSpeed = speed;
             lastCapacity = capacity;
             updateGeneratedRotation();
-            notifyStressCapacityChange(capacity);
+            if (hasNetwork()) {
+                notifyStressCapacityChange(capacity);
+            }
         }
     }
 
@@ -105,7 +107,9 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         lastGeneratedSpeed = 0.0F;
         lastCapacity = 0.0F;
         updateGeneratedRotation();
-        notifyStressCapacityChange(calculateAddedStressCapacity());
+        if (hasNetwork()) {
+            notifyStressCapacityChange(calculateAddedStressCapacity());
+        }
         sendData();
     }
 
