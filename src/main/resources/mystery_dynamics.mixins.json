@@ -7,8 +7,7 @@
     "SteamEngineBlockEntityMixin",
     "BoilerDataMixin",
     "PotatoCannonItemMixin",
-    "PotatoCannonAmmoMixin",
-    "ArcaneTurbineResearchMixin"
+    "PotatoCannonAmmoMixin"
   ],
   "client": [
     "ThaumonomiconPagePlanMixin"

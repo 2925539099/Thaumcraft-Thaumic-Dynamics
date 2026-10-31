@@ -13,7 +13,9 @@
     "INFERNAL_BOILER"
   ],
   "siblings": [],
-  "flags": [],
+  "flags": [
+    "secondary"
+  ],
   "text_pages": [
     "mystery_dynamics.research.arcane_turbine.text"
   ],
