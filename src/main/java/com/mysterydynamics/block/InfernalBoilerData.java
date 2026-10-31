@@ -134,7 +134,7 @@ public class InfernalBoilerData extends BoilerData {
         if (last >= 0) {
             tooltip.set(last, Component.literal(
                     "589,824 su  通过 " + attachedEngines + " 个引擎")
-                    .withStyle(net.minecraft.ChatFormatting.GREEN));
+                    .withStyle(net.minecraft.ChatFormatting.AQUA));
         }
         return result;
     }
