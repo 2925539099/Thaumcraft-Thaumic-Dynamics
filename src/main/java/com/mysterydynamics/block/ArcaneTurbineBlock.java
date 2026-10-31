@@ -95,6 +95,16 @@ public class ArcaneTurbineBlock extends HorizontalDirectionalBlock {
     }
 
     @Override
+    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state,
+                              net.minecraft.world.level.block.entity.BlockEntity blockEntity,
+                              ItemStack tool) {
+        // 和门一致：创造模式不产生掉落物。
+        if (!player.isCreative()) {
+            super.playerDestroy(level, player, pos, state, blockEntity, tool);
+        }
+    }
+
+    @Override
     public BlockState rotate(BlockState state, Rotation rotation) {
         return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
     }
