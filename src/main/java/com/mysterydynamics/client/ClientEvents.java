@@ -26,6 +26,7 @@ public final class ClientEvents {
             default -> key;
         });
         NeoForge.EVENT_BUS.addListener(StressTooltipEvents::onItemTooltip);
+        ArcaneTurbinePartialModels.init();
     }
 
     private ClientEvents() {
