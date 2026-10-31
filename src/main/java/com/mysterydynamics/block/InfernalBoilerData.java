@@ -40,9 +40,9 @@ public class InfernalBoilerData extends BoilerData {
         // 只在服务端写引擎数；客户端使用同步下来的值。
         // 否则客户端 linkedEngineCount 永远是0，护目镜会在0和真实值之间闪烁。
         if (boiler.getLevel() != null && !boiler.getLevel().isClientSide) {
-            // BoilerDataMixin 会把贴着的奥法涡轮机也计入 attachedEngines；
-            // 这里不能直接覆盖，否则涡轮机会被当成 0 台引擎。
-            this.attachedEngines = Math.max(this.attachedEngines, boiler.linkedEngineCount());
+            // 引擎数量由 linkNearbySteamEngines/BoilerDataMixin 统一统计，
+            // 这里不保存旧值，否则拆除涡轮机后会一直残留引擎数。
+            this.attachedEngines = boiler.linkedEngineCount();
         }
     }
 

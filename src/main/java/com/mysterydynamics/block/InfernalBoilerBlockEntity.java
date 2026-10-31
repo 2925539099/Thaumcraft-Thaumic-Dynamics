@@ -227,10 +227,12 @@ public class InfernalBoilerBlockEntity extends FluidTankBlockEntity implements I
                 }
             }
         }
-        int count = engines.size();
+        int count = engines.size() + countShellTurbines();
         if (boiler != null && boiler.attachedEngines != count) {
             boiler.attachedEngines = count;
             // 让客户端护目镜拿到同一个引擎数，避免显示值来回闪。
+            setChanged();
+            sendData();
             notifyUpdate();
         }
         this.linkedEngineCount = count;
@@ -238,6 +240,28 @@ public class InfernalBoilerBlockEntity extends FluidTankBlockEntity implements I
 
     public int linkedEngineCount() {
         return linkedEngineCount;
+    }
+
+    /** 精确统计贴在炼狱锅炉外壳任意一面上的涡轮机下半部分。 */
+    private int countShellTurbines() {
+        java.util.Set<BlockPos> turbines = new java.util.HashSet<>();
+        for (int y = 0; y <= 4; y++) {
+            for (int x = 0; x <= 3; x++) {
+                for (int z = 0; z <= 3; z++) {
+                    BlockPos shellPos = InfernalBoilerStructure.world(boilerOrigin, x, y, z, rotation);
+                    for (Direction direction : Direction.Plane.HORIZONTAL) {
+                        BlockPos neighbor = shellPos.relative(direction);
+                        BlockState state = level.getBlockState(neighbor);
+                        if (state.is(MysteryDynamics.ARCANE_TURBINE.get())
+                                && state.getValue(ArcaneTurbineBlock.HALF)
+                                == net.minecraft.world.level.block.state.properties.DoubleBlockHalf.LOWER) {
+                            turbines.add(neighbor);
+                        }
+                    }
+                }
+            }
+        }
+        return turbines.size();
     }
 
     private void updateShellState() {
