@@ -143,13 +143,16 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
 
     /** 统计锅炉附近已放置的涡轮机下半部分。 */
     private int countNearbyTurbines(FluidTankBlockEntity controller) {
+        return countTurbines(level, controller.getBlockPos(), 6);
+    }
+
+    public static int countTurbines(net.minecraft.world.level.Level level, BlockPos center, int radius) {
         if (level == null) {
-            return 1;
+            return 0;
         }
-        BlockPos center = controller.getBlockPos();
         java.util.Set<BlockPos> found = new java.util.HashSet<>();
         for (BlockPos pos : BlockPos.betweenClosed(
-                center.offset(-4, -1, -4), center.offset(4, 2, 4))) {
+                center.offset(-radius, -1, -radius), center.offset(radius, 2, radius))) {
             BlockState state = level.getBlockState(pos);
             if (state.is(com.mysterydynamics.MysteryDynamics.ARCANE_TURBINE.get())
                     && state.getValue(ArcaneTurbineBlock.HALF) == DoubleBlockHalf.LOWER) {

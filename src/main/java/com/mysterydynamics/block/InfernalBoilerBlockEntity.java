@@ -227,7 +227,7 @@ public class InfernalBoilerBlockEntity extends FluidTankBlockEntity implements I
                 }
             }
         }
-        int count = engines.size();
+        int count = engines.size() + ArcaneTurbineBlockEntity.countTurbines(level, worldPosition, 6);
         if (boiler != null && boiler.attachedEngines != count) {
             boiler.attachedEngines = count;
             // 让客户端护目镜拿到同一个引擎数，避免显示值来回闪。
