@@ -21,7 +21,6 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
     private float lastEfficiency = -1.0F;
     private float lastGeneratedSpeed = 0.0F;
     private float lastCapacity = 0.0F;
-    private FluidTankBlockEntity currentController;
 
     public ArcaneTurbineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -87,7 +86,6 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
             return 0.0F;
         }
         float best = 0.0F;
-        currentController = null;
         for (Direction direction : Direction.Plane.HORIZONTAL) {
             BlockEntity blockEntity = level.getBlockEntity(worldPosition.relative(direction));
             if (!(blockEntity instanceof FluidTankBlockEntity tank)) {
@@ -97,17 +95,9 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
             if (controller == null || controller.boiler == null) {
                 continue;
             }
-            currentController = controller;
-            // 普通流体储罐没有主动寻找引擎；由涡轮机触发一次锅炉评估，
-            // BoilerDataMixin 会在这时把本涡轮机计入 attachedEngines。
-            if (!level.isClientSide) {
-                int turbines = Math.max(1, countNearbyTurbines(controller));
-                if (controller.boiler.attachedEngines <= 0) {
-                    controller.updateBoilerState();
-                }
-                if (controller.boiler.attachedEngines < turbines) {
-                    controller.boiler.attachedEngines = turbines;
-                }
+            // 让普通流体储罐重新执行 BoilerData.evaluate；Mixin 会把涡轮机计入引擎。
+            if (!level.isClientSide && controller.boiler.attachedEngines <= 0) {
+                controller.updateBoilerState();
             }
             if (!controller.boiler.isActive()) {
                 continue;
@@ -122,13 +112,6 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         if (infernal != null && infernal.boiler != null
                 && infernal.boiler.activeHeat > 0
                 && infernal.getTankInventory().getFluidAmount() > 0) {
-            currentController = infernal;
-            if (!level.isClientSide) {
-                int turbines = Math.max(1, countNearbyTurbines(infernal));
-                if (infernal.boiler.attachedEngines < turbines) {
-                    infernal.boiler.attachedEngines = turbines;
-                }
-            }
             float efficiency = infernal.boiler.getEngineEfficiency(infernal.getTotalTankSize());
             if (efficiency <= 0.0F) {
                 int engines = Math.max(1, infernal.boiler.attachedEngines);
@@ -139,11 +122,6 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
             }
         }
         return Math.min(1.0F, best);
-    }
-
-    /** 统计锅炉附近已放置的涡轮机下半部分。 */
-    private int countNearbyTurbines(FluidTankBlockEntity controller) {
-        return countTurbines(level, controller.getBlockPos(), 8);
     }
 
     public static int countTurbines(net.minecraft.world.level.Level level, BlockPos center, int radius) {
