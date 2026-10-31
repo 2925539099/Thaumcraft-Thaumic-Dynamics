@@ -132,10 +132,8 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         if (infernal != null && infernal.boiler != null
                 && infernal.boiler.activeHeat > 0
                 && infernal.getTankInventory().getFluidAmount() > 0) {
-            currentBoilerTotalStress = infernal.isOverclock()
-                    ? BOILER_TOTAL_STRESS * 2.0F : BOILER_TOTAL_STRESS;
-            currentPerTurbineMax = infernal.isOverclock()
-                    ? MAX_STRESS * 2.0F : MAX_STRESS;
+            currentBoilerTotalStress = BOILER_TOTAL_STRESS;
+            currentPerTurbineMax = MAX_STRESS;
             currentEngineCount = Math.max(1, infernal.boiler.attachedEngines);
             float efficiency = infernal.boiler.getEngineEfficiency(infernal.getTotalTankSize());
             if (efficiency <= 0.0F) {
@@ -209,7 +207,7 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
                 tooltip.add(net.minecraft.network.chat.Component.literal(
                         "超频判定: " + (infernal.isOverclock() ? "是" : "否")));
                 tooltip.add(net.minecraft.network.chat.Component.literal(
-                        "总应力上限: " + (infernal.isOverclock() ? "589,824" : "294,912") + " SU"));
+                        "总应力上限: 294,912 SU"));
             }
         }
         return added;
