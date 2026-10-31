@@ -325,6 +325,7 @@ public class InfernalBoilerBlockEntity extends FluidTankBlockEntity implements I
         if (accepted > 0) {
             fireEssentia += accepted;
             setChanged();
+            sendData();
             notifyUpdate();
         }
         return accepted;
@@ -353,6 +354,7 @@ public class InfernalBoilerBlockEntity extends FluidTankBlockEntity implements I
         fireEssentia = aspects == null ? 0
                 : Math.max(0, Math.min(MAX_FIRE_ESSENTIA, aspects.getAmount(Aspect.FIRE)));
         setChanged();
+        sendData();
         notifyUpdate();
     }
 
@@ -373,6 +375,7 @@ public class InfernalBoilerBlockEntity extends FluidTankBlockEntity implements I
         }
         fireEssentia -= amount;
         setChanged();
+        sendData();
         notifyUpdate();
         return true;
     }

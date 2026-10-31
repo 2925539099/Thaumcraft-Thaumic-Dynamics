@@ -110,6 +110,17 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
             if (controller == null || controller.boiler == null) {
                 continue;
             }
+            if (controller instanceof InfernalBoilerBlockEntity infernal) {
+                currentBoilerTotalStress = infernal.isOverclock()
+                        ? BOILER_TOTAL_STRESS * 2.0F : BOILER_TOTAL_STRESS;
+                currentPerTurbineMax = MAX_STRESS;
+                currentEngineCount = Math.max(1, infernal.boiler.attachedEngines);
+                if (infernal.boiler.isActive()) {
+                    best = Math.max(best, infernal.boiler.getEngineEfficiency(
+                            infernal.getTotalTankSize()));
+                }
+                continue;
+            }
             if (!level.isClientSide && controller.boiler.attachedEngines <= 0) {
                 controller.updateBoilerState();
             }
