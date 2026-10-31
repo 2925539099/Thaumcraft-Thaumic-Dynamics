@@ -3,15 +3,6 @@
   "pools": [
     {
       "rolls": 1,
-      "conditions": [
-        {
-          "condition": "minecraft:block_state_property",
-          "block": "mystery_dynamics:arcane_turbine",
-          "properties": {
-            "half": "lower"
-          }
-        }
-      ],
       "entries": [
         {
           "type": "minecraft:item",
