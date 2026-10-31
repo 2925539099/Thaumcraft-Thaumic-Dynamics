@@ -131,17 +131,11 @@ public class InfernalBoilerData extends BoilerData {
             return 0.0F;
         }
         if (!controller.isOverclock()) {
-            // Create 原版：引擎数超过热等级后，单台效率 = 热等级 / 引擎数；
-            // 总输出不再按“目标值 / 引擎最大总输出”倒推，因此不会越加越少。
+            // Create 原版：引擎数超过热等级后，单台效率 = 热等级 / 引擎数。
             return attachedEngines <= heat ? 1.0F : (float) heat / attachedEngines;
         }
-        double configuredCapacity = BlockStressValues.getCapacity(AllBlocks.STEAM_ENGINE.get());
-        float capacity = configuredCapacity > 0.0D ? (float) configuredCapacity : ENGINE_STRESS;
-        // 超频硬上限 589824：引擎多于满级18台时自动降低单台效率，
-        // 保证护目镜公式 eff * 16 * max(heat, engines) * capacity 不超过两倍原版满级。
-        int effectiveCount = Math.max(heat, attachedEngines);
-        float maxEfficiency = OVERCLOCK_TOTAL_STRESS
-                / (16.0F * effectiveCount * capacity);
-        return Math.min(2.0F, maxEfficiency);
+        // 超频只翻倍锅炉总应力上限，不把每台蒸汽引擎的出力直接 ×2。
+        // 蒸汽引擎仍按普通效率分配，单台仍受 16384 SU 上限约束。
+        return attachedEngines <= heat ? 1.0F : (float) heat / attachedEngines;
     }
 }
