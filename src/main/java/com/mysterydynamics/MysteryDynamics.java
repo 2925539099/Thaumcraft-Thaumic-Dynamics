@@ -381,10 +381,11 @@ public class MysteryDynamics {
     private static BlockBehaviour.Properties arcaneTurbineProperties() {
         return BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_PURPLE)
-                .strength(4.0F, 12.0F)
-                .sound(SoundType.METAL)
+                .strength(2.0F, 6.0F)
+                .sound(SoundType.COPPER)
                 .requiresCorrectToolForDrops()
                 .noOcclusion()
+                .noLootTable()
                 .dynamicShape();
     }
 

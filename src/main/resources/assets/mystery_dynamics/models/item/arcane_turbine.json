@@ -3,8 +3,8 @@
   "display": {
     "gui": {
       "rotation": [
-        25,
-        45,
+        30,
+        225,
         0
       ],
       "translation": [
@@ -13,9 +13,9 @@
         0
       ],
       "scale": [
-        0.48,
-        0.48,
-        0.48
+        0.35,
+        0.35,
+        0.35
       ]
     },
     "ground": {
@@ -55,7 +55,7 @@
     "thirdperson_righthand": {
       "rotation": [
         75,
-        45,
+        135,
         0
       ],
       "translation": [
@@ -64,15 +64,15 @@
         0
       ],
       "scale": [
-        0.3,
-        0.3,
-        0.3
+        0.25,
+        0.25,
+        0.25
       ]
     },
     "thirdperson_lefthand": {
       "rotation": [
         75,
-        45,
+        135,
         0
       ],
       "translation": [
@@ -81,9 +81,9 @@
         0
       ],
       "scale": [
-        0.3,
-        0.3,
-        0.3
+        0.25,
+        0.25,
+        0.25
       ]
     },
     "firstperson_righthand": {

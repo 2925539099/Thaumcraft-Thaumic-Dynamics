@@ -100,7 +100,7 @@ public class ArcaneTurbineBlock extends HorizontalDirectionalBlock {
                               ItemStack tool) {
         // 和门一致：创造模式不产生掉落物。
         if (!player.isCreative()) {
-            super.playerDestroy(level, player, pos, state, blockEntity, tool);
+            Block.popResource(level, pos, new ItemStack(asItem()));
         }
     }
 
