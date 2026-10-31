@@ -86,7 +86,8 @@ public class ArcaneTurbineBlock extends HorizontalDirectionalBlock {
             BlockPos otherPos = state.getValue(HALF) == DoubleBlockHalf.LOWER ? pos.above() : pos.below();
             BlockState other = level.getBlockState(otherPos);
             if (other.is(this)) {
-                level.removeBlock(otherPos, false);
+                // 不触发邻块更新，避免下半部分先被 updateShape 替换掉而丢失掉落物。
+                level.setBlock(otherPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_NONE);
             }
         }
         return super.playerWillDestroy(level, pos, state, player);
