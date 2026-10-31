@@ -196,7 +196,17 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
                 && level.getBlockEntity(worldPosition.below()) instanceof ArcaneTurbineBlockEntity lower) {
             return lower.addToGoggleTooltip(tooltip, isPlayerSneaking);
         }
-        return super.addToGoggleTooltip(tooltip, isPlayerSneaking);
+        boolean added = super.addToGoggleTooltip(tooltip, isPlayerSneaking);
+        if (level != null) {
+            InfernalBoilerBlockEntity infernal = InfernalBoilerStructure.findController(level, worldPosition);
+            if (infernal != null) {
+                tooltip.add(net.minecraft.network.chat.Component.literal(
+                        "超频判定: " + (infernal.isOverclock() ? "是" : "否")));
+                tooltip.add(net.minecraft.network.chat.Component.literal(
+                        "总应力上限: " + (infernal.isOverclock() ? "589,824" : "294,912") + " SU"));
+            }
+        }
+        return added;
     }
 
     /** 与蒸汽引擎一致：转向冲突时自动调整输出方向，避免被 Create 顶成掉落物。 */
