@@ -1,16 +1,12 @@
 package com.mysterydynamics.block;
 
 import com.mysterydynamics.compat.InfernalBoilerCompat;
-import com.simibubi.create.AllBlocks;
-import com.simibubi.create.api.stress.BlockStressValues;
 import com.simibubi.create.content.fluids.tank.BoilerData;
 import com.simibubi.create.content.fluids.tank.FluidTankBlockEntity;
 import com.simibubi.create.foundation.utility.CreateLang;
 
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
-import java.util.List;
 
 import net.neoforged.fml.ModList;
 
@@ -119,24 +115,6 @@ public class InfernalBoilerData extends BoilerData {
     @Override
     public int getTheoreticalHeatLevel() {
         return activeHeat;
-    }
-
-    @Override
-    public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking, int boilerSize) {
-        boolean result = super.addToGoggleTooltip(tooltip, isPlayerSneaking, boilerSize);
-        if (!result || tooltip.isEmpty()) {
-            return result;
-        }
-        int last = tooltip.size() - 1;
-        if (!tooltip.get(last).getString().toLowerCase().contains("su")) {
-            return result;
-        }
-        float total = controller != null && controller.isOverclock()
-                ? ArcaneTurbineBlockEntity.BOILER_TOTAL_STRESS * 2.0F
-                : ArcaneTurbineBlockEntity.BOILER_TOTAL_STRESS;
-        tooltip.set(last, Component.literal(String.format(
-                "应力量: %,.0f su  通过 %d 个引擎", total, attachedEngines)));
-        return result;
     }
 
     @Override
