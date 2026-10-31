@@ -143,7 +143,7 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
 
     /** 统计锅炉附近已放置的涡轮机下半部分。 */
     private int countNearbyTurbines(FluidTankBlockEntity controller) {
-        return countTurbines(level, controller.getBlockPos(), 6);
+        return countTurbines(level, controller.getBlockPos(), 8);
     }
 
     public static int countTurbines(net.minecraft.world.level.Level level, BlockPos center, int radius) {
