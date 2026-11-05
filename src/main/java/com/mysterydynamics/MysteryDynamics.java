@@ -20,6 +20,7 @@ import com.mysterydynamics.block.LargeCentrifugeInputBlockEntity;
 import com.mysterydynamics.block.LargeCentrifugePortBlock;
 import com.mysterydynamics.block.LargeCentrifugePortBlockEntity;
 import com.mysterydynamics.block.RedstoneEngineBlock;
+import com.mysterydynamics.block.StationBlock;
 import com.mysterydynamics.block.RedstoneEngineBlockEntity;
 import com.mysterydynamics.compat.InfernalBoilerConstruct;
 import com.mysterydynamics.compat.InfernalBoilerStructure;
@@ -183,17 +184,17 @@ public class MysteryDynamics {
     /** 器械制作台 / 机械师工作站。 */
     public static final DeferredBlock<Block> MECHANIST_WORKSTATION =
             BLOCKS.register("mechanist_workstation",
-                    () -> new Block(stationProperties()));
+                    () -> new StationBlock(stationProperties()));
 
     /** 轻量化炼金作坊 / 小型炼金台。 */
     public static final DeferredBlock<Block> ALCHEMY_WORKSHOP =
             BLOCKS.register("alchemy_workshop",
-                    () -> new Block(stationProperties()));
+                    () -> new StationBlock(stationProperties()));
 
     /** 神秘使工作站。 */
     public static final DeferredBlock<Block> THAUMATURGE_WORKSTATION =
             BLOCKS.register("thaumaturge_workstation",
-                    () -> new Block(stationProperties()));
+                    () -> new StationBlock(stationProperties()));
 
     // ---- 物品 ----
     public static final DeferredItem<BlockItem> STRAW_ITEM = ITEMS.registerSimpleBlockItem(STRAW_GOLEM_POWER);

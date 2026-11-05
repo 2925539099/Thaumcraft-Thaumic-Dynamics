@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=north": {
       "model": "mystery_dynamics:block/alchemy_workshop"
+    },
+    "facing=east": {
+      "model": "mystery_dynamics:block/alchemy_workshop",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "mystery_dynamics:block/alchemy_workshop",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "mystery_dynamics:block/alchemy_workshop",
+      "y": 270
     }
   }
 }
