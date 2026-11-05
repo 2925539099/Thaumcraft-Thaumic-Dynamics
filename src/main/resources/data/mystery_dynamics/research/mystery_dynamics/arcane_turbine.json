@@ -14,7 +14,8 @@
   ],
   "siblings": [],
   "flags": [
-    "secondary"
+    "secondary",
+    "concealed"
   ],
   "text_pages": [
     "mystery_dynamics.research.arcane_turbine.text"
