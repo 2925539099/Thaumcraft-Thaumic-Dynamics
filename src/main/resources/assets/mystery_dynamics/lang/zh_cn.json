@@ -108,5 +108,8 @@
   "block.mystery_dynamics.thaumaturge_workstation": "神秘使工作站",
   "mystery_dynamics.tooltip.stress": "应力量：",
   "mystery_dynamics.tooltip.rpm": "%sx RPM",
-  "mystery_dynamics.tooltip.max_stress": "-> 最多 %s su"
+  "mystery_dynamics.tooltip.max_stress": "-> 最多 %s su",
+  "tc.research_name.MONEY_AND_POWER": "金钱与动力",
+  "tc.research_text.MONEY_AND_POWER": "他们显然不明白自己产出了多少的财富",
+  "mystery_dynamics.research.money_and_power.text": "传统的工坊始终存在着先天缺陷——至少对你日益膨胀的订单量来说是这样的。\n\n为了赶在交货期限前交货，你抱着试一试的态度雇佣了几个村民来承担一些基础任务。令人惊喜的是，这些大鼻子们的劳动效率出奇地高，不仅让生产进度大幅提前，而且他们在一些微小利润的激励下学习迅速，很快便熟练的接管了一些工艺流程。\n\n比起那些漫天要价的同行们来说，这些哼哼哈哈的家伙们显然是个性价比极高的人工替代方案，而且利润要的也不多。\n\n是时候彻底和那些到处吃拿卡要的家伙们说再见了。"
 }

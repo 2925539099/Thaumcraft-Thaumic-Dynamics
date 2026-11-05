@@ -1,0 +1,26 @@
+{
+  "key": "MONEY_AND_POWER",
+  "order": 18,
+  "category": "MYSTERY_DYNAMICS",
+  "col": -3,
+  "row": 0,
+  "complexity": 0,
+  "warp": 0,
+  "parents": [],
+  "parents_hidden": [],
+  "siblings": [],
+  "flags": [
+    "autoUnlock"
+  ],
+  "text_pages": [
+    "mystery_dynamics.research.money_and_power.text"
+  ],
+  "pages": [
+    {
+      "type": "TEXT",
+      "text": "mystery_dynamics.research.money_and_power.text",
+      "source": "mystery_dynamics.research.money_and_power.text"
+    }
+  ],
+  "icon": "minecraft:textures/item/emerald.png"
+}
