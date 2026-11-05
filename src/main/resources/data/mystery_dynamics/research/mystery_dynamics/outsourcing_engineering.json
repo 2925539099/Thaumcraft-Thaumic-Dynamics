@@ -1,0 +1,28 @@
+{
+  "key": "OUTSOURCING_ENGINEERING",
+  "order": 19,
+  "category": "MYSTERY_DYNAMICS",
+  "col": -4,
+  "row": 2,
+  "complexity": 0,
+  "warp": 0,
+  "parents": [
+    "MONEY_AND_POWER"
+  ],
+  "parents_hidden": [],
+  "siblings": [],
+  "flags": [
+    "autoUnlock"
+  ],
+  "text_pages": [
+    "mystery_dynamics.research.outsourcing_engineering.text"
+  ],
+  "item": "thaumcraft:arcane_workbench",
+  "pages": [
+    {
+      "type": "TEXT",
+      "text": "mystery_dynamics.research.outsourcing_engineering.text",
+      "source": "mystery_dynamics.research.outsourcing_engineering.text"
+    }
+  ]
+}
