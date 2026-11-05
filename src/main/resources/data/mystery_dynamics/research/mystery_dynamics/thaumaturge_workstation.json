@@ -19,7 +19,9 @@
   ],
   "parents_hidden": [],
   "siblings": [],
-  "flags": [],
+  "flags": [
+    "secondary"
+  ],
   "text_pages": [
     "mystery_dynamics.research.thaumaturge_workstation.text"
   ],
