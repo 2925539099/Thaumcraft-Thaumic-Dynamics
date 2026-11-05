@@ -180,6 +180,21 @@ public class MysteryDynamics {
             BLOCKS.register("arcane_turbine",
                     () -> new ArcaneTurbineBlock(arcaneTurbineProperties()));
 
+    /** 器械制作台 / 机械师工作站。 */
+    public static final DeferredBlock<Block> MECHANIST_WORKSTATION =
+            BLOCKS.register("mechanist_workstation",
+                    () -> new Block(stationProperties()));
+
+    /** 轻量化炼金作坊 / 小型炼金台。 */
+    public static final DeferredBlock<Block> ALCHEMY_WORKSHOP =
+            BLOCKS.register("alchemy_workshop",
+                    () -> new Block(stationProperties()));
+
+    /** 神秘使工作站。 */
+    public static final DeferredBlock<Block> THAUMATURGE_WORKSTATION =
+            BLOCKS.register("thaumaturge_workstation",
+                    () -> new Block(stationProperties()));
+
     // ---- 物品 ----
     public static final DeferredItem<BlockItem> STRAW_ITEM = ITEMS.registerSimpleBlockItem(STRAW_GOLEM_POWER);
     public static final DeferredItem<BlockItem> WOOD_ITEM = ITEMS.registerSimpleBlockItem(WOOD_GOLEM_POWER);
@@ -194,6 +209,12 @@ public class MysteryDynamics {
     public static final DeferredItem<BlockItem> INFERNAL_BOILER_ITEM = ITEMS.registerSimpleBlockItem(INFERNAL_BOILER);
     public static final DeferredItem<BlockItem> INFERNAL_BOILER_FACE_ITEM = ITEMS.registerSimpleBlockItem(INFERNAL_BOILER_FACE);
     public static final DeferredItem<BlockItem> ARCANE_TURBINE_ITEM = ITEMS.registerSimpleBlockItem(ARCANE_TURBINE);
+    public static final DeferredItem<BlockItem> MECHANIST_WORKSTATION_ITEM =
+            ITEMS.registerSimpleBlockItem(MECHANIST_WORKSTATION);
+    public static final DeferredItem<BlockItem> ALCHEMY_WORKSHOP_ITEM =
+            ITEMS.registerSimpleBlockItem(ALCHEMY_WORKSHOP);
+    public static final DeferredItem<BlockItem> THAUMATURGE_WORKSTATION_ITEM =
+            ITEMS.registerSimpleBlockItem(THAUMATURGE_WORKSTATION);
 
     // ---- 揭示之工程师护目镜：护甲值继承揭示之护目镜，无耐久 ----
     public static final DeferredHolder<ArmorMaterial, ArmorMaterial> REVEALING_ENGINEER_GOGGLES_MATERIAL =
@@ -309,6 +330,9 @@ public class MysteryDynamics {
                         output.accept(NERIIDS_PROTECTION.get());
                         output.accept(HIGH_PRESSURE_LAUNCHER.get());
                         output.accept(ARCANE_TURBINE_ITEM.get());
+                        output.accept(MECHANIST_WORKSTATION_ITEM.get());
+                        output.accept(ALCHEMY_WORKSHOP_ITEM.get());
+                        output.accept(THAUMATURGE_WORKSTATION_ITEM.get());
                     })
                     .build());
 
@@ -388,8 +412,15 @@ public class MysteryDynamics {
         return LARGE_CENTRIFUGE_CASING_BE.get();
     }
 
-    private static BlockBehaviour.Properties arcaneTurbineProperties() {
+    private static BlockBehaviour.Properties stationProperties() {
         return BlockBehaviour.Properties.of()
+                .mapColor(MapColor.WOOD)
+                .strength(2.5F, 6.0F)
+                .sound(SoundType.WOOD)
+                .noOcclusion();
+    }
+
+    private static BlockBehaviour.Properties arcaneTurbineProperties() {        return BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_PURPLE)
                 .strength(2.0F, 6.0F)
                 .sound(SoundType.COPPER)
