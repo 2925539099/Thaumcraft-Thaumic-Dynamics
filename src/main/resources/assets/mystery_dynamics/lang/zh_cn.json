@@ -115,5 +115,8 @@
   "tc.research_name.OUTSOURCING_ENGINEERING": "外包工程",
   "tc.research_text.OUTSOURCING_ENGINEERING": "简单高效",
   "mystery_dynamics.research.outsourcing_engineering.text": "雇佣村民生产虽然解决了人手问题，但只靠死板的报酬，很难让他们的效率再进一步。\n\n为了充分调动他们的主观能动性，你决定改变合作模式：不再直接监管生产过程，而是提供简化的设备与基础原料，并签下一纸具有法律效力的外包契约——你只管下发订单和材料，他们按时交付合格成品。\n\n至于报酬，别再想那些根本流通不开的金币了；用这些大鼻子最喜欢的绿宝石来结算吧。",
-  "mystery_dynamics.research.outsourcing_engineering.image": "<IMG>mystery_dynamics:textures/research/outsourcing.png:0:0:255:255:.25</IMG>"
+  "mystery_dynamics.research.outsourcing_engineering.image": "<IMG>mystery_dynamics:textures/research/outsourcing.png:0:0:255:255:.25</IMG>",
+  "tc.research_name.THAUMATURGE_WORKSTATION": "神秘使工作站",
+  "tc.research_text.THAUMATURGE_WORKSTATION": "分发订单",
+  "mystery_dynamics.research.thaumaturge_workstation.text": "许多基础的物品素材并不涉及高深的技术运用，只是单纯地需要重复劳作。于是你挑选了一批技术门槛不高、但极其消耗精力的玩意授权给了这群大鼻子。\n\n出乎意料的是，只要按时结清报酬，这些村民便会在工作站前哼哧哼哧地干上一整天，产出极其稳定的素材。\n\n比起和那群自命不凡的同行们勾心斗角，把这种粗活交给听话的村民显然轻松得多。你现在可以将更多的精力投身于更重要的研究了。"
 }

@@ -1,0 +1,52 @@
+{
+  "key": "THAUMATURGE_WORKSTATION",
+  "order": 21,
+  "category": "MYSTERY_DYNAMICS",
+  "col": -4,
+  "row": 4,
+  "complexity": 3,
+  "warp": 0,
+  "parents": [
+    "OUTSOURCING_ENGINEERING",
+    "DISTILESSENTIA",
+    "PAVETRAVEL",
+    "PAVEWARD",
+    "ENCHFABRIC",
+    "THAUMIUM",
+    "JARLABEL",
+    "NODESTABILIZER",
+    "NODESTABILIZERADV"
+  ],
+  "parents_hidden": [],
+  "siblings": [],
+  "flags": [],
+  "text_pages": [
+    "mystery_dynamics.research.thaumaturge_workstation.text"
+  ],
+  "aspects": [
+    {
+      "aspect": "cognitio",
+      "amount": 6
+    },
+    {
+      "aspect": "fabrico",
+      "amount": 6
+    },
+    {
+      "aspect": "lucrum",
+      "amount": 6
+    }
+  ],
+  "item": "mystery_dynamics:thaumaturge_workstation",
+  "pages": [
+    {
+      "type": "TEXT",
+      "text": "mystery_dynamics.research.thaumaturge_workstation.text",
+      "source": "mystery_dynamics.research.thaumaturge_workstation.text"
+    },
+    {
+      "type": "ARCANE",
+      "source": "THAUMATURGE_WORKSTATION"
+    }
+  ]
+}

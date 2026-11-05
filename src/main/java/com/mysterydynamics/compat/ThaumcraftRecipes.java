@@ -239,6 +239,25 @@ public final class ThaumcraftRecipes {
                 'F', stack("create", "encased_fan"),
                 'G', stack("thaumcraft", "greatwood_planks"),
                 'A', alchemicalConstruct);
+
+        // 神秘使工作站：金杖端 / 宏伟之木杖柄 / 金杖端
+        //               魔导手册 / 奥术工作台 / 知识碎片
+        ThaumcraftApi.addArcaneCraftingRecipe(
+                "THAUMATURGE_WORKSTATION",
+                new ItemStack(MysteryDynamics.THAUMATURGE_WORKSTATION_ITEM.get()),
+                new AspectList()
+                        .add(Aspect.AIR, 10)
+                        .add(Aspect.FIRE, 10)
+                        .add(Aspect.WATER, 10)
+                        .add(Aspect.EARTH, 10)
+                        .add(Aspect.ORDER, 10)
+                        .add(Aspect.ENTROPY, 10),
+                "ABA", "CDE",
+                'A', stack("thaumcraft", "wand_cap_gold"),
+                'B', stack("thaumcraft", "wand_rod_greatwood"),
+                'C', stack("thaumcraft", "thaumonomicon"),
+                'D', stack("thaumcraft", "arcane_workbench"),
+                'E', stack("thaumcraft", "knowledge_fragment"));
     }
 
     /** 书页居中显示（图案补到 3 格宽），合成时仍允许左右平移。 */
