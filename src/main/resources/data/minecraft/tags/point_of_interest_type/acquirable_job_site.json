@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "mystery_dynamics:thaumaturge_workstation",
+    "mystery_dynamics:alchemy_workshop",
+    "mystery_dynamics:mechanist_workstation"
+  ]
+}

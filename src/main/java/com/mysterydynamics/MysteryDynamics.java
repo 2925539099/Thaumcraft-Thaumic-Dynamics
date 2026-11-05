@@ -28,6 +28,7 @@ import com.mysterydynamics.compat.LargeCentrifugeConstruct;
 import com.mysterydynamics.item.HighPressureLauncherItem;
 import com.mysterydynamics.item.NeriidsProtectionItem;
 import com.mysterydynamics.item.RevealingEngineerGogglesItem;
+import com.mysterydynamics.villager.ModVillagers;
 import com.simibubi.create.api.stress.BlockStressValues;
 import com.simibubi.create.content.equipment.goggles.GogglesItem;
 import com.simibubi.create.content.fluids.tank.FluidTankBlockEntity;
@@ -343,6 +344,7 @@ public class MysteryDynamics {
         ARMOR_MATERIALS.register(modEventBus);
         BLOCK_ENTITY_TYPES.register(modEventBus);
         CREATIVE_TABS.register(modEventBus);
+        ModVillagers.register(modEventBus);
         modEventBus.addListener(MysteryDynamics::commonSetup);
         modEventBus.addListener(MysteryDynamics::registerCapabilities);
     }

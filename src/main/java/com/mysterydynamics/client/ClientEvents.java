@@ -4,7 +4,9 @@ import com.mysterydynamics.MysteryDynamics;
 import com.simibubi.create.content.equipment.potatoCannon.PotatoCannonItemRenderer;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.VillagerRenderer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -47,6 +49,13 @@ public final class ClientEvents {
                 ArcaneTurbineRenderer::new);
         NeoForge.EVENT_BUS.addListener(InfernalBoilerWorldRenderer::onRenderLevel);
         preloadResearchIcons();
+    }
+
+    @SubscribeEvent
+    public static void addLayers(EntityRenderersEvent.AddLayers event) {
+        if (event.getRenderer(EntityType.VILLAGER) instanceof VillagerRenderer renderer) {
+            renderer.addLayer(new MechanistSkinLayer(renderer));
+        }
     }
 
     private static void preloadResearchIcons() {
