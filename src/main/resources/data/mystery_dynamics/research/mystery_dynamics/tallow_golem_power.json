@@ -12,7 +12,9 @@
   ],
   "parents_hidden": [],
   "siblings": [],
-  "flags": [],
+  "flags": [
+    "concealed"
+  ],
   "text_pages": [
     "mystery_dynamics.research.tallow_golem_power.text"
   ],
