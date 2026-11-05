@@ -258,6 +258,26 @@ public final class ThaumcraftRecipes {
                 'C', stack("thaumcraft", "thaumonomicon"),
                 'D', stack("thaumcraft", "arcane_workbench"),
                 'E', stack("thaumcraft", "knowledge_fragment"));
+
+        // 小型炼金台：奥术蒸馏器 / 魔导手册 / 铁桶
+        //             炼金炉 / 台桌 / 闪耀之光
+        ThaumcraftApi.addArcaneCraftingRecipe(
+                "ALCHEMY_WORKSHOP",
+                new ItemStack(MysteryDynamics.ALCHEMY_WORKSHOP_ITEM.get()),
+                new AspectList()
+                        .add(Aspect.AIR, 30)
+                        .add(Aspect.FIRE, 30)
+                        .add(Aspect.WATER, 30)
+                        .add(Aspect.EARTH, 30)
+                        .add(Aspect.ORDER, 30)
+                        .add(Aspect.ENTROPY, 30),
+                "ABC", "DEF",
+                'A', stack("thaumcraft", "arcane_alembic"),
+                'B', stack("thaumcraft", "thaumonomicon"),
+                'C', new ItemStack(Items.BUCKET),
+                'D', stack("thaumcraft", "alchemical_furnace"),
+                'E', stack("thaumcraft", "table"),
+                'F', stack("thaumcraft", "nitor"));
     }
 
     /** 书页居中显示（图案补到 3 格宽），合成时仍允许左右平移。 */

@@ -1,0 +1,58 @@
+{
+  "key": "ALCHEMY_WORKSHOP",
+  "order": 22,
+  "category": "MYSTERY_DYNAMICS",
+  "col": -4,
+  "row": 5,
+  "complexity": 3,
+  "warp": 0,
+  "parents": [
+    "OUTSOURCING_ENGINEERING",
+    "DISTILESSENTIA",
+    "JARLABEL",
+    "PUREIRON",
+    "ETHEREALBLOOM",
+    "LIQUIDDEATH",
+    "ESSENTIACRYSTAL",
+    "THAUMATORIUM",
+    "GOLEMSTRAW"
+  ],
+  "parents_hidden": [],
+  "siblings": [],
+  "flags": [
+    "secondary"
+  ],
+  "text_pages": [
+    "mystery_dynamics.research.alchemy_workshop.text"
+  ],
+  "aspects": [
+    {
+      "aspect": "instrumentum",
+      "amount": 6
+    },
+    {
+      "aspect": "fabrico",
+      "amount": 6
+    },
+    {
+      "aspect": "ardor",
+      "amount": 6
+    },
+    {
+      "aspect": "vas",
+      "amount": 6
+    }
+  ],
+  "item": "mystery_dynamics:alchemy_workshop",
+  "pages": [
+    {
+      "type": "TEXT",
+      "text": "mystery_dynamics.research.alchemy_workshop.text",
+      "source": "mystery_dynamics.research.alchemy_workshop.text"
+    },
+    {
+      "type": "ARCANE",
+      "source": "ALCHEMY_WORKSHOP"
+    }
+  ]
+}
