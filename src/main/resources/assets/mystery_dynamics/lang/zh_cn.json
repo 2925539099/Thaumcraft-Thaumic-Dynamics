@@ -114,5 +114,6 @@
   "mystery_dynamics.research.money_and_power.text": "传统工坊始终存在先天缺陷——至少对你日益膨胀的订单量而言是这样。\n\n为了赶在交货期限前完成订单，你抱着试一试的态度雇了几个村民承担基础工作。令人惊喜的是，这些大鼻子干活出奇地利索，不仅让生产进度大幅提前，而且只要给一点微薄利润，他们学得飞快，很快就熟练接管了一部分流程。\n\n比起那些漫天要价的同行，这些哼哼哈哈的家伙显然是性价比极高的人工替代方案，而且要求的利润也不多。\n\n是时候彻底和那些到处吃拿卡要的家伙们说再见了。",
   "tc.research_name.OUTSOURCING_ENGINEERING": "外包工程",
   "tc.research_text.OUTSOURCING_ENGINEERING": "简单高效",
-  "mystery_dynamics.research.outsourcing_engineering.text": "雇佣村民生产虽然解决了人手问题，但只靠死板的报酬，很难让他们的效率再进一步。\n\n为了充分调动他们的主观能动性，你决定改变合作模式：不再直接监管生产过程，而是提供简化的设备与基础原料，并签下一纸具有法律效力的外包契约——你只管下发订单和材料，他们按时交付合格成品。\n\n至于报酬，别再想那些根本流通不开的金币了；用这些大鼻子最喜欢的绿宝石来结算吧。"
+  "mystery_dynamics.research.outsourcing_engineering.text": "雇佣村民生产虽然解决了人手问题，但只靠死板的报酬，很难让他们的效率再进一步。\n\n为了充分调动他们的主观能动性，你决定改变合作模式：不再直接监管生产过程，而是提供简化的设备与基础原料，并签下一纸具有法律效力的外包契约——你只管下发订单和材料，他们按时交付合格成品。\n\n至于报酬，别再想那些根本流通不开的金币了；用这些大鼻子最喜欢的绿宝石来结算吧。",
+  "mystery_dynamics.research.outsourcing_engineering.image": "<IMG>mystery_dynamics:textures/research/outsourcing.png:0:0:1024:1024:.18</IMG>"
 }

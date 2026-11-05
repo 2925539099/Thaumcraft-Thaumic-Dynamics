@@ -15,7 +15,8 @@
     "autoUnlock"
   ],
   "text_pages": [
-    "mystery_dynamics.research.outsourcing_engineering.text"
+    "mystery_dynamics.research.outsourcing_engineering.text",
+    "mystery_dynamics.research.outsourcing_engineering.image"
   ],
   "item": "thaumcraft:arcane_workbench",
   "pages": [
@@ -23,6 +24,11 @@
       "type": "TEXT",
       "text": "mystery_dynamics.research.outsourcing_engineering.text",
       "source": "mystery_dynamics.research.outsourcing_engineering.text"
+    },
+    {
+      "type": "TEXT",
+      "text": "mystery_dynamics.research.outsourcing_engineering.image",
+      "source": "mystery_dynamics.research.outsourcing_engineering.image"
     }
   ]
 }
