@@ -2,8 +2,8 @@
   "key": "THAUMATURGE_WORKSTATION",
   "order": 21,
   "category": "MYSTERY_DYNAMICS",
-  "col": -5,
-  "row": 2,
+  "col": -4,
+  "row": 4,
   "complexity": 3,
   "warp": 0,
   "parents": [

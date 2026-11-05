@@ -2,8 +2,8 @@
   "key": "ALCHEMY_WORKSHOP",
   "order": 22,
   "category": "MYSTERY_DYNAMICS",
-  "col": -4,
-  "row": 5,
+  "col": -5,
+  "row": 4,
   "complexity": 3,
   "warp": 0,
   "parents": [
