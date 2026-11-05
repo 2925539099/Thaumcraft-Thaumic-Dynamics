@@ -4,6 +4,7 @@ import com.mysterydynamics.MysteryDynamics;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -13,6 +14,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.village.VillagerTradesEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -80,7 +82,7 @@ public final class VillagerTrades {
         add(e, 1, "thaumcraft:glass_phial", 12, "minecraft:emerald", 1, 12, 2);
         add(e, 1, "minecraft:emerald", 1, "thaumcraft:glass_phial", 8, 16, 1);
         addRange(e, 1, "minecraft:coal", 3, 16, "minecraft:emerald", 1, 12, 2);
-        add(e, 1, "thaumcraft:phial_of_essentia", 4, "minecraft:emerald", 4, 12, 2);
+        addPhialCost(e, 1, 4, 4, 12, 2);
         // 2 级
         addTwo(e, 2, "minecraft:raw_iron", 4, "minecraft:emerald", 16,
                 "thaumcraft:native_iron_cluster", 4, 8, 5);
@@ -103,7 +105,7 @@ public final class VillagerTrades {
         add(e, 5, "minecraft:emerald", 12, "thaumcraft:bucket_death", 1, 1, 30);
         add(e, 5, "minecraft:emerald", 12, "thaumcraft:essentia_crystallizer", 1, 2, 30);
         add(e, 5, "minecraft:emerald", 6, "thaumcraft:mnemonic_matrix", 1, 3, 30);
-        addRange(e, 5, "minecraft:emerald", 8, 32, "thaumcraft:phial_of_essentia", 4, 4, 30);
+        addPhialResultRange(e, 5, 8, 32, 4, 4, 30);
     }
 
     private static void mechanist(VillagerTradesEvent e) {
@@ -171,6 +173,39 @@ public final class VillagerTrades {
                 new ItemCost(Items.EMERALD, min + random.nextInt(max - min + 1)),
                 new ItemStack(golems.get(random.nextInt(golems.size()))),
                 uses, xp, FLOAT));
+    }
+
+    private static void addPhialCost(VillagerTradesEvent e, int level, int count,
+                                     int emeralds, int uses, int xp) {
+        e.getTrades().get(level).add((trader, random) -> new MerchantOffer(
+                new ItemCost(randomPhial(random), count),
+                new ItemStack(Items.EMERALD, emeralds), uses, xp, FLOAT));
+    }
+
+    private static void addPhialResultRange(VillagerTradesEvent e, int level, int min, int max,
+                                            int resultCount, int uses, int xp) {
+        e.getTrades().get(level).add((trader, random) -> new MerchantOffer(
+                new ItemCost(Items.EMERALD, min + random.nextInt(max - min + 1)),
+                new ItemStack(randomPhial(random), resultCount), uses, xp, FLOAT));
+    }
+
+    private static List<Item> PHIAL_ITEMS;
+
+    private static Item randomPhial(RandomSource random) {
+        if (PHIAL_ITEMS == null) {
+            PHIAL_ITEMS = new ArrayList<>();
+            for (var entry : BuiltInRegistries.ITEM.entrySet()) {
+                ResourceLocation id = entry.getKey().location();
+                if (id.getNamespace().equals("thaumcraft")
+                        && id.getPath().startsWith("phial_of_essentia_")) {
+                    PHIAL_ITEMS.add(entry.getValue());
+                }
+            }
+        }
+        if (PHIAL_ITEMS.isEmpty()) {
+            return item("thaumcraft:phial_of_essentia");
+        }
+        return PHIAL_ITEMS.get(random.nextInt(PHIAL_ITEMS.size()));
     }
 
     private static Item item(String id) {
