@@ -560,7 +560,7 @@
         }
       },
       "rotation": {
-        "angle": -15,
+        "angle": -22.5,
         "axis": "y",
         "origin": [
           10.75,
@@ -638,7 +638,7 @@
         }
       },
       "rotation": {
-        "angle": -15,
+        "angle": -22.5,
         "axis": "y",
         "origin": [
           10.75,
@@ -716,7 +716,7 @@
         }
       },
       "rotation": {
-        "angle": -15,
+        "angle": -22.5,
         "axis": "y",
         "origin": [
           10.75,
@@ -1422,7 +1422,7 @@
         }
       },
       "rotation": {
-        "angle": 15,
+        "angle": 22.5,
         "axis": "y",
         "origin": [
           8,
@@ -1500,7 +1500,7 @@
         }
       },
       "rotation": {
-        "angle": 15,
+        "angle": 22.5,
         "axis": "y",
         "origin": [
           8,
@@ -1578,7 +1578,7 @@
         }
       },
       "rotation": {
-        "angle": 15,
+        "angle": 22.5,
         "axis": "y",
         "origin": [
           8,
