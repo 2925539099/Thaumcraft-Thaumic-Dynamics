@@ -20,7 +20,8 @@
   "parents_hidden": [],
   "siblings": [],
   "flags": [
-    "secondary"
+    "secondary",
+    "concealed"
   ],
   "text_pages": [
     "mystery_dynamics.research.alchemy_workshop.text"
