@@ -294,7 +294,7 @@ public final class ThaumcraftRecipes {
                         .add(Aspect.ENTROPY, 5),
                 "ABC", "DEF", "GHG",
                 'A', stack("create", "wrench"),
-                'B', stack("thaumcraft", "arcane_stone_stairs"),
+                'B', stack("thaumcraft", "arcane_stone_slab"),
                 'C', stack("create", "brass_hand"),
                 'D', stack("thaumcraft", "greatwood_planks"),
                 'E', new ItemStack(Items.STICK),
