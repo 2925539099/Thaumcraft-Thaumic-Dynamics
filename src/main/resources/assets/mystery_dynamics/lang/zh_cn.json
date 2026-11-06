@@ -125,5 +125,5 @@
   "tc.research_name.COOPERATIVE_WORK": "联合作业",
   "tc.research_text.COOPERATIVE_WORK": "联合生产",
   "mystery_dynamics.research.cooperative_work.text": "相较于神秘学中那些晦涩难懂的公式与物料配比，纯粹的机械工程学门槛无疑要低得多。\n\n大鼻子们并不需要理解构建的受力分析或气密原理，只需要照着图纸照猫画虎就能快速上手组装。即使是刚入门的家伙也足以胜任这些枯燥乏味的任务。\n\n你的一位合作伙伴在得知这一议程后大感兴趣，也打算在他的工坊内试着雇佣村民来提升产能。不过为了防止这群刚入门的技霸们把设备给折腾成废铁，他向你订购了一套耐用的工作站，并向你提供了一些技术资料作为报酬。\n\n作为交换，你同意以友情价的价格来收取加工费，利用成熟的生产流程来为他批量生产工作站。",
-  "mystery_dynamics.research.cooperative_work.image": "<IMG>mystery_dynamics:textures/research/cooperative_work_page.png:0:0:255:188:.5</IMG><BR>如图，右一为正带领村民展望未来的合作伙伴。"
+  "mystery_dynamics.research.cooperative_work.image": "<IMG>mystery_dynamics:textures/research/cooperative_work_page.png:0:0:255:188:.45</IMG><BR>如图，右一为正带领村民展望未来的合作伙伴。"
 }
