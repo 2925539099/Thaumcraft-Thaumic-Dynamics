@@ -1,0 +1,48 @@
+{
+  "key": "MECHANIST_WORKSTATION",
+  "order": 24,
+  "category": "MYSTERY_DYNAMICS",
+  "col": -7,
+  "row": 1,
+  "complexity": 3,
+  "warp": 0,
+  "parents": [
+    "COOPERATIVE_WORK",
+    "THAUMIUM"
+  ],
+  "parents_hidden": [],
+  "siblings": [],
+  "flags": [
+    "secondary",
+    "concealed"
+  ],
+  "text_pages": [
+    "mystery_dynamics.research.mechanist_workstation.text"
+  ],
+  "aspects": [
+    {
+      "aspect": "instrumentum",
+      "amount": 6
+    },
+    {
+      "aspect": "fabrico",
+      "amount": 6
+    },
+    {
+      "aspect": "permutatio",
+      "amount": 6
+    }
+  ],
+  "item": "mystery_dynamics:mechanist_workstation",
+  "pages": [
+    {
+      "type": "TEXT",
+      "text": "mystery_dynamics.research.mechanist_workstation.text",
+      "source": "mystery_dynamics.research.mechanist_workstation.text"
+    },
+    {
+      "type": "ARCANE",
+      "source": "MECHANIST_WORKSTATION"
+    }
+  ]
+}

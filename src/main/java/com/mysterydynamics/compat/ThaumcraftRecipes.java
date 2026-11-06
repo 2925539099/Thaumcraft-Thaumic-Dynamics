@@ -278,6 +278,29 @@ public final class ThaumcraftRecipes {
                 'D', stack("thaumcraft", "alchemical_furnace"),
                 'E', stack("thaumcraft", "table"),
                 'F', stack("thaumcraft", "nitor"));
+
+        // 机械师工作站：扳手 / 奥术石台阶 / 黄铜手部零件
+        //               宏伟之树木板 / 木棍 / 宏伟之树木板
+        //               神秘锭 / 神秘方块 / 神秘锭
+        ThaumcraftApi.addArcaneCraftingRecipe(
+                "MECHANIST_WORKSTATION",
+                new ItemStack(MysteryDynamics.MECHANIST_WORKSTATION_ITEM.get()),
+                new AspectList()
+                        .add(Aspect.AIR, 5)
+                        .add(Aspect.FIRE, 5)
+                        .add(Aspect.WATER, 5)
+                        .add(Aspect.EARTH, 5)
+                        .add(Aspect.ORDER, 5)
+                        .add(Aspect.ENTROPY, 5),
+                "ABC", "DEF", "GHG",
+                'A', stack("create", "wrench"),
+                'B', stack("thaumcraft", "arcane_stone_stairs"),
+                'C', stack("create", "brass_hand"),
+                'D', stack("thaumcraft", "greatwood_planks"),
+                'E', new ItemStack(Items.STICK),
+                'F', stack("thaumcraft", "greatwood_planks"),
+                'G', stack("thaumcraft", "thaumium_ingot"),
+                'H', stack("thaumcraft", "thaumium_block"));
     }
 
     /** 书页居中显示（图案补到 3 格宽），合成时仍允许左右平移。 */
