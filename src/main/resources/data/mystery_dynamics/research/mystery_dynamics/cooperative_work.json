@@ -12,8 +12,7 @@
   "parents_hidden": [],
   "siblings": [],
   "flags": [
-    "secondary",
-    "concealed"
+    "autoUnlock"
   ],
   "text_pages": [
     "mystery_dynamics.research.cooperative_work.text",
