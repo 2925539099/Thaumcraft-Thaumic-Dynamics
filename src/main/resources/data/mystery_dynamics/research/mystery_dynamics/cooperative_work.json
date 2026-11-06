@@ -1,0 +1,35 @@
+{
+  "key": "COOPERATIVE_WORK",
+  "order": 23,
+  "category": "MYSTERY_DYNAMICS",
+  "col": -5,
+  "row": 1,
+  "complexity": 0,
+  "warp": 0,
+  "parents": [
+    "OUTSOURCING_ENGINEERING"
+  ],
+  "parents_hidden": [],
+  "siblings": [],
+  "flags": [
+    "secondary",
+    "concealed"
+  ],
+  "text_pages": [
+    "mystery_dynamics.research.cooperative_work.text",
+    "mystery_dynamics.research.cooperative_work.image"
+  ],
+  "pages": [
+    {
+      "type": "TEXT",
+      "text": "mystery_dynamics.research.cooperative_work.text",
+      "source": "mystery_dynamics.research.cooperative_work.text"
+    },
+    {
+      "type": "TEXT",
+      "text": "mystery_dynamics.research.cooperative_work.image",
+      "source": "mystery_dynamics.research.cooperative_work.image"
+    }
+  ],
+  "icon": "mystery_dynamics:textures/research/cooperative_work.png"
+}
