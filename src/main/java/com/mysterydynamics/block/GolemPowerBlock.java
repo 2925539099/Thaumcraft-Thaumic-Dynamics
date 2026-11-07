@@ -11,6 +11,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -51,6 +52,26 @@ public class GolemPowerBlock extends HorizontalKineticBlock implements IBE<Golem
         return state.getValue(HORIZONTAL_FACING).getClockWise().getAxis();
     }
 
+    /**
+     * 传动轴与正面垂直，不能直接用父类“正面朝向相邻传动”的放置逻辑。
+     * 旁边有传动时，让旋转轴与该传动对齐；两个候选朝向里优先正面朝向玩家。
+     * 潜行放置或没有可对齐的传动时保持原来的“正面朝向玩家”。
+     */
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        Direction preferred = getPreferredHorizontalFacing(context);
+        boolean sneaking = context.getPlayer() != null && context.getPlayer().isShiftKeyDown();
+        if (preferred == null || sneaking) {
+            return super.getStateForPlacement(context);
+        }
+        Direction towardsPlayer = context.getHorizontalDirection().getOpposite();
+        // getClockWise().getAxis() == preferred.getAxis() 的朝向只有与 preferred 垂直的两个
+        Direction facing = towardsPlayer.getAxis() != preferred.getAxis()
+                ? towardsPlayer
+                : preferred.getClockWise();
+        return defaultBlockState().setValue(HORIZONTAL_FACING, facing);
+    }
+
     @Override
     public boolean hasShaftTowards(LevelReader world, BlockPos pos, BlockState state, Direction face) {
         return face.getAxis() == getRotationAxis(state);
@@ -83,7 +104,14 @@ public class GolemPowerBlock extends HorizontalKineticBlock implements IBE<Golem
         }
 
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof GolemPowerBlockEntity dynamo) {
-            dynamo.toggleDirection();
+            if (!dynamo.toggleDirection()) {
+                // 网络里还有别的动力源，翻转会与之冲突，拒绝并提示
+                if (context.getPlayer() != null) {
+                    context.getPlayer().displayClientMessage(net.minecraft.network.chat.Component.translatable(
+                            "mystery_dynamics.direction.blocked_other_generator"), true);
+                }
+                return InteractionResult.SUCCESS;
+            }
             notifyDirection(context.getPlayer(), dynamo);
             IWrenchable.playRotateSound(level, pos);
         }

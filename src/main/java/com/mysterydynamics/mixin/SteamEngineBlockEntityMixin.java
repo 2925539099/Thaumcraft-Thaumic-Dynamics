@@ -5,12 +5,10 @@ import com.simibubi.create.content.kinetics.steamEngine.SteamEngineBlock;
 import com.simibubi.create.content.kinetics.steamEngine.SteamEngineBlockEntity;
 
 import net.minecraft.core.Direction;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
@@ -34,14 +32,7 @@ public abstract class SteamEngineBlockEntityMixin {
         }
     }
 
-    /**
-     * 原版把锅炉效率 clamp 到 [0,1]。炼狱锅炉超频时效率需要到 2.0，
-     * 才能让 12 台引擎显示/输出满级锅炉两倍的 589824 SU。
-     */
-    @Redirect(method = "tick",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;clamp(FFF)F"),
-            remap = false)
-    private static float mysterydynamics$allowOverclockEfficiency(float value, float min, float max) {
-        return Mth.clamp(value, min, Math.max(max, 2.0F));
-    }
+    // 以前这里还有一个 @Redirect 把 tick 里的 Mth.clamp 上限放宽到 2.0，
+    // 但 InfernalBoilerData.getEngineEfficiency 永远 ≤ 1（超频只翻倍涡轮机总应力），
+    // 那个重定向对炼狱锅炉是死代码，却会改变所有锅炉/其他模组的蒸汽引擎行为，因此已移除。
 }

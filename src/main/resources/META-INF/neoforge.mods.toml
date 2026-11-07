@@ -25,7 +25,8 @@ side = "BOTH"
 [[dependencies.mystery_dynamics]]
 modId = "create"
 type = "required"
-versionRange = "[6.0.0,)"
+# 本模组通过 mixin 挂钩 Create 6.0.x 内部类；6.1 起签名可能变化，先限制版本避免启动崩溃。
+versionRange = "[6.0.0,6.1)"
 ordering = "NONE"
 side = "BOTH"
 

@@ -86,25 +86,26 @@ public class ArcaneTurbineBlock extends KineticBlock
         return state;
     }
 
-    @Override
-    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide) {
-            BlockPos otherPos = state.getValue(HALF) == DoubleBlockHalf.LOWER ? pos.above() : pos.below();
-            if (level.getBlockState(otherPos).is(this)) {
-                level.setBlock(otherPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
-            }
-        }
-        return super.playerWillDestroy(level, pos, state, player);
-    }
-
+    /**
+     * 另一半统一在 {@link #onRemove} 里拆除。不要在 playerWillDestroy 里提前拆：
+     * 那样另一半的 onRemove 会反过来先把玩家正在挖的这一半删掉，
+     * 导致原版的 removeBlock 失败、生存模式挖掉后什么也不掉。
+     */
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState,
                          boolean movedByPiston) {
         if (!level.isClientSide && !newState.is(this)) {
-            // 钻头、动态结构、爆炸等非玩家破坏也要拆掉另一半。
+            // 玩家、钻头、动态结构、爆炸等任何方式移除一半，都静默拆掉另一半：
+            // 只有被破坏的那一半走战利品表，所以整台只掉一个物品。
             BlockPos otherPos = state.getValue(HALF) == DoubleBlockHalf.LOWER ? pos.above() : pos.below();
-            if (level.getBlockState(otherPos).is(this)) {
-                level.setBlock(otherPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+            BlockState otherState = level.getBlockState(otherPos);
+            if (otherState.is(this)) {
+                level.setBlock(otherPos, Blocks.AIR.defaultBlockState(),
+                        Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS);
+                if (!movedByPiston) {
+                    // 与原版门一致：给另一半也播放破坏粒子/音效
+                    level.levelEvent(2001, otherPos, Block.getId(otherState));
+                }
             }
             boolean anyTurbineLeft = ArcaneTurbineBlockEntity.countTurbines(level, pos, 8) > 0;
             // 涡轮机移除后让相邻储罐重新评估锅炉状态，流体储罐会恢复原状。
@@ -147,8 +148,18 @@ public class ArcaneTurbineBlock extends KineticBlock
                 pos = pos.below();
             }
             if (level.getBlockEntity(pos) instanceof ArcaneTurbineBlockEntity turbine) {
-                turbine.toggleDirection();
-                IWrenchable.playRotateSound(level, pos);
+                boolean toggled = turbine.toggleDirection();
+                Player player = context.getPlayer();
+                if (player != null) {
+                    // 被其他动力源带动时会自动对齐回去，提示方向由网络决定
+                    String key = !toggled ? "mystery_dynamics.direction.locked_by_network"
+                            : turbine.isReversed() ? "mystery_dynamics.direction.ccw"
+                            : "mystery_dynamics.direction.cw";
+                    player.displayClientMessage(Component.translatable(key), true);
+                }
+                if (toggled) {
+                    IWrenchable.playRotateSound(level, pos);
+                }
             }
         }
         return InteractionResult.SUCCESS;
@@ -161,11 +172,10 @@ public class ArcaneTurbineBlock extends KineticBlock
             return InteractionResult.SUCCESS;
         }
         BlockPos pos = context.getClickedPos();
-        BlockPos otherPos = state.getValue(HALF) == DoubleBlockHalf.LOWER ? pos.above() : pos.below();
-        if (level.getBlockState(otherPos).is(this)) {
-            level.setBlock(otherPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+        // 另一半由 onRemove 静默拆除；只有真的移除成功才返还一个物品
+        if (!level.removeBlock(pos, false)) {
+            return InteractionResult.SUCCESS;
         }
-        level.removeBlock(pos, false);
         Player player = context.getPlayer();
         if (player != null && !player.isCreative()) {
             player.getInventory().placeItemBackInInventory(new ItemStack(asItem()));

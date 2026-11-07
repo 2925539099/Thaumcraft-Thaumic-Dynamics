@@ -3,7 +3,6 @@ package com.mysterydynamics.compat;
 import com.mysterydynamics.MysteryDynamics;
 import com.simibubi.create.AllBlocks;
 
-import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -55,11 +54,14 @@ public final class LargeCentrifugeCompat {
         if (!isStructureBlock(event.getLevel().getBlockState(event.getPos()))) {
             return;
         }
-        Direction face = event.getFace();
-        if (new LargeCentrifugeTrigger().performTrigger(event.getLevel(), stack, player,
-                event.getPos(), face == null ? Direction.UP : face, 0)) {
+        LargeCentrifugeTrigger.Outcome outcome =
+                LargeCentrifugeTrigger.attempt(event.getLevel(), stack, player, event.getPos());
+        if (outcome != LargeCentrifugeTrigger.Outcome.NOT_APPLICABLE) {
+            // 失败时同样吞掉这次点击：否则法杖物品还会经由 WandTriggerRegistry
+            // 再触发一次，导致提示与结构扫描重复。
             event.setCanceled(true);
-            event.setCancellationResult(InteractionResult.SUCCESS);
+            event.setCancellationResult(outcome == LargeCentrifugeTrigger.Outcome.FORMED
+                    ? InteractionResult.SUCCESS : InteractionResult.CONSUME);
         }
     }
 }

@@ -44,6 +44,8 @@ public final class LargeCentrifugeRenderer implements BlockEntityRenderer<LargeC
     private record ModelData(List<Quad> quads) {
     }
 
+    private static final org.slf4j.Logger LOGGER = com.mojang.logging.LogUtils.getLogger();
+
     private static ModelData staticModel;
     private static ModelData rotorModel;
     private static final Map<ResourceLocation, TextureAtlasSprite> SPRITES = new HashMap<>();
@@ -65,6 +67,13 @@ public final class LargeCentrifugeRenderer implements BlockEntityRenderer<LargeC
 
     public static void clearFrameCache() {
         RENDERED_THIS_FRAME.clear();
+    }
+
+    /** 资源重载（F3+T / 切换资源包）后丢弃模型与 sprite 缓存，避免贴图错位。 */
+    public static void clearCaches() {
+        staticModel = null;
+        rotorModel = null;
+        SPRITES.clear();
     }
 
     /** 视锥兜底渲染：pose 是关卡相机相对空间，需要自行平移到控制器。 */
@@ -182,8 +191,7 @@ public final class LargeCentrifugeRenderer implements BlockEntityRenderer<LargeC
             }
             return new ModelData(List.copyOf(quads));
         } catch (Exception exception) {
-            System.err.println("[mystery_dynamics] Failed to load large centrifuge model " + path
-                    + ": " + exception);
+            LOGGER.error("Failed to load large centrifuge model {}", path, exception);
             return new ModelData(List.of());
         }
     }

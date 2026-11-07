@@ -5,10 +5,12 @@ import com.simibubi.create.content.fluids.tank.BoilerData;
 import com.simibubi.create.content.fluids.tank.FluidTankBlockEntity;
 import com.simibubi.create.foundation.utility.CreateLang;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
 import java.util.List;
+import java.util.Locale;
 
 
 import net.neoforged.fml.ModList;
@@ -28,6 +30,10 @@ public class InfernalBoilerData extends BoilerData {
     public static final float VANILLA_MAX_BOILER_STRESS = 18.0F * 16.0F * ENGINE_STRESS;
     /** 超频时按原版满级锅炉最大应力的两倍计算。 */
     public static final float OVERCLOCK_TOTAL_STRESS = VANILLA_MAX_BOILER_STRESS * 2.0F;
+    /** 模型上能装风箱的位置数，见 InfernalBoilerCompat.countBellows。 */
+    private static final int MAX_BELLOWS = 3;
+    private static final String INDENT = "    ";
+    private static final String SUB_INDENT = "     ";
 
     private InfernalBoilerBlockEntity controller;
 
@@ -38,13 +44,20 @@ public class InfernalBoilerData extends BoilerData {
             return;
         }
         this.controller = boiler;
+        // 热量与引擎数只在服务端计算；客户端使用同步下来的值。
+        // 客户端没有可靠的 fireVisTicks/引擎数，自行计算会让护目镜显示错误或来回闪烁。
+        if (boiler.getLevel() == null || boiler.getLevel().isClientSide) {
+            return;
+        }
+        int before = activeHeat;
         updateCustomHeat(boiler);
-        // 只在服务端写引擎数；客户端使用同步下来的值。
-        // 否则客户端 linkedEngineCount 永远是0，护目镜会在0和真实值之间闪烁。
-        if (boiler.getLevel() != null && !boiler.getLevel().isClientSide) {
-            // 引擎数量由 linkNearbySteamEngines/BoilerDataMixin 统一统计，
-            // 这里不保存旧值，否则拆除涡轮机后会一直残留引擎数。
-            this.attachedEngines = boiler.linkedEngineCount();
+        // 引擎数量由 linkNearbySteamEngines/BoilerDataMixin 统一统计，
+        // 这里不保存旧值，否则拆除涡轮机后会一直残留引擎数。
+        this.attachedEngines = boiler.linkedEngineCount();
+        if (before != activeHeat) {
+            // 风箱/魔力/超频变化后立即同步热等级，不等 Create 的下一次采样。
+            boiler.setChanged();
+            boiler.sendData();
         }
     }
 
@@ -52,6 +65,9 @@ public class InfernalBoilerData extends BoilerData {
     public boolean updateTemperature(FluidTankBlockEntity tank) {
         if (!(tank instanceof InfernalBoilerBlockEntity boiler)) {
             return super.updateTemperature(tank);
+        }
+        if (boiler.getLevel() == null || boiler.getLevel().isClientSide) {
+            return false;
         }
         int before = activeHeat;
         updateCustomHeat(boiler);
@@ -79,10 +95,11 @@ public class InfernalBoilerData extends BoilerData {
     }
 
     private boolean hasWater(FluidTankBlockEntity tank) {
-        // 有任意储量（正常情况就是水）或仍有管道供水，都允许工作。
-        // 完全空仓且没有 waterSupply 时才停机。
-        return tank.getTankInventory().getFluidAmount() > 0
-                || (tank.boiler != null && tank.boiler.waterSupply > 0.0F);
+        // 储罐里必须是水（岩浆等其它流体不算），或仍有管道供水。
+        var fluid = tank.getTankInventory().getFluid();
+        boolean storedWater = !fluid.isEmpty()
+                && fluid.getFluid().is(net.minecraft.tags.FluidTags.WATER);
+        return storedWater || (tank.boiler != null && tank.boiler.waterSupply > 0.0F);
     }
 
     @Override
@@ -104,7 +121,8 @@ public class InfernalBoilerData extends BoilerData {
     public MutableComponent getHeatLevelTextComponent() {
         if (controller != null && controller.isOverclock()) {
             return Component.empty().append(
-                    Component.literal("超频").withStyle(net.minecraft.ChatFormatting.AQUA));
+                    Component.translatable("mystery_dynamics.infernal_boiler.goggles.overclock")
+                            .withStyle(ChatFormatting.AQUA));
         }
         int heat = Math.min(18, Math.max(0, activeHeat));
         if (isPassive()) {
@@ -127,16 +145,60 @@ public class InfernalBoilerData extends BoilerData {
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking, int boilerSize) {
         boolean result = super.addToGoggleTooltip(tooltip, isPlayerSneaking, boilerSize);
-        if (!result || controller == null || !controller.isOverclock() || tooltip.isEmpty()) {
+        if (!result || controller == null) {
             return result;
         }
-        int last = tooltip.size() - 1;
-        if (last >= 0) {
-            tooltip.set(last, Component.literal(
-                    "589,824 su  通过 " + attachedEngines + " 个引擎")
-                    .withStyle(net.minecraft.ChatFormatting.AQUA));
+        // Create 只有在接了引擎、且不处于“缺水显示进水速率”分支时，最后一行才是应力行。
+        if (controller.isOverclock() && attachedEngines > 0
+                && getMaxHeatLevelForWaterSupply() > 0 && !tooltip.isEmpty()) {
+            String total = String.format(Locale.ROOT, "%,d",
+                    Math.round(overclockCapacity(boilerSize)));
+            tooltip.set(tooltip.size() - 1, Component.literal(SUB_INDENT).append(
+                    Component.translatable("mystery_dynamics.infernal_boiler.goggles.overclock_capacity",
+                            total, attachedEngines).withStyle(ChatFormatting.AQUA)));
+        }
+
+        tooltip.add(Component.empty());
+        tooltip.add(Component.literal(INDENT).append(Component.translatable(
+                "mystery_dynamics.infernal_boiler.goggles.fire_essentia",
+                controller.fireEssentia(), InfernalBoilerBlockEntity.MAX_FIRE_ESSENTIA)
+                .withStyle(ChatFormatting.GOLD)));
+        int visTicks = controller.fireVisTicks();
+        tooltip.add(Component.literal(INDENT).append(visTicks > 0
+                ? Component.translatable("mystery_dynamics.infernal_boiler.goggles.vis_boost",
+                        (visTicks + 19) / 20).withStyle(ChatFormatting.LIGHT_PURPLE)
+                : Component.translatable("mystery_dynamics.infernal_boiler.goggles.vis_boost_none")
+                        .withStyle(ChatFormatting.DARK_GRAY)));
+        if (isPlayerSneaking) {
+            int bellows = ModList.get().isLoaded("thaumcraft")
+                    ? InfernalBoilerCompat.countBellows(controller) / 2 : 0;
+            tooltip.add(Component.literal(INDENT).append(Component.translatable(
+                    "mystery_dynamics.infernal_boiler.goggles.bellows", bellows, MAX_BELLOWS)
+                    .withStyle(ChatFormatting.GRAY)));
+        } else {
+            tooltip.add(Component.literal(INDENT).append(
+                    Component.translatable("mystery_dynamics.goggles.sneak_for_details")
+                            .withStyle(ChatFormatting.DARK_GRAY)));
         }
         return result;
+    }
+
+    /**
+     * 超频时的实际总应力：蒸汽引擎效率被 Create 限制在 1，仍按原版公式出力；
+     * 只有奥法涡轮机共享两倍的锅炉应力上限（单台仍受上限约束）。
+     */
+    private float overclockCapacity(int boilerSize) {
+        int engines = Math.max(1, attachedEngines);
+        int boilerLevel = Math.min(activeHeat, Math.min(getMaxHeatLevelForWaterSupply(),
+                getMaxHeatLevelForBoilerSize(boilerSize)));
+        // 与 Create 护目镜相同的原版公式，按蒸汽引擎占比分摊。
+        float vanillaTotal = getEngineEfficiency(boilerSize) * 16.0F
+                * Math.max(boilerLevel, attachedEngines) * ENGINE_STRESS;
+        int steamEngines = Math.min(controller.linkedSteamEngines(), engines);
+        float steamPart = vanillaTotal * steamEngines / engines;
+        float turbinePart = controller.linkedTurbines()
+                * Math.min(ArcaneTurbineBlockEntity.MAX_STRESS, OVERCLOCK_TOTAL_STRESS / engines);
+        return steamPart + turbinePart;
     }
 
     @Override

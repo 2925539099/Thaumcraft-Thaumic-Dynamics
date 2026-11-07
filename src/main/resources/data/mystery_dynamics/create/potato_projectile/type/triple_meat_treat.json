@@ -1,4 +1,14 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "thaumcraft"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "thaumcraft:triple_meat_treat"
+    }
+  ],
   "items": "thaumcraft:triple_meat_treat",
   "damage": 1,
   "knockback": 0.0,

@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.logging.LogUtils;
 import com.mojang.math.Axis;
 import com.mysterydynamics.MysteryDynamics;
 import com.mysterydynamics.block.InfernalBoilerBlockEntity;
@@ -34,9 +35,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+
 /** 用 bbmodel 数据绘制整栋 4×4×5 锅炉模型。 */
 public final class InfernalBoilerRenderer implements BlockEntityRenderer<InfernalBoilerBlockEntity> {
 
+    private static final Logger LOGGER = LogUtils.getLogger();
     private static final Set<BlockPos> RENDERED_THIS_FRAME = new HashSet<>();
 
     private record Vertex(float x, float y, float z, float u, float v) {
@@ -77,16 +81,20 @@ public final class InfernalBoilerRenderer implements BlockEntityRenderer<Inferna
         RENDERED_THIS_FRAME.clear();
     }
 
+    /** 资源重载（F3+T / 资源包切换）后丢弃已解析的模型和贴图，下次渲染时重新加载。 */
+    public static void clearCaches() {
+        normal = null;
+        overclock = null;
+        SPRITES.clear();
+    }
+
     public static void renderAt(InfernalBoilerBlockEntity boiler, PoseStack pose, Vec3 camera,
                                 MultiBufferSource bufferSource, int packedLight) {
         if (!boiler.isFormedMultiBlock()) {
             return;
         }
+        // isFormedMultiBlock 已保证 origin 有效。
         BlockPos origin = boiler.boilerOrigin();
-        if (origin.equals(BlockPos.ZERO)) {
-            // 兼容旧存档/成型瞬间 controller 尚未写入 origin 的情况。
-            origin = boiler.getBlockPos().offset(-1, -3, -1);
-        }
         ModelData data = boiler.isOverclock() ? overclock() : normal();
         if (data == null || data.quads().isEmpty()) {
             return;
@@ -193,8 +201,7 @@ public final class InfernalBoilerRenderer implements BlockEntityRenderer<Inferna
             }
             return new ModelData(List.copyOf(quads));
         } catch (Exception exception) {
-            System.err.println("[mystery_dynamics] Failed to load boiler model " + path + ": "
-                    + exception);
+            LOGGER.error("Failed to load infernal boiler model {}", path, exception);
             return new ModelData(List.of());
         }
     }

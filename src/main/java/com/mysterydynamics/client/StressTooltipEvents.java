@@ -26,8 +26,17 @@ public final class StressTooltipEvents {
             addStressTooltip(event, golem.rpm(), golem.rpm() * golem.capacityPerRpm());
         } else if (block == MysteryDynamics.REDSTONE_ENGINE.get()) {
             addStressTooltip(event, RedstoneEngineBlockEntity.MAX_RPM, RedstoneEngineBlockEntity.MAX_STRESS);
+            // 输出随红石信号线性变化，0 信号停转
+            event.getToolTip().add(Component.translatable("mystery_dynamics.tooltip.redstone_engine.scaling",
+                    format(RedstoneEngineBlockEntity.rpmFor(1)), format(RedstoneEngineBlockEntity.MAX_RPM),
+                    format(RedstoneEngineBlockEntity.stressFor(1)), format(RedstoneEngineBlockEntity.MAX_STRESS))
+                    .withStyle(ChatFormatting.GRAY));
+            event.getToolTip().add(Component.translatable("mystery_dynamics.tooltip.redstone_engine.off")
+                    .withStyle(ChatFormatting.GRAY));
         } else if (block == MysteryDynamics.ARCANE_TURBINE.get()) {
             addStressTooltip(event, 64.0F, com.mysterydynamics.block.ArcaneTurbineBlockEntity.MAX_STRESS);
+            event.getToolTip().add(Component.translatable("mystery_dynamics.tooltip.arcane_turbine.boiler")
+                    .withStyle(ChatFormatting.GRAY));
         }
     }
 
@@ -37,7 +46,7 @@ public final class StressTooltipEvents {
                 .withStyle(ChatFormatting.GRAY));
         tooltip.add(Component.literal("▮▮▮ ")
                 .withStyle(ChatFormatting.YELLOW)
-                .append(Component.translatable("mystery_dynamics.tooltip.rpm",
+                .append(Component.translatable("mystery_dynamics.tooltip.rpm_value",
                         format(rpm)).withStyle(ChatFormatting.YELLOW)));
         tooltip.add(Component.translatable("mystery_dynamics.tooltip.max_stress",
                 format(maxStress)).withStyle(ChatFormatting.DARK_GRAY));

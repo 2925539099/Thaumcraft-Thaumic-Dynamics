@@ -54,6 +54,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
@@ -261,7 +262,10 @@ public class MysteryDynamics {
     public static final DeferredItem<NeriidsProtectionItem> NERIIDS_PROTECTION =
             ITEMS.register("neriids_protection",
                     () -> new NeriidsProtectionItem(
-                            new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+                            // 与神秘头盔一致：耐久系数 25 → 头盔 275 点
+                            new Item.Properties().stacksTo(1)
+                                    .durability(ArmorItem.Type.HELMET.getDurability(25))
+                                    .rarity(Rarity.RARE)));
 
     // ---- 高压动力发射器：暂用土豆加农炮的全部数据 ----
     public static final DeferredItem<HighPressureLauncherItem> HIGH_PRESSURE_LAUNCHER =
@@ -426,7 +430,8 @@ public class MysteryDynamics {
                 .noOcclusion();
     }
 
-    private static BlockBehaviour.Properties arcaneTurbineProperties() {        return BlockBehaviour.Properties.of()
+    private static BlockBehaviour.Properties arcaneTurbineProperties() {
+        return BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_PURPLE)
                 .strength(2.0F, 6.0F)
                 .sound(SoundType.COPPER)
@@ -441,7 +446,9 @@ public class MysteryDynamics {
                 .strength(3.0F, 12.0F)
                 .sound(SoundType.METAL)
                 .noOcclusion()
-                .noLootTable();
+                .noLootTable()
+                // 多方块部件：活塞推动会让结构与控制器失联
+                .pushReaction(PushReaction.BLOCK);
     }
 
     private static BlockBehaviour.Properties infernalBoilerProperties() {
@@ -458,7 +465,8 @@ public class MysteryDynamics {
                 .mapColor(MapColor.COLOR_LIGHT_BLUE)
                 .strength(0.3F)
                 .sound(SoundType.GLASS)
-                .noOcclusion();
+                .noOcclusion()
+                .pushReaction(PushReaction.BLOCK);
     }
 
     private static BlockBehaviour.Properties infernalBoilerCasingProperties() {
@@ -466,7 +474,8 @@ public class MysteryDynamics {
                 .mapColor(MapColor.NETHER)
                 .strength(2.0F, 6.0F)
                 .sound(SoundType.NETHER_BRICKS)
-                .noOcclusion();
+                .noOcclusion()
+                .pushReaction(PushReaction.BLOCK);
     }
 
     private static BlockBehaviour.Properties infernalBoilerShellProperties() {
@@ -474,7 +483,8 @@ public class MysteryDynamics {
                 .mapColor(MapColor.NETHER)
                 .strength(2.0F, 6.0F)
                 .sound(SoundType.NETHER_BRICKS)
-                .noOcclusion();
+                .noOcclusion()
+                .pushReaction(PushReaction.BLOCK);
     }
 
     private static IFluidHandler findBoilerTank(Level level, BlockPos pos) {
@@ -488,13 +498,15 @@ public class MysteryDynamics {
                     FluidTankBlockEntity controller = be.isController() ? be : be.getControllerBE();
                     return controller == null ? null : controller.boiler.createHandler();
                 });
-        // 底座/正面/shell 本身没有 BE，但管道应能把水送进整栋锅炉的储罐。
+        // 底座 BE 直接代理到储罐；必须先于下面的方块级搜索注册（先注册者优先），
+        // 否则每次管道查询都会走一遍结构搜索。
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK,
+                INFERNAL_BOILER_CASING_BE.get(), (be, side) -> be);
+        // 正面/shell（以及旧存档里没有 BE 的底座）通过结构搜索找到储罐。
         event.registerBlock(Capabilities.FluidHandler.BLOCK,
                 (level, pos, state, blockEntity, side) -> findBoilerTank(level, pos),
                 INFERNAL_BOILER_CASING.get(), INFERNAL_BOILER_SHELL.get(),
                 INFERNAL_BOILER_FACE.get());
-        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK,
-                INFERNAL_BOILER_CASING_BE.get(), (be, side) -> be);
         if (ModList.get().isLoaded("thaumcraft")) {
             com.mysterydynamics.compat.InfernalBoilerCompat.registerCapabilities(event);
             com.mysterydynamics.compat.LargeCentrifugeCompat.registerCapabilities(event);
@@ -522,9 +534,16 @@ public class MysteryDynamics {
                     () -> (double) (RedstoneEngineBlockEntity.MAX_STRESS / RedstoneEngineBlockEntity.MAX_RPM));
             BlockStressValues.RPM.register(REDSTONE_ENGINE.get(),
                     new BlockStressValues.GeneratedRpm(Math.round(RedstoneEngineBlockEntity.MAX_RPM), false));
-            com.simibubi.create.api.contraption.ContraptionMovementSetting.REGISTRY.register(
-                    ARCANE_TURBINE.get(),
-                    () -> com.simibubi.create.api.contraption.ContraptionMovementSetting.UNMOVABLE);
+            for (Block block : List.<Block>of(ARCANE_TURBINE.get(),
+                    INFERNAL_BOILER.get(), INFERNAL_BOILER_FACE.get(),
+                    INFERNAL_BOILER_CASING.get(), INFERNAL_BOILER_SHELL.get(),
+                    LARGE_CENTRIFUGE_CONTROLLER.get(), LARGE_CENTRIFUGE_CASING.get(),
+                    LARGE_CENTRIFUGE_INPUT.get(), LARGE_CENTRIFUGE_INPUT_PORT.get(),
+                    LARGE_CENTRIFUGE_OUTPUT_PORT.get())) {
+                // 多方块部件被装置带走会留下失联的隐形方块。
+                com.simibubi.create.api.contraption.ContraptionMovementSetting.REGISTRY.register(
+                        block, () -> com.simibubi.create.api.contraption.ContraptionMovementSetting.UNMOVABLE);
+            }
             // 安装了神秘时代时才注册奥术工作台配方（未安装时不加载 compat 类）
             if (net.neoforged.fml.ModList.get().isLoaded("thaumcraft")) {
                 com.mysterydynamics.compat.ThaumcraftRecipes.register();
