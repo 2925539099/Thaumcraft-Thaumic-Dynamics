@@ -18,7 +18,9 @@ public class LargeCentrifugePortBlockEntity extends BlockEntity
         implements IEssentiaTransport, IHaveGoggleInformation {
 
     private final boolean input;
-    private BlockPos center = BlockPos.ZERO;
+    /** 成型时记录的控制器坐标；null 表示未知（旧存档）。 */
+    @javax.annotation.Nullable
+    private BlockPos center;
     private int rotation;
 
     public LargeCentrifugePortBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state,
@@ -33,12 +35,18 @@ public class LargeCentrifugePortBlockEntity extends BlockEntity
         setChanged();
     }
 
+    @javax.annotation.Nullable
+    public BlockPos center() {
+        return center;
+    }
+
     private LargeCentrifugeControllerBlockEntity controller() {
         if (level == null) {
             return null;
         }
-        if (!center.equals(BlockPos.ZERO)) {
-            return level.getBlockEntity(center) instanceof LargeCentrifugeControllerBlockEntity c ? c : null;
+        if (center != null) {
+            return level.isLoaded(center)
+                    && level.getBlockEntity(center) instanceof LargeCentrifugeControllerBlockEntity c ? c : null;
         }
         for (int dy = -2; dy <= 2; dy++) {
             for (int dx = -2; dx <= 2; dx++) {
@@ -149,16 +157,32 @@ public class LargeCentrifugePortBlockEntity extends BlockEntity
     }
 
     @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        CompoundTag tag = new CompoundTag();
+        saveAdditional(tag, registries);
+        return tag;
+    }
+
+    @Override
+    public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
+        return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.putLong("Center", center.asLong());
+        if (center != null) {
+            tag.putLong("Center", center.asLong());
+        }
         tag.putInt("Rotation", rotation);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        center = BlockPos.of(tag.getLong("Center"));
+        // 旧存档用 BlockPos.ZERO 表示“未知”，这里统一转成 null。
+        BlockPos loaded = tag.contains("Center") ? BlockPos.of(tag.getLong("Center")) : null;
+        center = loaded == null || loaded.equals(BlockPos.ZERO) ? null : loaded;
         rotation = tag.getInt("Rotation") & 3;
     }
 }

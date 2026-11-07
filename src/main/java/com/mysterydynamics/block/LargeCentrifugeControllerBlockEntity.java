@@ -103,7 +103,10 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
         if (processingActive) {
             process(speed);
         }
-        applySpinDamage(speed);
+        // 受伤无敌帧为 10 tick，每 2 tick 扫描一次足够，且减半实体查询开销。
+        if ((level.getGameTime() & 1L) == 0L) {
+            applySpinDamage(speed);
+        }
         if (dirty && level.getGameTime() % 10L == 0L) {
             sync();
         }
@@ -128,21 +131,16 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
                 worldPosition.getZ() - 0.625D,
                 worldPosition.getX() + 1.625D, worldPosition.getY() + 1.75D,
                 worldPosition.getZ() + 1.625D);
-        var source = ModDamageTypes.centrifuge(level);
         // 以旋转区/中央多方块的几何中心作为击退原点。
         Vec3 center = area.getCenter();
 
-        // LivingEntity 查询对普通生物有效；玩家显式补扫，避免玩家实体不在
-        // 区块实体索引里时漏判。
-        java.util.List<LivingEntity> targets =
-                new java.util.ArrayList<>(level.getEntitiesOfClass(LivingEntity.class, area));
-        if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-            for (net.minecraft.server.level.ServerPlayer player : serverLevel.players()) {
-                if (!targets.contains(player) && area.intersects(player.getBoundingBox())) {
-                    targets.add(player);
-                }
-            }
+        // getEntitiesOfClass 已包含玩家；旁观者没有碰撞，直接跳过。
+        List<LivingEntity> targets = level.getEntitiesOfClass(LivingEntity.class, area,
+                entity -> entity.isAlive() && !entity.isSpectator());
+        if (targets.isEmpty()) {
+            return;
         }
+        var source = ModDamageTypes.centrifuge(level);
 
         for (LivingEntity entity : targets) {
             if (!entity.hurt(source, damage)) {
@@ -184,56 +182,27 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
         }
         int rotation = rotation();
         BlockPos port = LargeCentrifugeStructure.world(worldPosition, -1, -1, 0, rotation);
-        // 不限定单一朝向：端口六面都尝试一次，兼容管道正/反向查询。
-        for (Direction dir : Direction.values()) {
-            BlockPos pipePos = port.relative(dir);
-            IEssentiaTransport pipe = EssentiaCapabilities.find(level, pipePos, dir.getOpposite());
-            if (pipe == null) {
-                continue;
-            }
-            Aspect aspect = pipe.getEssentiaType(dir.getOpposite());
-            if (aspect == null) {
-                aspect = pipe.getSuctionType(dir.getOpposite());
-            }
-            if (aspect == null || !canAcceptAspect(aspect)) {
-                continue;
-            }
-            int taken = pipe.takeEssentia(aspect, 1, dir.getOpposite());
-            if (taken == 0) {
-                taken = pipe.takeEssentia(aspect, 1, dir);
-            }
-            if (taken > 0) {
-                addEssentia(aspect, taken);
-                return;
-            }
-        }
-    }
-
-    /** 主动把处理好的源质推给输出口相邻管道。 */
-    private void pushToOutputPipe() {
-        if (level == null || !canOutputEssentia()) {
+        // 只从端口朝外的一面抽取，与端口 isConnectable 的朝向保持一致，
+        // 避免把端口上方/下方无关的源质罐也抽空。
+        Direction dir = LargeCentrifugeStructure.directionForLocal(-1, 0, rotation);
+        BlockPos pipePos = port.relative(dir);
+        IEssentiaTransport pipe = EssentiaCapabilities.find(level, pipePos, dir.getOpposite());
+        if (pipe == null) {
             return;
         }
-        int rotation = rotation();
-        BlockPos port = LargeCentrifugeStructure.world(worldPosition, 1, -1, 0, rotation);
-        for (Direction dir : Direction.values()) {
-            BlockPos pipePos = port.relative(dir);
-            IEssentiaTransport pipe = EssentiaCapabilities.find(level, pipePos, dir.getOpposite());
-            if (pipe == null) {
-                continue;
-            }
-            Aspect aspect = outputAspect();
-            if (aspect == null) {
-                return;
-            }
-            int accepted = pipe.addEssentia(aspect, 1, dir.getOpposite());
-            if (accepted == 0) {
-                accepted = pipe.addEssentia(aspect, 1, dir);
-            }
-            if (accepted > 0) {
-                takeEssentia(aspect, accepted);
-                return;
-            }
+        Aspect aspect = pipe.getEssentiaType(dir.getOpposite());
+        if (aspect == null) {
+            aspect = pipe.getSuctionType(dir.getOpposite());
+        }
+        if (aspect == null || !canAcceptAspect(aspect)) {
+            return;
+        }
+        int taken = pipe.takeEssentia(aspect, 1, dir.getOpposite());
+        if (taken == 0) {
+            taken = pipe.takeEssentia(aspect, 1, dir);
+        }
+        if (taken > 0) {
+            addEssentia(aspect, taken);
         }
     }
 
@@ -290,12 +259,12 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
         if (processing.totalAmount() <= 0) {
             processing = new AspectList();
             processingActive = false;
-        }
-        if (level != null && level.getGameTime() % 20 == 0) {
+            // 批次结束立即同步，客户端状态不再停留在“离心中”。
             sync();
-        } else {
-            setChanged();
+            return;
         }
+        setChanged();
+        dirty = true;
     }
 
     private void processOne() {
@@ -309,6 +278,7 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
             if (decision != null) {
                 output.add(decision, 1);
             }
+            dirty = true;
             return;
         }
     }
@@ -339,7 +309,11 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
 
     /** 一次只能输入一种类型；已有类型后只能补同种源质。 */
     public boolean canAcceptAspect(Aspect aspect) {
-        return aspect != null && (input.totalAmount() == 0 || input.amount(aspect) > 0);
+        if (aspect == null || aspect.components().isEmpty()) {
+            // 原初源质无法再分解；接收后只会被吞掉，直接拒收。
+            return false;
+        }
+        return input.totalAmount() == 0 || input.amount(aspect) > 0;
     }
 
     public int addEssentia(Aspect aspect, int amount) {
@@ -410,43 +384,80 @@ public class LargeCentrifugeControllerBlockEntity extends BlockEntity implements
         return output.totalAmount();
     }
 
+    /** 当前单位的处理进度（0~1），用于护目镜显示。 */
+    public float progressFraction() {
+        if (!processingActive || processing.totalAmount() <= 0) {
+            return 0.0F;
+        }
+        return Math.min(1.0F, progress / (float) PROCESS_TIME);
+    }
+
+    /** 当前状态的一行说明；客户端标签与护目镜共用。 */
+    public Component statusComponent() {
+        float speed = inputSpeed();
+        if (speed < MIN_RPM) {
+            return Component.translatable("mystery_dynamics.large_centrifuge.status.slow", MIN_RPM)
+                    .withStyle(ChatFormatting.RED);
+        }
+        if (processingActive) {
+            return Component.translatable("mystery_dynamics.large_centrifuge.status.processing",
+                    processing.totalAmount()).withStyle(ChatFormatting.AQUA);
+        }
+        if (!output.isEmpty()) {
+            return Component.translatable("mystery_dynamics.large_centrifuge.status.output",
+                    output.totalAmount()).withStyle(ChatFormatting.GREEN);
+        }
+        if (input.totalAmount() > 0) {
+            return Component.translatable("mystery_dynamics.large_centrifuge.status.filling",
+                    CAPACITY - input.totalAmount()).withStyle(ChatFormatting.GRAY);
+        }
+        return Component.translatable("mystery_dynamics.large_centrifuge.status.idle")
+                .withStyle(ChatFormatting.GRAY);
+    }
+
+    private static Component indent(Component line) {
+        return Component.literal("    ").append(line);
+    }
+
     @Override
     public boolean addToGoggleTooltip(java.util.List<Component> tooltip, boolean isPlayerSneaking) {
-        tooltip.add(Component.translatable("block.mystery_dynamics.large_centrifuge_controller")
-                .withStyle(ChatFormatting.GOLD));
+        tooltip.add(indent(Component.translatable("block.mystery_dynamics.large_centrifuge_controller")
+                .withStyle(ChatFormatting.GOLD)));
         Aspect in = inputAspect();
         Component inputName = in == null
-                ? Component.literal("空").withStyle(ChatFormatting.DARK_GRAY)
+                ? Component.translatable("mystery_dynamics.large_centrifuge.empty")
+                        .withStyle(ChatFormatting.DARK_GRAY)
                 : Component.translatable("tc.aspect." + in.getTag())
                         .withStyle(style -> style.withColor(in.getColor() & 0xFFFFFF));
-        tooltip.add(Component.literal("源质: ").append(inputName)
-                .append(Component.literal(" " + input.totalAmount() + " / " + CAPACITY))
-                .withStyle(ChatFormatting.GRAY));
-        tooltip.add(Component.literal("状态: " + (processingActive ? "离心中"
-                        : output.isEmpty() ? "待输入" : "输出中"))
-                .withStyle(ChatFormatting.GRAY));
-        if (!processing.isEmpty()) {
-            tooltip.add(Component.literal("处理中: " + processing.totalAmount())
-                    .withStyle(ChatFormatting.DARK_AQUA));
+        tooltip.add(indent(Component.translatable("mystery_dynamics.large_centrifuge.stored",
+                inputName, input.totalAmount(), CAPACITY).withStyle(ChatFormatting.GRAY)));
+        tooltip.add(indent(statusComponent()));
+        if (processingActive) {
+            tooltip.add(indent(Component.translatable("mystery_dynamics.large_centrifuge.progress",
+                    Math.round(progressFraction() * 100.0F)).withStyle(ChatFormatting.DARK_AQUA)));
         }
         for (Aspect aspect : output.aspects()) {
             int amount = output.amount(aspect);
             if (amount > 0) {
-                tooltip.add(Component.literal("  ")
+                tooltip.add(Component.literal("      ")
                         .append(Component.translatable("tc.aspect." + aspect.getTag())
                                 .withStyle(style -> style.withColor(aspect.getColor() & 0xFFFFFF)))
                         .append(Component.literal(" × " + amount))
                         .withStyle(ChatFormatting.AQUA));
             }
         }
-        float speed = inputSpeed();
-        if (speed < MIN_RPM) {
-            tooltip.add(Component.literal("转速不足: 需要 " + MIN_RPM + " RPM（当前 "
-                            + Math.round(speed) + "）")
-                    .withStyle(ChatFormatting.RED));
+        tooltip.add(indent(Component.translatable("mystery_dynamics.large_centrifuge.speed",
+                Math.round(inputSpeed()), MIN_RPM, MAX_RPM).withStyle(ChatFormatting.DARK_GRAY)));
+        if (isPlayerSneaking) {
+            tooltip.add(indent(Component.translatable("mystery_dynamics.large_centrifuge.hint.ports")
+                    .withStyle(ChatFormatting.DARK_GRAY)));
+            tooltip.add(indent(Component.translatable("mystery_dynamics.large_centrifuge.hint.primal")
+                    .withStyle(ChatFormatting.DARK_GRAY)));
+            tooltip.add(indent(Component.translatable("mystery_dynamics.large_centrifuge.hint.redstone")
+                    .withStyle(ChatFormatting.DARK_GRAY)));
         } else {
-            tooltip.add(Component.literal("转速: " + Math.round(speed) + " RPM")
-                    .withStyle(ChatFormatting.DARK_GRAY));
+            tooltip.add(indent(Component.translatable("mystery_dynamics.goggles.sneak_for_details")
+                    .withStyle(ChatFormatting.DARK_GRAY)));
         }
         return true;
     }

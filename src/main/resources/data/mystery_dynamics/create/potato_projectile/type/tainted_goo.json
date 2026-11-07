@@ -1,4 +1,14 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "thaumcraft"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "thaumcraft:tainted_goo"
+    }
+  ],
   "items": "thaumcraft:tainted_goo",
   "damage": 3,
   "knockback": 0.1,

@@ -2,7 +2,9 @@
 
 [![Latest Release](https://img.shields.io/github/v/release/2925539099/Thaumcraft-Thaumic-Dynamics?label=release)](https://github.com/2925539099/Thaumcraft-Thaumic-Dynamics/releases/latest)
 
-基于神秘时代，为机械动力额外增添一些设备。NeoForge 1.21.1 / Create 6.0.x / 神秘时代 port.265+（必需前置）。
+基于神秘时代，为机械动力额外增添一些设备。NeoForge 1.21.1 / Create 6.0.x（不支持 6.1+）/ 神秘时代 port.265+ / Curios（均为必需前置）。
+
+> 最近一次全检大修的改动清单与遗留问题见 [docs/全检大修记录.md](docs/全检大修记录.md)。
 
 ## 傀儡动力系统
 
@@ -97,7 +99,6 @@
 - `data/mystery_dynamics/research/mystery_dynamics/mystery_test.json`
 
 本地化键：`tc.research_category.MYSTERY_DYNAMICS`、`tc.research_name.MYSTERY_TEST`、`tc.research_text.MYSTERY_TEST`、`mystery_dynamics.research.test.text`。
-## 奥术工作台配方
 ## 奥术工作台配方
 
 以下 9 个配方会注册到奥术工作台，并作为 ARCANE 配方页显示在对应研究里：
@@ -246,7 +247,9 @@ tools/
 避雷针、金币、虚空种子
 ```
 
-特殊效果包括虚弱、中毒、腐毒、凋零、着火、发光、爆炸、雷击和猪灵仇恨。
+特殊效果包括虚弱、中毒、腐毒、凋零、着火、发光、爆炸、雷击和猪灵仇恨。爆炸不破坏方块；雷击只在雷暴天气且目标头顶露天时触发。
+
+命中方块后回收弹药只对本发射器射出的专属弹药生效，普通土豆加农炮不受影响。
 
 ## 大型奥法离心机
 
@@ -274,13 +277,14 @@ tools/
 - 结构页为 3×3×3 搭建图，底部显示法杖激活需求；
 - 法杖激活需求：火、地、风、混沌、水、秩序各 50 Vis；
 - 未完成“大型奥法离心机”研究时，法杖激活与原版多方块一样直接失败，不额外提示；
+- 已完成研究但结构没搭对时，用法杖点离合器或动力轴承会提示第一个不对的坐标和应放的方块；
 - 手册结构页中底层炼金构材显示在橙色位置；实际成型判定仍按正面中央的炼金构材。
 
 ### 运行
 
 - 顶部动力输入口接入 Create 旋转，最低 32 RPM，最高 256 RPM；
 - 内部容量 24 点源质，输入口在模型西侧，输出口在东侧；
-- 同一批只能输入一种源质，处理结果在开始时确定一次；
+- 同一批只能输入一种**复合**源质，原初源质会被拒收（无法再分解）；处理结果在开始时确定一次；
 - 输出未排空前不接受新源质；
 - 存满或正面强启方块收到红石信号后开始离心；强启只检测“强启控制器”模型对应的单一方块。
 

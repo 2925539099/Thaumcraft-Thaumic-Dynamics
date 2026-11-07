@@ -55,6 +55,7 @@ public class LargeCentrifugeControllerBlock extends Block implements EntityBlock
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState,
                          boolean movedByPiston) {
+        super.onRemove(state, level, pos, newState, movedByPiston);
         if (!level.isClientSide && !newState.is(state.getBlock())
                 && !LargeCentrifugeStructure.isRestoring()) {
             level.levelEvent(2001, pos, Block.getId(state));

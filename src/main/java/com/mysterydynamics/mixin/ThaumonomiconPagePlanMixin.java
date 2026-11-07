@@ -32,6 +32,9 @@ public abstract class ThaumonomiconPagePlanMixin {
         mutable.put("INFERNAL_BOILER", List.of(
                 ThaumonomiconPagePlan.Kind.TEXT,
                 ThaumonomiconPagePlan.Kind.CONSTRUCT));
+        mutable.put("LARGE_CENTRIFUGE", List.of(
+                ThaumonomiconPagePlan.Kind.TEXT,
+                ThaumonomiconPagePlan.Kind.CONSTRUCT));
         mutable.put("REVEALING_ENGINEER_GOGGLES", List.of(
                 ThaumonomiconPagePlan.Kind.TEXT,
                 ThaumonomiconPagePlan.Kind.NORMAL));

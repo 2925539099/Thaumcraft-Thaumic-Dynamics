@@ -24,15 +24,24 @@ def depsDir = file(project.findProperty('depsDir') ?: '../.tools/deps')
 if (!depsDir.exists()) {
     depsDir = file('libs')
 }
+// 按文件名前缀匹配，升级前置版本时不用再改这里；同一前置有多个版本时取文件名最大的那个。
+def depPatterns = [
+        'create-*.jar',
+        'ponder-neoforge-*.jar',
+        'flywheel-neoforge-*.jar',
+        'curios-neoforge-*.jar',
+        'Registrate-*.jar',
+        'thaumcraft-*.jar',
+]
+def depJars = depPatterns.collect { pattern ->
+    def matches = fileTree(depsDir) { include pattern }.files.sort { it.name }
+    if (matches.isEmpty()) {
+        throw new GradleException("缺少编译期前置 ${depsDir}/${pattern}，放置方法见 libs/README.md")
+    }
+    matches.last()
+}
 dependencies {
-    compileOnly files(
-            "${depsDir}/create-6.0.10.jar",
-            "${depsDir}/ponder-neoforge-1.0.82+mc1.21.1.jar",
-            "${depsDir}/flywheel-neoforge-1.21.1-1.0.6.jar",
-            "${depsDir}/curios-neoforge-9.5.1+1.21.1.jar",
-            "${depsDir}/Registrate-MC1.21-1.3.0+67.jar",
-            "${depsDir}/thaumcraft-0.2.2.95-port.265.jar"
-    )
+    compileOnly files(depJars)
 }
 
 // 源码包不是模组，剔除元数据并单独输出（同盔甲附加的处理）

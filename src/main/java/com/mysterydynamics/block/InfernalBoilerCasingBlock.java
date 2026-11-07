@@ -64,11 +64,19 @@ public class InfernalBoilerCasingBlock extends FluidTankBlock {
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState,
                          boolean movedByPiston) {
-        if (!level.isClientSide && !newState.is(state.getBlock())
-                && !InfernalBoilerStructure.isRestoring()) {
+        if (newState.is(state.getBlock())) {
+            return;
+        }
+        // 被活塞/装置带走（movedByPiston）同样要拆整栋：缺一块的成型锅炉无法自愈。
+        // requestDismantle 会先读取本方块 BE 里记录的 origin，所以必须在移除 BE 之前调用。
+        if (!level.isClientSide && !InfernalBoilerStructure.isRestoring()) {
             InfernalBoilerStructure.requestDismantle(level, pos);
         }
-        // 不调用 FluidTankBlock.onRemove：否则 Create 的连通性更新会反过来
-        // 清掉/改写正在恢复的底座方块，造成缺块和旋转错位。
+        // 不调用 FluidTankBlock.onRemove：它会对 controller 做 splitMulti，
+        // 反过来清掉/改写正在恢复的底座方块，造成缺块和旋转错位。
+        // 这里只做 BlockBehaviour.onRemove 的本职工作：移除本方块的 BE，避免残留在恢复后的方块上。
+        if (state.hasBlockEntity()) {
+            level.removeBlockEntity(pos);
+        }
     }
 }

@@ -46,6 +46,8 @@ public class InfernalBoilerBlock extends FluidTankBlock {
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState,
                          boolean movedByPiston) {
+        // movedByPiston（被装置带走）也照常拆整栋：留在原地的部件会恢复成原始方块，
+        // 被带走的只是无掉落的隐形部件，不会复制材料。
         if (!level.isClientSide && state.getValue(FORMED)
                 && !newState.is(state.getBlock())
                 && !InfernalBoilerStructure.isRestoring()) {

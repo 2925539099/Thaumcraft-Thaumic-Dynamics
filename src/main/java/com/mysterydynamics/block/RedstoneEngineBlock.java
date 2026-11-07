@@ -77,9 +77,17 @@ public class RedstoneEngineBlock extends HorizontalKineticBlock implements IBE<R
         return state.getValue(HORIZONTAL_FACING).getAxis();
     }
 
-    /** 输出轴朝向玩家看的方向（背对玩家），方便直接接在要驱动的机械上。 */
+    /**
+     * 输出轴朝向玩家看的方向（背对玩家），方便直接接在要驱动的机械上。
+     * 旁边已有朝向本格的传动时，输出轴直接对准它（与 Create 创造马达一致）；潜行放置则忽略。
+     */
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
+        Direction preferred = getPreferredHorizontalFacing(context);
+        boolean sneaking = context.getPlayer() != null && context.getPlayer().isShiftKeyDown();
+        if (preferred != null && !sneaking) {
+            return defaultBlockState().setValue(HORIZONTAL_FACING, preferred);
+        }
         return defaultBlockState().setValue(HORIZONTAL_FACING, context.getHorizontalDirection());
     }
 
@@ -101,7 +109,8 @@ public class RedstoneEngineBlock extends HorizontalKineticBlock implements IBE<R
                                    BlockPos fromPos, boolean isMoving) {
         super.neighborChanged(state, level, pos, block, fromPos, isMoving);
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof RedstoneEngineBlockEntity engine) {
-            engine.updateSignal(level.getBestNeighborSignal(pos));
+            // 只登记新信号，由方块实体限频应用，避免红石时钟反复重算整网被 Create 判定闪烁
+            engine.queueSignal(level.getBestNeighborSignal(pos));
         }
     }
 
@@ -124,15 +133,18 @@ public class RedstoneEngineBlock extends HorizontalKineticBlock implements IBE<R
         }
 
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof RedstoneEngineBlockEntity engine) {
-            engine.toggleDirection();
+            boolean toggled = engine.toggleDirection();
             if (context.getPlayer() != null) {
+                // 网络里还有别的动力源时拒绝翻转，提示玩家原因
+                String key = !toggled ? "mystery_dynamics.direction.blocked_other_generator"
+                        : engine.isReversed() ? "mystery_dynamics.direction.ccw"
+                        : "mystery_dynamics.direction.cw";
                 context.getPlayer().displayClientMessage(
-                        net.minecraft.network.chat.Component.translatable(
-                                engine.isReversed() ? "mystery_dynamics.direction.ccw"
-                                        : "mystery_dynamics.direction.cw"),
-                        true);
+                        net.minecraft.network.chat.Component.translatable(key), true);
             }
-            IWrenchable.playRotateSound(level, pos);
+            if (toggled) {
+                IWrenchable.playRotateSound(level, pos);
+            }
         }
         return InteractionResult.SUCCESS;
     }
