@@ -5,10 +5,12 @@ import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
 import com.simibubi.create.content.kinetics.base.IRotate;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -30,7 +32,13 @@ public class RedstoneEngineBlockEntity extends GeneratingKineticBlockEntity {
     public static final float MIN_STRESS = 128.0F;
     public static final float MAX_STRESS = 8192.0F;
 
+    /** 两次实际应用信号之间至少间隔的 tick 数（信号变化最多延迟这么久生效）。 */
+    private static final int SIGNAL_COOLDOWN = 10;
+
     private int signal;
+    /** 最近一次收到的红石信号；与 {@link #signal} 不同时等冷却结束再应用。 */
+    private int pendingSignal;
+    private int signalCooldown;
     private boolean reversed;
     /** 由 Block#setPlacedBy 标记：下一次 initialize 时按相邻传动对齐方向。 */
     private boolean pendingPlacementAlign;
@@ -50,19 +58,47 @@ public class RedstoneEngineBlockEntity extends GeneratingKineticBlockEntity {
     /** 放置时调用：记录信号，并让 initialize 只在对齐时执行一次转速更新。 */
     public void markPlaced(int signal) {
         this.signal = Mth.clamp(signal, 0, 15);
+        this.pendingSignal = this.signal;
         this.pendingPlacementAlign = true;
     }
 
-    /** 红石信号变化时调用；只有真的变化才重算。 */
-    public void updateSignal(int newSignal) {
+    /**
+     * 红石信号变化时调用。冷却结束时立即应用，否则先记下，
+     * 由 {@link #tick()} 在冷却结束后应用最新值（包括 0）。
+     * 这样红石时钟最多每 {@link #SIGNAL_COOLDOWN} tick 重算一次网络。
+     */
+    public void queueSignal(int newSignal) {
+        pendingSignal = Mth.clamp(newSignal, 0, 15);
+        if (signalCooldown <= 0) {
+            applySignal(pendingSignal);
+        }
+    }
+
+    /** 真正写入信号并重算转速；只有真的变化才重算。 */
+    private void applySignal(int newSignal) {
         int clamped = Mth.clamp(newSignal, 0, 15);
+        pendingSignal = clamped;
         if (clamped == signal) {
             return;
         }
         signal = clamped;
+        signalCooldown = SIGNAL_COOLDOWN;
         setChanged();
         sendData();
         updateGeneratedRotation();
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (level == null || level.isClientSide) {
+            return;
+        }
+        if (signalCooldown > 0) {
+            signalCooldown--;
+        } else if (pendingSignal != signal) {
+            applySignal(pendingSignal);
+        }
     }
 
     public static float rpmFor(int signal) {
@@ -105,10 +141,22 @@ public class RedstoneEngineBlockEntity extends GeneratingKineticBlockEntity {
         if (level == null || level.isClientSide) {
             return;
         }
-        // 只有刚放下（需要对齐）时才更新一次；区块加载不触发网络重算。
         if (pendingPlacementAlign) {
             pendingPlacementAlign = false;
             alignToConnection();
+            updateGeneratedRotation();
+            return;
+        }
+        // 蓝图炮/指令放置、动态结构拆装、卸载期间红石变化都不会经过 setPlacedBy，
+        // 这里重新读取一次实际信号；没变化且已在网络中时不触发网络重算。
+        int actual = Mth.clamp(level.getBestNeighborSignal(worldPosition), 0, 15);
+        if (actual != signal) {
+            signal = actual;
+            pendingSignal = actual;
+            setChanged();
+            sendData();
+            updateGeneratedRotation();
+        } else if (!hasNetwork()) {
             updateGeneratedRotation();
         }
     }
@@ -137,18 +185,24 @@ public class RedstoneEngineBlockEntity extends GeneratingKineticBlockEntity {
         }
     }
 
-    /** 翻转方向；同一网络里的红石发动机会一起翻转。 */
-    public void toggleDirection() {
-        boolean target = !reversed;
-
+    /**
+     * 翻转方向；同一网络里的红石发动机会一起翻转。
+     *
+     * <p>经齿轮/变速箱连接的发动机可能本来就一正一反，所以每台各自取反。
+     * 网络里还有其他正在输出的动力源时无法一起翻转，直接拒绝并返回 false。</p>
+     */
+    public boolean toggleDirection() {
         if (level == null || level.isClientSide) {
-            reversed = target;
-            return;
+            reversed = !reversed;
+            return true;
+        }
+        if (hasOtherGenerator()) {
+            return false;
         }
 
         List<RedstoneEngineBlockEntity> group = collectConnectedEngines();
         for (RedstoneEngineBlockEntity engine : group) {
-            engine.reversed = target;
+            engine.reversed = !engine.reversed;
             engine.setChanged();
             engine.sendData();
         }
@@ -161,6 +215,43 @@ public class RedstoneEngineBlockEntity extends GeneratingKineticBlockEntity {
             }
         }
         driver.updateGeneratedRotation();
+        return true;
+    }
+
+    /** 网络里是否还有红石发动机以外、正在输出转速的动力源。 */
+    private boolean hasOtherGenerator() {
+        if (!hasNetwork()) {
+            return false;
+        }
+        for (KineticBlockEntity member : getOrCreateNetwork().members.keySet()) {
+            if (member instanceof GeneratingKineticBlockEntity generator
+                    && !(member instanceof RedstoneEngineBlockEntity)
+                    && generator.getGeneratedSpeed() != 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 护目镜：在 Create 的应力信息后追加当前信号与对应输出。 */
+    @Override
+    public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
+        super.addToGoggleTooltip(tooltip, isPlayerSneaking);
+        tooltip.add(Component.literal("    ").append(Component.translatable(
+                        "mystery_dynamics.goggles.redstone_engine.signal", signal))
+                .withStyle(ChatFormatting.GRAY));
+        if (signal <= 0) {
+            tooltip.add(Component.literal("    ").append(Component.translatable(
+                            "mystery_dynamics.goggles.redstone_engine.off"))
+                    .withStyle(ChatFormatting.DARK_GRAY));
+        } else {
+            tooltip.add(Component.literal("    ").append(Component.translatable(
+                            "mystery_dynamics.goggles.redstone_engine.output",
+                            String.format("%,.0f", rpmFor(signal)),
+                            String.format("%,.0f", stressFor(signal))))
+                    .withStyle(ChatFormatting.AQUA));
+        }
+        return true;
     }
 
     private List<RedstoneEngineBlockEntity> collectConnectedEngines() {
@@ -189,6 +280,9 @@ public class RedstoneEngineBlockEntity extends GeneratingKineticBlockEntity {
     protected void read(CompoundTag compound, HolderLookup.Provider registries, boolean clientPacket) {
         super.read(compound, registries, clientPacket);
         signal = Mth.clamp(compound.getInt("Signal"), 0, 15);
+        if (!clientPacket) {
+            pendingSignal = signal;
+        }
         reversed = compound.getBoolean("Reversed");
     }
 }

@@ -166,9 +166,15 @@ public final class VillagerTrades {
     }
 
     private static void addGolem(VillagerTradesEvent e, int level, int min, int max, int uses, int xp) {
-        List<Item> golems = List.of(
-                item("thaumcraft:golem_straw"), item("thaumcraft:golem_wood"),
-                item("thaumcraft:golem_clay"), item("thaumcraft:golem_stone"));
+        List<Item> golems = new ArrayList<>();
+        for (String id : List.of("thaumcraft:golem_straw", "thaumcraft:golem_wood",
+                "thaumcraft:golem_clay", "thaumcraft:golem_stone")) {
+            Item golem = item(id);
+            if (golem != Items.AIR) {
+                golems.add(golem);
+            }
+        }
+        if (golems.isEmpty()) return;
         e.getTrades().get(level).add((trader, random) -> new MerchantOffer(
                 new ItemCost(Items.EMERALD, min + random.nextInt(max - min + 1)),
                 new ItemStack(golems.get(random.nextInt(golems.size()))),
@@ -177,6 +183,7 @@ public final class VillagerTrades {
 
     private static void addPhialCost(VillagerTradesEvent e, int level, int count,
                                      int emeralds, int uses, int xp) {
+        if (phials().isEmpty()) return;
         e.getTrades().get(level).add((trader, random) -> new MerchantOffer(
                 new ItemCost(randomPhial(random), count),
                 new ItemStack(Items.EMERALD, emeralds), uses, xp, FLOAT));
@@ -184,6 +191,7 @@ public final class VillagerTrades {
 
     private static void addPhialResultRange(VillagerTradesEvent e, int level, int min, int max,
                                             int resultCount, int uses, int xp) {
+        if (phials().isEmpty()) return;
         e.getTrades().get(level).add((trader, random) -> new MerchantOffer(
                 new ItemCost(Items.EMERALD, min + random.nextInt(max - min + 1)),
                 new ItemStack(randomPhial(random), resultCount), uses, xp, FLOAT));
@@ -191,23 +199,34 @@ public final class VillagerTrades {
 
     private static List<Item> PHIAL_ITEMS;
 
-    private static Item randomPhial(RandomSource random) {
+    /** 所有源质之瓶；找不到带源质的变种时退回空瓶 ID，仍找不到则为空列表（交易会被跳过）。 */
+    private static List<Item> phials() {
         if (PHIAL_ITEMS == null) {
-            PHIAL_ITEMS = new ArrayList<>();
+            List<Item> phials = new ArrayList<>();
             for (var entry : BuiltInRegistries.ITEM.entrySet()) {
                 ResourceLocation id = entry.getKey().location();
                 if (id.getNamespace().equals("thaumcraft")
                         && id.getPath().startsWith("phial_of_essentia_")) {
-                    PHIAL_ITEMS.add(entry.getValue());
+                    phials.add(entry.getValue());
                 }
             }
+            if (phials.isEmpty()) {
+                Item fallback = item("thaumcraft:phial_of_essentia");
+                if (fallback != Items.AIR) {
+                    phials.add(fallback);
+                }
+            }
+            PHIAL_ITEMS = phials;
         }
-        if (PHIAL_ITEMS.isEmpty()) {
-            return item("thaumcraft:phial_of_essentia");
-        }
-        return PHIAL_ITEMS.get(random.nextInt(PHIAL_ITEMS.size()));
+        return PHIAL_ITEMS;
     }
 
+    private static Item randomPhial(RandomSource random) {
+        List<Item> phials = phials();
+        return phials.get(random.nextInt(phials.size()));
+    }
+
+    /** 找不到的 ID 返回 AIR（默认值注册表），调用方据此跳过交易。 */
     private static Item item(String id) {
         return BuiltInRegistries.ITEM.get(ResourceLocation.parse(id));
     }

@@ -41,11 +41,11 @@ public final class InfernalBoilerEssentiaHandler implements IEssentiaTransport {
 
     private boolean isInputPort() {
         InfernalBoilerBlockEntity controller = target();
-        BlockPos origin = controller.boilerOrigin();
-        if (origin.equals(BlockPos.ZERO)) {
+        if (!controller.hasFormation()) {
             return false;
         }
-        BlockPos port = InfernalBoilerStructure.world(origin, 2, 1, 3, controller.rotation());
+        BlockPos port = InfernalBoilerStructure.world(controller.boilerOrigin(), 2, 1, 3,
+                controller.rotation());
         return accessPos.equals(port);
     }
 

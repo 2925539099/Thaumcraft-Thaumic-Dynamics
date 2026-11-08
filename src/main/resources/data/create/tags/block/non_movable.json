@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "mystery_dynamics:infernal_boiler",
+    "mystery_dynamics:infernal_boiler_face",
+    "mystery_dynamics:infernal_boiler_casing",
+    "mystery_dynamics:infernal_boiler_shell",
+    "mystery_dynamics:large_centrifuge_controller",
+    "mystery_dynamics:large_centrifuge_casing",
+    "mystery_dynamics:large_centrifuge_input",
+    "mystery_dynamics:large_centrifuge_input_port",
+    "mystery_dynamics:large_centrifuge_output_port",
+    "mystery_dynamics:arcane_turbine"
+  ]
+}

@@ -38,7 +38,8 @@ public final class InfernalBoilerCompat {
                 "infernal_boiler_structure");
 
         // 守卫者玻璃的 useItemOn 会拦截法杖，所以额外在交互事件里处理所有结构方块。
-        NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, true,
+        // receiveCanceled = false：领地/保护模组取消交互后不再成型。
+        NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, false,
                 InfernalBoilerCompat::onRightClickBlock);
     }
 
@@ -66,11 +67,14 @@ public final class InfernalBoilerCompat {
         if (!isStructureBlock(event.getLevel().getBlockState(event.getPos()))) {
             return;
         }
-        Direction face = event.getFace();
-        if (new InfernalBoilerTrigger().performTrigger(event.getLevel(), stack, player,
-                event.getPos(), face == null ? Direction.UP : face, 0)) {
+        InfernalBoilerTrigger.Outcome outcome =
+                InfernalBoilerTrigger.attempt(event.getLevel(), stack, player, event.getPos());
+        if (outcome != InfernalBoilerTrigger.Outcome.NOT_APPLICABLE) {
+            // 失败时同样吞掉这次点击：否则法杖物品还会经由 WandTriggerRegistry
+            // 再触发一次，导致提示与结构扫描重复。
             event.setCanceled(true);
-            event.setCancellationResult(InteractionResult.SUCCESS);
+            event.setCancellationResult(outcome == InfernalBoilerTrigger.Outcome.FORMED
+                    ? InteractionResult.SUCCESS : InteractionResult.CONSUME);
         }
     }
 
@@ -106,10 +110,10 @@ public final class InfernalBoilerCompat {
         if (level == null || level.isClientSide) {
             return;
         }
-        var origin = boiler.boilerOrigin();
-        if (origin.equals(net.minecraft.core.BlockPos.ZERO)) {
+        if (!boiler.hasFormation()) {
             return;
         }
+        var origin = boiler.boilerOrigin();
         var port = InfernalBoilerStructure.world(origin, 2, 1, 3, boiler.rotation());
         Direction front = boiler.frontDirection();
         for (Direction side : new Direction[]{front, front.getOpposite()}) {
@@ -126,10 +130,14 @@ public final class InfernalBoilerCompat {
         }
     }
 
-    /** 尝试从附近节点/中继器抽取 1 点 Ignis，给锅炉 200 tick 的 +9 热等级。 */
+    /**
+     * 尝试从附近节点/中继器抽取 1 点 Ignis，给锅炉 200 tick 的 +9 热等级。
+     * 只在锅炉真正工作（接有引擎）时抽取，空闲时不白白消耗灵气。
+     */
     public static void tickVis(InfernalBoilerBlockEntity boiler) {
         Level level = boiler.getLevel();
-        if (level == null || level.isClientSide || boiler.fireVisTicks() > 0) {
+        if (level == null || level.isClientSide || boiler.fireVisTicks() > 0
+                || !boiler.isWorking()) {
             return;
         }
         if (level.getGameTime() % 20L != 0L) {
@@ -159,10 +167,8 @@ public final class InfernalBoilerCompat {
         if (level == null) {
             return 0;
         }
-        var origin = boiler.boilerOrigin();
-        if (origin.equals(net.minecraft.core.BlockPos.ZERO)) {
-            origin = boiler.getBlockPos().offset(-1, -3, -1);
-        }
+        var origin = boiler.hasFormation()
+                ? boiler.boilerOrigin() : boiler.getBlockPos().offset(-1, -3, -1);
         int rotation = boiler.rotation();
         int count = 0;
         for (int[] p : BELLOW_POSITIONS) {

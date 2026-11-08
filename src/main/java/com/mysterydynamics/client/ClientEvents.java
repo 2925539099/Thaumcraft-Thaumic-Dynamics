@@ -10,6 +10,7 @@ import net.minecraft.world.entity.EntityType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent;
 import net.neoforged.neoforge.common.NeoForge;
@@ -31,6 +32,14 @@ public final class ClientEvents {
         ArcaneTurbinePartialModels.init();
     }
 
+    private static final java.util.List<String> RESEARCH_ICONS = java.util.List.of(
+            "textures/research/test_icon.png",
+            "textures/research/cooperative_work.png",
+            "textures/research/money_and_power.png",
+            "textures/research/outsourcing.png",
+            "textures/misc/r_infernal_boiler.png",
+            "textures/misc/r_large_centrifuge.png");
+
     private ClientEvents() {
     }
 
@@ -47,8 +56,22 @@ public final class ClientEvents {
                 InfernalBoilerRenderer::new);
         event.registerBlockEntityRenderer(MysteryDynamics.ARCANE_TURBINE_BE.get(),
                 ArcaneTurbineRenderer::new);
+    }
+
+    @SubscribeEvent
+    public static void clientSetup(FMLClientSetupEvent event) {
+        // 游戏总线监听只注册一次（RegisterRenderers 不保证只触发一次）。
         NeoForge.EVENT_BUS.addListener(InfernalBoilerWorldRenderer::onRenderLevel);
-        preloadResearchIcons();
+        event.enqueueWork(ClientEvents::preloadResearchIcons);
+    }
+
+    @SubscribeEvent
+    public static void registerReloadListeners(
+            net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent event) {
+        // F3+T / 切换资源包后丢弃锅炉模型与 sprite 缓存。
+        event.registerReloadListener(
+                (net.minecraft.server.packs.resources.ResourceManagerReloadListener) manager ->
+                        InfernalBoilerRenderer.clearCaches());
     }
 
     @SubscribeEvent
@@ -60,10 +83,10 @@ public final class ClientEvents {
 
     private static void preloadResearchIcons() {
         // 自定义研究图标不会自动进入纹理管理器；不预加载时研究书会画成黑紫缺失纹理。
+        // 列表需与 data/mystery_dynamics/research/**/*.json 中的 "icon" 保持一致。
         var textureManager = Minecraft.getInstance().getTextureManager();
-        textureManager.getTexture(ResourceLocation.fromNamespaceAndPath(
-                MysteryDynamics.MODID, "textures/research/test_icon.png"));
-        textureManager.getTexture(ResourceLocation.fromNamespaceAndPath(
-                MysteryDynamics.MODID, "textures/misc/r_infernal_boiler.png"));
+        for (String path : RESEARCH_ICONS) {
+            textureManager.getTexture(ResourceLocation.fromNamespaceAndPath(MysteryDynamics.MODID, path));
+        }
     }
 }

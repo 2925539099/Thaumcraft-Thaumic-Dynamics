@@ -30,31 +30,51 @@ public final class LargeCentrifugeTrigger implements IWandTriggerManager {
                 .add(Aspect.ORDER, 50);
     }
 
+    /** 触发结果：NOT_APPLICABLE 表示不是离心机结构，交给其它多方块处理。 */
+    public enum Outcome {
+        NOT_APPLICABLE,
+        FAILED,
+        FORMED
+    }
+
     @Override
     public boolean performTrigger(Level level, ItemStack stack, Player player, BlockPos pos,
                                   Direction face, int event) {
+        return attempt(level, stack, player, pos) == Outcome.FORMED;
+    }
+
+    public static Outcome attempt(Level level, ItemStack stack, Player player, BlockPos pos) {
         if (level.isClientSide || player == null
                 || !(stack.getItem() instanceof TCFunctionalItems.WandCastingItem wand)) {
-            return false;
+            return Outcome.NOT_APPLICABLE;
         }
+        // 与原版多方块一致：未完成研究时静默失败。
         if (!ResearchApi.isComplete(player, RESEARCH_KEY)) {
-            return false;
+            return Outcome.NOT_APPLICABLE;
         }
         LargeCentrifugeStructure.Match match = LargeCentrifugeStructure.find(level, pos);
         if (match == null) {
-            return false;
+            LargeCentrifugeStructure.Mismatch mismatch = LargeCentrifugeStructure.diagnose(level, pos);
+            if (mismatch == null) {
+                return Outcome.NOT_APPLICABLE;
+            }
+            BlockPos at = mismatch.pos();
+            player.displayClientMessage(Component.translatable(
+                    "mystery_dynamics.large_centrifuge.incomplete",
+                    at.getX(), at.getY(), at.getZ(), mismatch.expected()), false);
+            return Outcome.FAILED;
         }
         if (!wand.consumeVisCost(stack, player, activationCost(), true)) {
             player.displayClientMessage(
                     Component.translatable("mystery_dynamics.large_centrifuge.no_vis"), false);
-            return false;
+            return Outcome.FAILED;
         }
         if (!LargeCentrifugeStructure.form(level, match)) {
-            return false;
+            return Outcome.FAILED;
         }
         player.displayClientMessage(
                 Component.translatable("mystery_dynamics.large_centrifuge.formed"), true);
         level.playSound(null, pos, SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.BLOCKS, 1.0F, 1.0F);
-        return true;
+        return Outcome.FORMED;
     }
 }

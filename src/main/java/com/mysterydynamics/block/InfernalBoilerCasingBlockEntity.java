@@ -27,18 +27,35 @@ public class InfernalBoilerCasingBlockEntity extends FluidTankBlockEntity
     }
 
     private InfernalBoilerBlockEntity cachedController;
+    /** 所属锅炉的 origin（成型时写入）；有了它就不必在附近盲扫，避免两座锅炉相邻时认错。 */
+    private BlockPos ownerOrigin;
+
+    public BlockPos ownerOrigin() {
+        return ownerOrigin;
+    }
+
+    public void setOwnerOrigin(BlockPos origin) {
+        this.ownerOrigin = origin;
+        this.cachedController = null;
+        setChanged();
+    }
 
     @Override
     public void write(net.minecraft.nbt.CompoundTag tag,
                       net.minecraft.core.HolderLookup.Provider registries, boolean clientPacket) {
         // 这是代理 BE，不保存 FluidTankBlockEntity 的 controller/width 数据。
-        // Create 原版 write 会在 controller 为 null 时抛 NPE。
+        // Create 原版 write 会在 controller 为 null 时抛 NPE。只记录所属锅炉。
+        if (ownerOrigin != null) {
+            tag.putLong("BoilerOrigin", ownerOrigin.asLong());
+        }
     }
 
     @Override
     protected void read(net.minecraft.nbt.CompoundTag tag,
                         net.minecraft.core.HolderLookup.Provider registries, boolean clientPacket) {
         // 代理 BE 不读取储罐数据。
+        ownerOrigin = tag.contains("BoilerOrigin") ? BlockPos.of(tag.getLong("BoilerOrigin")) : null;
+        cachedController = null;
     }
 
     private InfernalBoilerBlockEntity controller() {
@@ -47,7 +64,8 @@ public class InfernalBoilerCasingBlockEntity extends FluidTankBlockEntity
         }
         InfernalBoilerBlockEntity cached = cachedController;
         if (cached != null && cached.getLevel() == level
-                && !cached.isRemoved() && cached.isController()) {
+                && !cached.isRemoved() && cached.isController() && cached.hasFormation()
+                && (ownerOrigin == null || ownerOrigin.equals(cached.boilerOrigin()))) {
             return cached;
         }
         cachedController = null;

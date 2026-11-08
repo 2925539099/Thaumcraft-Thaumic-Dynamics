@@ -1,4 +1,14 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "thaumcraft"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "thaumcraft:void_metal_nugget"
+    }
+  ],
   "items": "thaumcraft:void_metal_nugget",
   "damage": 8,
   "knockback": 1.0,

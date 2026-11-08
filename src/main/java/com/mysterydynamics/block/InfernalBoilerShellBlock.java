@@ -34,6 +34,7 @@ public class InfernalBoilerShellBlock extends Block {
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState,
                          boolean movedByPiston) {
+        // movedByPiston 时同样拆整栋，避免成型锅炉缺了模型锚点却继续工作。
         if (!level.isClientSide && !newState.is(state.getBlock())
                 && !InfernalBoilerStructure.isRestoring()) {
             InfernalBoilerStructure.requestDismantle(level, pos);

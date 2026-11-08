@@ -1,4 +1,14 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "thaumcraft"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "thaumcraft:pork_nugget"
+    }
+  ],
   "items": "thaumcraft:pork_nugget",
   "damage": 1,
   "knockback": 0.0,

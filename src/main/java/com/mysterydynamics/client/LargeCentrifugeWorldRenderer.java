@@ -32,6 +32,9 @@ public final class LargeCentrifugeWorldRenderer {
     private static final List<BlockPos> CONTROLLERS = new ArrayList<>();
     private static ClientLevel cachedLevel;
     private static long lastScanTick = Long.MIN_VALUE;
+    /** 护目镜标签只在这个距离内绘制（穿墙显示，过远只会造成视觉噪音）。 */
+    private static final double LABEL_DISTANCE_SQ = 16.0D * 16.0D;
+    private static final int FULL_BRIGHT = 0xF000F0;
 
     private LargeCentrifugeWorldRenderer() {
     }
@@ -43,6 +46,9 @@ public final class LargeCentrifugeWorldRenderer {
         Minecraft minecraft = Minecraft.getInstance();
         ClientLevel level = minecraft.level;
         if (level == null) {
+            // 断开连接后释放旧世界的引用。
+            cachedLevel = null;
+            CONTROLLERS.clear();
             return;
         }
         Camera camera = event.getCamera();
@@ -75,7 +81,9 @@ public final class LargeCentrifugeWorldRenderer {
                         event.getPartialTick().getGameTimeDeltaPartialTick(false),
                         pose, cameraPos, bufferSource, light);
             }
-            drawGoggleLabel(controller, pose, camera, bufferSource, light);
+            if (pos.distToCenterSqr(cameraPos) <= LABEL_DISTANCE_SQ) {
+                drawGoggleLabel(controller, pose, camera, bufferSource);
+            }
         }
 
         bufferSource.endBatch(RenderType.entityCutoutNoCull(InventoryMenu.BLOCK_ATLAS));
@@ -106,7 +114,7 @@ public final class LargeCentrifugeWorldRenderer {
 
     /** 与神秘时代源质罐/揭示护目镜类似：戴护目镜时在控制器上方显示内部源质。 */
     private static void drawGoggleLabel(LargeCentrifugeControllerBlockEntity controller, PoseStack pose,
-                                        Camera camera, MultiBufferSource buffers, int light) {
+                                        Camera camera, MultiBufferSource buffers) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || !GogglesItem.isWearingGoggles(minecraft.player)) {
             return;
@@ -114,17 +122,14 @@ public final class LargeCentrifugeWorldRenderer {
         BlockPos pos = controller.getBlockPos();
         Vec3 cameraPos = camera.getPosition();
         Aspect in = controller.inputAspect();
-        String name = in == null ? "空" : Component.translatable("tc.aspect." + in.getTag()).getString();
+        Component name = in == null
+                ? Component.translatable("mystery_dynamics.large_centrifuge.empty")
+                : Component.translatable("tc.aspect." + in.getTag());
         int color = in == null ? 0xFFAAAAAA : (0xFF000000 | (in.getColor() & 0xFFFFFF));
-        Component text = Component.literal(name + " " + controller.storedInput() + " / 24");
-        float speed = controller.speed();
-        Component sub = Component.literal(speed < 32.0F
-                        ? "转速不足 · 需要 32 RPM"
-                        : controller.isProcessing()
-                        ? "离心中 · 输出 " + controller.storedOutput()
-                        : controller.storedOutput() > 0
-                        ? "输出中 " + controller.storedOutput() : "待输入")
-                .withStyle(speed < 32.0F ? ChatFormatting.RED : ChatFormatting.GRAY);
+        Component text = Component.empty().append(name).append(" " + controller.storedInput()
+                + " / " + LargeCentrifugeControllerBlockEntity.CAPACITY);
+        Component sub = controller.statusComponent();
+        boolean slow = controller.speed() < LargeCentrifugeControllerBlockEntity.MIN_RPM;
         pose.pushPose();
         pose.translate(pos.getX() + 0.5D - cameraPos.x,
                 pos.getY() + 1.95D - cameraPos.y,
@@ -134,36 +139,10 @@ public final class LargeCentrifugeWorldRenderer {
         var font = minecraft.font;
         var matrix = pose.last().pose();
         font.drawInBatch(text, -font.width(text) / 2.0F, 0, color, false,
-                matrix, buffers, Font.DisplayMode.SEE_THROUGH, 0x66000000, light);
-        int subColor = speed < 32.0F ? 0xFFFF5555 : 0xFFAAAAAA;
+                matrix, buffers, Font.DisplayMode.SEE_THROUGH, 0x66000000, FULL_BRIGHT);
+        int subColor = slow ? 0xFFFF5555 : 0xFFAAAAAA;
         font.drawInBatch(sub, -font.width(sub) / 2.0F, 11, subColor, false,
-                matrix, buffers, Font.DisplayMode.SEE_THROUGH, 0x66000000, light);
-        pose.popPose();
-
-        // 九个基座方块各自显示一份源质信息；不依赖旧存档里的 BlockEntity。
-        Component base = Component.literal((in == null ? "空" : name)
-                + " " + controller.storedInput() + "/24");
-        for (int x = -1; x <= 1; x++) {
-            for (int z = -1; z <= 1; z++) {
-                BlockPos basePos = LargeCentrifugeStructure.world(pos, x, -1, z,
-                        controller.rotation());
-                drawTextAt(base, basePos.getX() + 0.5D, basePos.getY() + 1.12D,
-                        basePos.getZ() + 0.5D, pose, camera, font, buffers, light, color, 0.015F);
-            }
-        }
-    }
-
-    private static void drawTextAt(Component text, double x, double y, double z,
-                                   PoseStack pose, Camera camera, Font font,
-                                   MultiBufferSource buffers, int light, int color, float scale) {
-        Vec3 cameraPos = camera.getPosition();
-        pose.pushPose();
-        pose.translate(x - cameraPos.x, y - cameraPos.y, z - cameraPos.z);
-        pose.mulPose(camera.rotation());
-        pose.scale(-scale, -scale, scale);
-        var matrix = pose.last().pose();
-        font.drawInBatch(text, -font.width(text) / 2.0F, 0, color, false,
-                matrix, buffers, Font.DisplayMode.SEE_THROUGH, 0x55000000, light);
+                matrix, buffers, Font.DisplayMode.SEE_THROUGH, 0x66000000, FULL_BRIGHT);
         pose.popPose();
     }
 }

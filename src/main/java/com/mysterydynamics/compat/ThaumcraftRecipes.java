@@ -1,5 +1,6 @@
 package com.mysterydynamics.compat;
 
+import com.mojang.logging.LogUtils;
 import com.mysterydynamics.MysteryDynamics;
 
 import net.minecraft.core.component.DataComponents;
@@ -15,12 +16,16 @@ import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 
+import org.slf4j.Logger;
+
 /**
  * 与神秘时代（port.265+）的奥术工作台配方对接。
  *
  * <p>只有在检测到 thaumcraft 模组时才会加载本类，避免未安装时出现类缺失。</p>
  */
 public final class ThaumcraftRecipes {
+
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     private ThaumcraftRecipes() {
     }
@@ -51,7 +56,7 @@ public final class ThaumcraftRecipes {
         ItemStack shaft = stack("create", "shaft");
 
         // 空傀儡动力系统框架：三神秘锭 + 齿轮/安山机壳/齿轮，六种元要素各 5 点
-        ThaumcraftApi.addArcaneCraftingRecipe(
+        arcane(
                 "STRAW_GOLEM_POWER",
                 frame,
                 new AspectList()
@@ -91,7 +96,7 @@ public final class ThaumcraftRecipes {
                 'F', frame, 'B', bone, 'S', fleshGolem);
 
         // 粘土：框架居中 / 粘土·粘土傀儡·粘土，火 30
-        ThaumcraftApi.addArcaneCraftingRecipe(
+        arcane(
                 "CLAY_GOLEM_POWER",
                 new ItemStack(MysteryDynamics.CLAY_GOLEM_POWER.get()),
                 new AspectList().add(Aspect.FIRE, 30),
@@ -102,7 +107,7 @@ public final class ThaumcraftRecipes {
 
         // 油脂：魔力油脂·框架·魔力油脂 / 木棍·油脂傀儡·木棍，
         // 风/秩序/混沌/地各 10 + 水 20
-        ThaumcraftApi.addArcaneCraftingRecipe(
+        arcane(
                 "TALLOW_GOLEM_POWER",
                 new ItemStack(MysteryDynamics.TALLOW_GOLEM_POWER.get()),
                 new AspectList()
@@ -119,7 +124,7 @@ public final class ThaumcraftRecipes {
 
         // 石头：框架居中 / 石砖·石头傀儡·石砖，
         // 风/秩序/混沌/地各 10 + 水 20 + 火 10
-        ThaumcraftApi.addArcaneCraftingRecipe(
+        arcane(
                 "STONE_GOLEM_POWER",
                 new ItemStack(MysteryDynamics.STONE_GOLEM_POWER.get()),
                 new AspectList()
@@ -155,7 +160,7 @@ public final class ThaumcraftRecipes {
         // 炼金构材 / 精密构件 / 传动杆
         // 神秘锭 / 神秘方块 / 神秘锭
         // 风 10、秩序 20、水 30、地 30、火 10、混沌 10
-        ThaumcraftApi.addArcaneCraftingRecipe(
+        arcane(
                 "REDSTONE_ENGINE",
                 new ItemStack(MysteryDynamics.REDSTONE_ENGINE.get()),
                 new AspectList()
@@ -179,7 +184,7 @@ public final class ThaumcraftRecipes {
         waterBreathingPotion.set(DataComponents.POTION_CONTENTS,
                 new PotionContents(Potions.LONG_WATER_BREATHING));
 
-        ThaumcraftApi.addInfusionCraftingRecipe(
+        infusion(
                 "NERIIDS_PROTECTION",
                 new ItemStack(MysteryDynamics.NERIIDS_PROTECTION.get()),
                 3,
@@ -199,7 +204,7 @@ public final class ThaumcraftRecipes {
                 waterBreathingPotion);
 
         // 高压动力发射系统：注魔祭坛
-        ThaumcraftApi.addInfusionCraftingRecipe(
+        infusion(
                 "HIGH_PRESSURE_LAUNCHER",
                 new ItemStack(MysteryDynamics.HIGH_PRESSURE_LAUNCHER.get()),
                 8,
@@ -224,7 +229,7 @@ public final class ThaumcraftRecipes {
         // 神秘锭 / 鼓风机 / 神秘锭
         // 宏伟之树木板 / 炼金构材 / 宏伟之树木板
         // 神秘锭 / 鼓风机 / 神秘锭
-        ThaumcraftApi.addArcaneCraftingRecipe(
+        arcane(
                 "ARCANE_TURBINE",
                 new ItemStack(MysteryDynamics.ARCANE_TURBINE.get()),
                 new AspectList()
@@ -242,7 +247,7 @@ public final class ThaumcraftRecipes {
 
         // 神秘使工作站：金杖端 / 宏伟之木杖柄 / 金杖端
         //               魔导手册 / 奥术工作台 / 知识碎片
-        ThaumcraftApi.addArcaneCraftingRecipe(
+        arcane(
                 "THAUMATURGE_WORKSTATION",
                 new ItemStack(MysteryDynamics.THAUMATURGE_WORKSTATION_ITEM.get()),
                 new AspectList()
@@ -261,7 +266,7 @@ public final class ThaumcraftRecipes {
 
         // 小型炼金台：奥术蒸馏器 / 魔导手册 / 铁桶
         //             炼金炉 / 台桌 / 闪耀之光
-        ThaumcraftApi.addArcaneCraftingRecipe(
+        arcane(
                 "ALCHEMY_WORKSHOP",
                 new ItemStack(MysteryDynamics.ALCHEMY_WORKSHOP_ITEM.get()),
                 new AspectList()
@@ -282,7 +287,7 @@ public final class ThaumcraftRecipes {
         // 机械师工作站：扳手 / 奥术石台阶 / 黄铜手部零件
         //               宏伟之树木板 / 木棍 / 宏伟之树木板
         //               神秘锭 / 神秘方块 / 神秘锭
-        ThaumcraftApi.addArcaneCraftingRecipe(
+        arcane(
                 "MECHANIST_WORKSTATION",
                 new ItemStack(MysteryDynamics.MECHANIST_WORKSTATION_ITEM.get()),
                 new AspectList()
@@ -306,12 +311,51 @@ public final class ThaumcraftRecipes {
     /** 书页居中显示（图案补到 3 格宽），合成时仍允许左右平移。 */
     private static void centered(String research, ItemStack output, AspectList aspects,
                                  int innerWidth, int innerHeight, Object... paddedRecipe) {
+        if (hasMissing(research, output, paddedRecipe)) {
+            return;
+        }
         ThaumcraftApi.getCraftingRecipes()
                 .add(new CenteredArcaneRecipe(research, output, aspects, innerWidth, innerHeight, paddedRecipe));
     }
 
+    /** 奥术工作台配方；材料或产物缺失时跳过注册。 */
+    private static void arcane(String research, ItemStack output, AspectList aspects, Object... recipe) {
+        if (hasMissing(research, output, recipe)) {
+            return;
+        }
+        ThaumcraftApi.addArcaneCraftingRecipe(research, output, aspects, recipe);
+    }
+
+    /** 注魔祭坛配方；材料或产物缺失时跳过注册。 */
+    private static void infusion(String research, ItemStack output, int instability, AspectList aspects,
+                                 ItemStack central, ItemStack... components) {
+        if (hasMissing(research, output, central) || hasMissing(research, output, (Object[]) components)) {
+            return;
+        }
+        ThaumcraftApi.addInfusionCraftingRecipe(research, output, instability, aspects, central, components);
+    }
+
+    /** 检查产物与配方里的 ItemStack 是否为空（通常是物品 ID 不存在）。 */
+    private static boolean hasMissing(String research, ItemStack output, Object... parts) {
+        boolean missing = output.isEmpty();
+        for (Object part : parts) {
+            if (part instanceof ItemStack stack && stack.isEmpty()) {
+                missing = true;
+            }
+        }
+        if (missing) {
+            LOGGER.error("配方 {} 的材料或产物缺失，已跳过注册", research);
+        }
+        return missing;
+    }
+
     private static ItemStack stack(String namespace, String path) {
-        Item item = BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(namespace, path));
+        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(namespace, path);
+        Item item = BuiltInRegistries.ITEM.getOptional(id).orElse(Items.AIR);
+        if (item == Items.AIR) {
+            LOGGER.error("找不到配方物品 {}，相关配方将不会注册", id);
+            return ItemStack.EMPTY;
+        }
         return new ItemStack(item);
     }
 }
