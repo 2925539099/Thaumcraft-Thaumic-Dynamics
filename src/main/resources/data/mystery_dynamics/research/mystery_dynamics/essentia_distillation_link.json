@@ -6,18 +6,25 @@
   "row": 3,
   "complexity": 0,
   "warp": 0,
-  "parents": [],
+  "parents": [
+    "DISTILESSENTIA"
+  ],
   "parents_hidden": [],
   "siblings": [],
   "flags": [
-    "autoUnlock",
+    "secondary",
     "round"
   ],
   "text_pages": [
     "mystery_dynamics.research.essentia_distillation.text"
   ],
   "item": "thaumcraft:alchemical_furnace",
-  "aspects": [],
+  "aspects": [
+    {
+      "aspect": "auram",
+      "amount": 1
+    }
+  ],
   "pages": [
     {
       "type": "TEXT",

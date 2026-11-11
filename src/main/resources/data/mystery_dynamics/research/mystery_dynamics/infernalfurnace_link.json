@@ -5,12 +5,14 @@
   "col": 1,
   "row": 5,
   "complexity": 2,
-  "warp": 0,
-  "parents": [],
+  "warp": 2,
+  "parents": [
+    "INFERNALFURNACE"
+  ],
   "parents_hidden": [],
   "siblings": [],
   "flags": [
-    "autoUnlock",
+    "secondary",
     "round"
   ],
   "text_pages": [
