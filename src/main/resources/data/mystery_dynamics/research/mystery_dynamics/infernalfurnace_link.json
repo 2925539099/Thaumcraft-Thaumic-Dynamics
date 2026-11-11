@@ -5,12 +5,12 @@
   "col": 1,
   "row": 5,
   "complexity": 2,
-  "warp": 2,
+  "warp": 0,
   "parents": [],
   "parents_hidden": [],
   "siblings": [],
   "flags": [
-    "secondary",
+    "autoUnlock",
     "round"
   ],
   "text_pages": [
