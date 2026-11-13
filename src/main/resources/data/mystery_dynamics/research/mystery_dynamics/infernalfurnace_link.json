@@ -19,7 +19,7 @@
     "tc.research_page.INFERNALFURNACE.1",
     "tc.research_page.INFERNALFURNACE.2"
   ],
-  "icon": "mystery_dynamics:textures/misc/r_infernalfurnace.png",
+  "icon": "thaumcraft:textures/misc/r_infernalfurnace.png",
   "aspects": [
     {
       "aspect": "ignis",

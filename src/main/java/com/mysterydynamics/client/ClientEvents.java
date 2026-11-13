@@ -38,7 +38,7 @@ public final class ClientEvents {
             "textures/research/money_and_power.png",
             "textures/research/outsourcing.png",
             "textures/misc/r_infernal_boiler.png",
-            "textures/misc/r_infernalfurnace.png",
+            "thaumcraft:textures/misc/r_infernalfurnace.png",
             "textures/misc/r_large_centrifuge.png");
 
     private ClientEvents() {
@@ -89,7 +89,10 @@ public final class ClientEvents {
         // 列表需与 data/mystery_dynamics/research/**/*.json 中的 "icon" 保持一致。
         var textureManager = Minecraft.getInstance().getTextureManager();
         for (String path : RESEARCH_ICONS) {
-            textureManager.getTexture(ResourceLocation.fromNamespaceAndPath(MysteryDynamics.MODID, path));
+            ResourceLocation id = path.contains(":")
+                    ? ResourceLocation.parse(path)
+                    : ResourceLocation.fromNamespaceAndPath(MysteryDynamics.MODID, path);
+            textureManager.getTexture(id);
         }
     }
 }
