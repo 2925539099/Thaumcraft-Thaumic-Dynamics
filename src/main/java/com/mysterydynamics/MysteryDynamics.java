@@ -461,7 +461,7 @@ public class MysteryDynamics {
     private static BlockBehaviour.Properties engineeringProperties() {
         return BlockBehaviour.Properties.of()
                 .mapColor(MapColor.METAL)
-                .strength(3.0F, 6.0F)
+                .strength(3.0F, 17.0F)
                 .sound(SoundType.METAL)
                 .requiresCorrectToolForDrops();
     }
@@ -469,7 +469,7 @@ public class MysteryDynamics {
     private static BlockBehaviour.Properties tankProperties() {
         return BlockBehaviour.Properties.of()
                 .mapColor(MapColor.METAL)
-                .strength(3.0F, 6.0F)
+                .strength(2.0F, 17.0F)
                 .sound(SoundType.METAL)
                 .requiresCorrectToolForDrops()
                 .noOcclusion();
