@@ -1,6 +1,6 @@
 {
   "ambientocclusion": false,
-  "render_type": "minecraft:cutout",
+  "render_type": "minecraft:translucent",
   "textures": {
     "particle": "mystery_dynamics:block/reinforced_essentia_tank_t0",
     "t0": "mystery_dynamics:block/reinforced_essentia_tank_t0",
@@ -989,55 +989,55 @@
       "faces": {
         "north": {
           "uv": [
-            32.0,
-            32.0,
-            64.0,
-            64.0
+            8.0,
+            8.0,
+            16.0,
+            16.0
           ],
           "texture": "#t4"
         },
         "east": {
           "uv": [
-            32.0,
-            32.0,
-            64.0,
-            64.0
+            8.0,
+            8.0,
+            16.0,
+            16.0
           ],
           "texture": "#t4"
         },
         "south": {
           "uv": [
-            32.0,
-            32.0,
-            64.0,
-            64.0
+            8.0,
+            8.0,
+            16.0,
+            16.0
           ],
           "texture": "#t4"
         },
         "west": {
           "uv": [
-            32.0,
-            32.0,
-            64.0,
-            64.0
+            8.0,
+            8.0,
+            16.0,
+            16.0
           ],
           "texture": "#t4"
         },
         "up": {
           "uv": [
-            32.0,
-            32.0,
-            64.0,
-            64.0
+            8.0,
+            8.0,
+            16.0,
+            16.0
           ],
           "texture": "#t4"
         },
         "down": {
           "uv": [
-            32.0,
-            32.0,
-            64.0,
-            64.0
+            8.0,
+            8.0,
+            16.0,
+            16.0
           ],
           "texture": "#t4"
         }
