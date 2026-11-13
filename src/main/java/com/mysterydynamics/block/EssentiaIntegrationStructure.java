@@ -35,7 +35,8 @@ public final class EssentiaIntegrationStructure {
                     } else if (y == 1) {
                         if (x == 0 ? !engineering : !tank) return false;
                     } else {
-                        if (x == 0 ? !state.isAir() : !tank) return false;
+                        // 顶层中心列成型时会被填满，不要求预先留空。
+                        if (x != 0 && !tank) return false;
                     }
                 }
             }
