@@ -196,17 +196,20 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
         TextureAtlasSprite sprite = Minecraft.getInstance().getModelManager()
                 .getAtlas(TextureAtlas.LOCATION_BLOCKS)
                 .getSprite(ResourceLocation.fromNamespaceAndPath("thaumcraft", "block/animatedglow"));
-        VertexConsumer fill = sprite.wrap(bufferSource.getBuffer(LIQUID));
+        VertexConsumer fill = sprite.wrap(bufferSource.getBuffer(
+                RenderType.entityCutoutNoCull(TextureAtlas.LOCATION_BLOCKS)));
         for (double[] tank : TANKS) {
             double w = tank[3] - tank[0];
             double h = tank[4] - tank[1];
             double d = tank[5] - tank[2];
-            float x1 = (float) (tank[0] + w * 0.25);
-            float x2 = (float) (tank[3] - w * 0.25);
-            float z1 = (float) (tank[2] + d * 0.25);
-            float z2 = (float) (tank[5] - d * 0.25);
-            float y1 = (float) (tank[1] + h * 0.0625);
-            float y2 = (float) (y1 + h * 0.625 * fraction);
+            // 比罐体内部模型大 0.1 格（1.6 像素），以内部模型中心为中心覆盖。
+            double grow = 1.6;
+            float x1 = (float) (tank[0] - grow);
+            float x2 = (float) (tank[3] + grow);
+            float z1 = (float) (tank[2] - grow);
+            float z2 = (float) (tank[5] + grow);
+            float y1 = (float) (tank[1] + h * 0.0625 - grow);
+            float y2 = (float) (y1 + (h + grow * 2.0) * 0.625 * fraction);
             liquidCube(fill, pose, x1, y1, z1, x2, y2, z2, r, g, b, 255, LightTexture.FULL_BRIGHT);
         }
     }
@@ -237,7 +240,8 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
                                      float u, float v, float r, float g, float b, int a, int light,
                                      float nx, float ny, float nz) {
         c.addVertex(pose.last(), x, y, z).setColor(r, g, b, a / 255.0F)
-                .setUv(u, v).setLight(light);
+                .setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light)
+                .setNormal(pose.last(), nx, ny, nz);
     }
 
     private static ModelData model() {
