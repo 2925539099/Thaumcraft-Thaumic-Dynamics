@@ -10,7 +10,8 @@
     "PotatoCannonAmmoMixin"
   ],
   "client": [
-    "ThaumonomiconPagePlanMixin"
+    "ThaumonomiconPagePlanMixin",
+    "VillagerProfessionLayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
