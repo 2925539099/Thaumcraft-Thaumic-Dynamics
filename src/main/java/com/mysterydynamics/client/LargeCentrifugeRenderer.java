@@ -96,7 +96,7 @@ public final class LargeCentrifugeRenderer implements BlockEntityRenderer<LargeC
 
         pose.pushPose();
         pose.translate(0.5D, 0.5D, 0.5D);
-        pose.mulPose(Axis.YP.rotationDegrees(controller.rotation() * 90.0F));
+        pose.mulPose(Axis.YP.rotationDegrees(-controller.rotation() * 90.0F));
         pose.translate(-0.5D, -0.5D, -0.5D);
         draw(statics, pose, buffers, packedLight);
 
