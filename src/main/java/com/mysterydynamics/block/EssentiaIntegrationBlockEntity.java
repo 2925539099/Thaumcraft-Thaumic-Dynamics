@@ -117,7 +117,7 @@ public class EssentiaIntegrationBlockEntity extends com.simibubi.create.foundati
     @Override
     public int getSuctionAmount(Direction side) {
         EssentiaIntegrationBlockEntity be = controllerBE();
-        return side == portFace() && be != null && be.aspects.totalAmount() < CAPACITY ? 24 : 0;
+        return side == portFace() && be != null && be.aspects.totalAmount() < CAPACITY ? 64 : 0;
     }
 
     @Override
