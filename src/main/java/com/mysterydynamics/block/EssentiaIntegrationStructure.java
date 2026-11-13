@@ -58,27 +58,19 @@ public final class EssentiaIntegrationStructure {
         return null;
     }
 
-    /** 成型：底层中心替换成专用控制器方块，其余部件隐藏。 */
+    /** 成型：整个 3×3×3 全部替换成源质集成存储站方块。 */
     public static boolean form(Level level, BlockPos origin) {
         if (!isValid(level, origin)) return false;
         for (int y = 0; y < SIZE; y++) {
             for (int x = -1; x <= 1; x++) {
                 for (int z = -1; z <= 1; z++) {
                     BlockPos pos = origin.offset(x, y, z);
-                    if (pos.equals(origin)) continue;
-                    BlockState state = level.getBlockState(pos);
-                    if (state.is(MysteryDynamics.ENGINEERING_CONSTRUCT.get())) {
-                        level.setBlock(pos, state.setValue(EngineeringConstructBlock.FORMED, true),
-                                Block.UPDATE_ALL);
-                    } else if (state.is(MysteryDynamics.REINFORCED_ESSENTIA_TANK.get())) {
-                        level.setBlock(pos, state.setValue(ReinforcedEssentiaTankBlock.FORMED, true),
-                                Block.UPDATE_ALL);
-                    }
+                    level.setBlock(pos,
+                            MysteryDynamics.ESSENTIA_INTEGRATION_STATION.get().defaultBlockState(),
+                            Block.UPDATE_ALL);
                 }
             }
         }
-        level.setBlock(origin, MysteryDynamics.ESSENTIA_INTEGRATION_STATION.get().defaultBlockState(),
-                Block.UPDATE_ALL);
         if (level.getBlockEntity(origin) instanceof EssentiaIntegrationBlockEntity station) {
             station.setFormed(true);
         }
@@ -108,27 +100,25 @@ public final class EssentiaIntegrationStructure {
         }
     }
 
-    /** 拆解：所有部件原地恢复为工程构材/加固源质储罐。 */
+    /** 拆解：整个 3×3×3 原地恢复为工程构材/加固源质储罐，顶层中心恢复空气。 */
     public static void dismantle(Level level, BlockPos origin) {
         if (level == null) return;
         for (int y = 0; y < SIZE; y++) {
             for (int x = -1; x <= 1; x++) {
                 for (int z = -1; z <= 1; z++) {
                     BlockPos pos = origin.offset(x, y, z);
-                    if (pos.equals(origin)) continue;
-                    BlockState state = level.getBlockState(pos);
-                    if (!(state.is(MysteryDynamics.ENGINEERING_CONSTRUCT.get())
-                            || state.is(MysteryDynamics.REINFORCED_ESSENTIA_TANK.get()))) {
-                        continue;
+                    BlockState restored;
+                    if (y == 0 || (y == 1 && x == 0)) {
+                        restored = MysteryDynamics.ENGINEERING_CONSTRUCT.get().defaultBlockState();
+                    } else if (x != 0) {
+                        restored = MysteryDynamics.REINFORCED_ESSENTIA_TANK.get().defaultBlockState();
+                    } else {
+                        // 顶层中心列原本是空气。
+                        restored = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
                     }
-                    level.setBlock(pos, state.setValue(
-                            state.is(MysteryDynamics.ENGINEERING_CONSTRUCT.get())
-                                    ? EngineeringConstructBlock.FORMED
-                                    : ReinforcedEssentiaTankBlock.FORMED, false), Block.UPDATE_ALL);
+                    level.setBlock(pos, restored, Block.UPDATE_ALL);
                 }
             }
         }
-        level.setBlock(origin,
-                MysteryDynamics.ENGINEERING_CONSTRUCT.get().defaultBlockState(), Block.UPDATE_ALL);
     }
 }
