@@ -6,16 +6,17 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import com.simibubi.create.foundation.blockEntity.CachedRenderBBBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IAspectContainer;
 
 /** 源质集成存储站的控制器方块实体，容量 12×256＝3072。 */
-public class EssentiaIntegrationBlockEntity extends BlockEntity implements IAspectContainer {
+public class EssentiaIntegrationBlockEntity extends CachedRenderBBBlockEntity implements IAspectContainer {
 
     public static final int CAPACITY = 3072;
 
@@ -28,6 +29,16 @@ public class EssentiaIntegrationBlockEntity extends BlockEntity implements IAspe
 
     public boolean isFormed() {
         return formed;
+    }
+
+    @Override
+    public AABB getRenderBoundingBox() {
+        // 整座模型是 3×3×3；必须扩大渲染裁剪盒，
+        // 否则视角偏移、控制器离开视锥时整座模型会消失。
+        BlockPos pos = getBlockPos();
+        return new AABB(pos.getX() - 1.0D, pos.getY(), pos.getZ() - 1.0D,
+                pos.getX() + 2.0D, pos.getY() + 3.0D, pos.getZ() + 2.0D)
+                .inflate(0.5D);
     }
 
     public void setFormed(boolean formed) {
@@ -44,7 +55,7 @@ public class EssentiaIntegrationBlockEntity extends BlockEntity implements IAspe
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
