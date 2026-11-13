@@ -108,9 +108,19 @@ public final class EssentiaIntegrationStructure {
                 }
             }
         }
-        if (level.getBlockEntity(origin) instanceof EssentiaIntegrationBlockEntity station) {
-            station.setRotation(rotation);
-            station.setFormed(true);
+        for (int y = 0; y < SIZE; y++) {
+            for (int x = -1; x <= 1; x++) {
+                for (int z = -1; z <= 1; z++) {
+                    BlockPos pos = local(origin, x, y, z, rotation);
+                    if (level.getBlockEntity(pos) instanceof EssentiaIntegrationBlockEntity station) {
+                        station.setRotation(rotation);
+                        station.setOwner(origin);
+                        if (pos.equals(origin)) {
+                            station.setFormed(true);
+                        }
+                    }
+                }
+            }
         }
         return true;
     }
