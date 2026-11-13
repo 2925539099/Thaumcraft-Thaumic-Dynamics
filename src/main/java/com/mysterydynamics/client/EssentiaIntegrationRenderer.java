@@ -205,10 +205,10 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
     private static void iconQuad(VertexConsumer c, PoseStack pose, double x, double y, double z,
                                  float nx, float ny, float nz, double size) {
         double h = size / 2.0;
-        c.addVertex(pose.last(), (float) (x), (float) (y - h), (float) (z + h)).setColor(255, 255, 255, 255).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT);
-        c.addVertex(pose.last(), (float) (x), (float) (y + h), (float) (z + h)).setColor(255, 255, 255, 255).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT);
-        c.addVertex(pose.last(), (float) (x), (float) (y + h), (float) (z - h)).setColor(255, 255, 255, 255).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT);
-        c.addVertex(pose.last(), (float) (x), (float) (y - h), (float) (z - h)).setColor(255, 255, 255, 255).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT);
+        c.addVertex(pose.last(), (float) (x), (float) (y - h), (float) (z + h)).setColor(255, 255, 255, 255).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose.last(), nx, ny, nz);
+        c.addVertex(pose.last(), (float) (x), (float) (y + h), (float) (z + h)).setColor(255, 255, 255, 255).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose.last(), nx, ny, nz);
+        c.addVertex(pose.last(), (float) (x), (float) (y + h), (float) (z - h)).setColor(255, 255, 255, 255).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose.last(), nx, ny, nz);
+        c.addVertex(pose.last(), (float) (x), (float) (y - h), (float) (z - h)).setColor(255, 255, 255, 255).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose.last(), nx, ny, nz);
     }
 
     private static ModelData model() {
