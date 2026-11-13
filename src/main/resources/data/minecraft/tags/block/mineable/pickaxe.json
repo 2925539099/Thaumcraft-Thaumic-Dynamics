@@ -12,6 +12,8 @@
     "mystery_dynamics:golem_power_frame",
     "mystery_dynamics:redstone_engine",
     "mystery_dynamics:infernal_boiler",
-    "mystery_dynamics:arcane_turbine"
+    "mystery_dynamics:arcane_turbine",
+    "mystery_dynamics:engineering_construct",
+    "mystery_dynamics:reinforced_essentia_tank"
   ]
 }

@@ -170,5 +170,7 @@
   "mystery_dynamics.research.cooperative_work.image": "<IMG>mystery_dynamics:textures/research/cooperative_work_page.png:0:0:255:188:.45</IMG><BR>Pictured: first on the right, the partner leading the villagers towards a bright future.",
   "tc.research_name.MECHANIST_WORKSTATION": "Mechanist Workstation",
   "tc.research_text.MECHANIST_WORKSTATION": "There must be a reason mechanists love green robes",
-  "mystery_dynamics.research.mechanist_workstation.text": "There's no great mystery to building a workstation: make a table out of sturdy materials, fit a few durable machining tools on top, and a complete workstation is done.\n\nBut while talking with the villagers you noticed something curious: these mechanists, who spend all day with gears, have an almost obsessive passion for green robes.\n\nYou have no idea what this strange trade custom is based on, but it doesn't affect the delivery of equipment or products. As long as the goods arrive on time, who cares what colour the tinkerers wear?"
+  "mystery_dynamics.research.mechanist_workstation.text": "There's no great mystery to building a workstation: make a table out of sturdy materials, fit a few durable machining tools on top, and a complete workstation is done.\n\nBut while talking with the villagers you noticed something curious: these mechanists, who spend all day with gears, have an almost obsessive passion for green robes.\n\nYou have no idea what this strange trade custom is based on, but it doesn't affect the delivery of equipment or products. As long as the goods arrive on time, who cares what colour the tinkerers wear?",
+  "block.mystery_dynamics.engineering_construct": "Engineering Construct",
+  "block.mystery_dynamics.reinforced_essentia_tank": "Reinforced Essentia Tank"
 }

@@ -201,6 +201,16 @@ public class MysteryDynamics {
             BLOCKS.register("thaumaturge_workstation",
                     () -> new StationBlock(stationProperties()));
 
+    /** 工程构材：装饰性工程建筑材料。 */
+    public static final DeferredBlock<Block> ENGINEERING_CONSTRUCT =
+            BLOCKS.register("engineering_construct",
+                    () -> new Block(engineeringProperties()));
+
+    /** 加固源质储罐：装饰性储罐方块。 */
+    public static final DeferredBlock<Block> REINFORCED_ESSENTIA_TANK =
+            BLOCKS.register("reinforced_essentia_tank",
+                    () -> new Block(tankProperties()));
+
     // ---- 物品 ----
     public static final DeferredItem<BlockItem> STRAW_ITEM = ITEMS.registerSimpleBlockItem(STRAW_GOLEM_POWER);
     public static final DeferredItem<BlockItem> WOOD_ITEM = ITEMS.registerSimpleBlockItem(WOOD_GOLEM_POWER);
@@ -221,6 +231,10 @@ public class MysteryDynamics {
             ITEMS.registerSimpleBlockItem(ALCHEMY_WORKSHOP);
     public static final DeferredItem<BlockItem> THAUMATURGE_WORKSTATION_ITEM =
             ITEMS.registerSimpleBlockItem(THAUMATURGE_WORKSTATION);
+    public static final DeferredItem<BlockItem> ENGINEERING_CONSTRUCT_ITEM =
+            ITEMS.registerSimpleBlockItem(ENGINEERING_CONSTRUCT);
+    public static final DeferredItem<BlockItem> REINFORCED_ESSENTIA_TANK_ITEM =
+            ITEMS.registerSimpleBlockItem(REINFORCED_ESSENTIA_TANK);
 
     // ---- 揭示之工程师护目镜：护甲值继承揭示之护目镜，无耐久 ----
     public static final DeferredHolder<ArmorMaterial, ArmorMaterial> REVEALING_ENGINEER_GOGGLES_MATERIAL =
@@ -342,6 +356,8 @@ public class MysteryDynamics {
                         output.accept(MECHANIST_WORKSTATION_ITEM.get());
                         output.accept(ALCHEMY_WORKSHOP_ITEM.get());
                         output.accept(THAUMATURGE_WORKSTATION_ITEM.get());
+                        output.accept(ENGINEERING_CONSTRUCT_ITEM.get());
+                        output.accept(REINFORCED_ESSENTIA_TANK_ITEM.get());
                     })
                     .build());
 
@@ -427,6 +443,23 @@ public class MysteryDynamics {
                 .mapColor(MapColor.WOOD)
                 .strength(2.5F, 6.0F)
                 .sound(SoundType.WOOD)
+                .noOcclusion();
+    }
+
+    private static BlockBehaviour.Properties engineeringProperties() {
+        return BlockBehaviour.Properties.of()
+                .mapColor(MapColor.METAL)
+                .strength(3.0F, 6.0F)
+                .sound(SoundType.METAL)
+                .requiresCorrectToolForDrops();
+    }
+
+    private static BlockBehaviour.Properties tankProperties() {
+        return BlockBehaviour.Properties.of()
+                .mapColor(MapColor.METAL)
+                .strength(3.0F, 6.0F)
+                .sound(SoundType.METAL)
+                .requiresCorrectToolForDrops()
                 .noOcclusion();
     }
 

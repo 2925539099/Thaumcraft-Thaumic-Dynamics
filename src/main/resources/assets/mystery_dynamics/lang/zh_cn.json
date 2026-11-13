@@ -170,5 +170,7 @@
   "mystery_dynamics.research.blazing.text": "锅炉的观察窗原来不只是摆设。<BR><BR>向炼狱锅炉通入火源质，内部的炉火便会像吃了蛋糕的烈焰人燃烧室一样猛然窜起：锅炉进入超频状态，只要火源质不断，输出就会大幅提升。<BR><BR>记得保持稳定供给。源质一旦耗尽，火焰就会恢复如常。",
   "tc.research_name.INFERNAL_BOILER_LINK": "炼狱锅炉",
   "tc.research_text.INFERNAL_BOILER_LINK": "升温加压",
-  "mystery_dynamics.research.infernal_boiler_link.text": "炼狱锅炉以炼狱熔炉与源质蒸馏为基础。完成这两项研究后即可学习它的搭建方法。"
+  "mystery_dynamics.research.infernal_boiler_link.text": "炼狱锅炉以炼狱熔炉与源质蒸馏为基础。完成这两项研究后即可学习它的搭建方法。",
+  "block.mystery_dynamics.engineering_construct": "工程构材",
+  "block.mystery_dynamics.reinforced_essentia_tank": "加固源质储罐"
 }
