@@ -227,7 +227,7 @@ public class EssentiaIntegrationBlockEntity extends com.simibubi.create.foundati
     public AspectList getAspects() {
         if (controller) return aspects;
         EssentiaIntegrationBlockEntity be = controllerBE();
-        return be != null && isPort() ? be.aspects : EMPTY;
+        return be != null ? be.aspects : EMPTY;
     }
 
     @Override
