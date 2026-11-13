@@ -186,6 +186,17 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
             double y2 = y1 + (tank[4] - tank[1] - 2.0) * fraction;
             liquidCube(fill, pose, (float) x1, (float) y1, (float) z1,
                     (float) x2, (float) y2, (float) z2, r, g, b, 230, packedLight);
+            // 罐体玻璃前面的液面，避免液体被玻璃深度遮挡。
+            liquidQuad(fill, pose, (float) (x1 - 0.02), (float) y1, (float) z2,
+                    (float) (x1 - 0.02), (float) y1, (float) z1,
+                    (float) (x1 - 0.02), (float) y2, (float) z1,
+                    (float) (x1 - 0.02), (float) y2, (float) z2,
+                    r, g, b, 230, packedLight, -1, 0, 0);
+            liquidQuad(fill, pose, (float) (x2 + 0.02), (float) y1, (float) z1,
+                    (float) (x2 + 0.02), (float) y1, (float) z2,
+                    (float) (x2 + 0.02), (float) y2, (float) z2,
+                    (float) (x2 + 0.02), (float) y2, (float) z1,
+                    r, g, b, 230, packedLight, 1, 0, 0);
         }
     }
 
