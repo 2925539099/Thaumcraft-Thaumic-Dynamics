@@ -4,6 +4,7 @@ import com.mysterydynamics.MysteryDynamics;
 import com.simibubi.create.content.equipment.potatoCannon.PotatoCannonItemRenderer;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.VillagerRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.neoforged.api.distmarker.Dist;
@@ -58,7 +59,6 @@ public final class ClientEvents {
                 ArcaneTurbineRenderer::new);
         event.registerBlockEntityRenderer(MysteryDynamics.ESSENTIA_INTEGRATION_BE.get(),
                 EssentiaIntegrationRenderer::new);
-        event.registerEntityRenderer(EntityType.VILLAGER, MysteryProfessionRenderer::new);
     }
 
     @SubscribeEvent
@@ -76,6 +76,13 @@ public final class ClientEvents {
         event.registerReloadListener(
                 (net.minecraft.server.packs.resources.ResourceManagerReloadListener) manager ->
                         InfernalBoilerRenderer.clearCaches());
+    }
+
+    @SubscribeEvent
+    public static void addLayers(EntityRenderersEvent.AddLayers event) {
+        if (event.getRenderer(EntityType.VILLAGER) instanceof VillagerRenderer renderer) {
+            renderer.addLayer(new MechanistSkinLayer(renderer));
+        }
     }
 
     private static void preloadResearchIcons() {
