@@ -139,9 +139,8 @@ public class EssentiaIntegrationBlockEntity extends com.simibubi.create.foundati
 
     @Override
     public Aspect getEssentiaType(Direction side) {
-        EssentiaIntegrationBlockEntity be = controllerBE();
-        if (side != portFace() || be == null || be.aspects.isEmpty()) return null;
-        return be.aspects.aspects().get(0);
+        // 多源质存储不对外声明单一类型；管道会使用自身的 suctionType 请求具体源质。
+        return null;
     }
 
     @Override

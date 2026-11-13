@@ -192,7 +192,7 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
         float b = (color & 255) / 255.0F;
         float fraction = Math.min(1.0F, total / (EssentiaIntegrationBlockEntity.CAPACITY / (float) TANKS.length));
 
-        VertexConsumer fill = bufferSource.getBuffer(LIQUID);
+        VertexConsumer fill = bufferSource.getBuffer(RenderType.debugFilledBox());
         for (double[] tank : TANKS) {
             double x1 = tank[0] + 1.2, y1 = tank[1] + 1.0, z1 = tank[2] + 1.2;
             double x2 = tank[3] - 1.2, z2 = tank[5] - 1.2;
