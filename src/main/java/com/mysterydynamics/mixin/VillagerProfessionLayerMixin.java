@@ -29,7 +29,7 @@ public abstract class VillagerProfessionLayerMixin {
                                            Operation<Void> original) {
         if (entity instanceof Villager villager && isMysteryProfession(villager)) {
             String path = texture.getPath();
-            if (path.contains("/type/") || path.contains("/profession/")) {
+            if (path.contains("/type/")) {
                 return;
             }
         }
