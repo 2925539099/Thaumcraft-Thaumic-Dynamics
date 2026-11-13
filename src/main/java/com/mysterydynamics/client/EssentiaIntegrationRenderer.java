@@ -12,6 +12,7 @@ import com.mysterydynamics.MysteryDynamics;
 import com.mysterydynamics.block.EssentiaIntegrationBlockEntity;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -26,6 +27,7 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.phys.Vec3;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -121,7 +123,7 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
                         .setNormal(pose.last(), quad.nx(), quad.ny(), quad.nz());
             }
         }
-        drawEssentia(blockEntity, pose, bufferSource);
+        drawEssentia(blockEntity, pose, bufferSource, packedLight);
         pose.popPose();
     }
 
@@ -141,18 +143,18 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
     };
 
     private static void drawEssentia(EssentiaIntegrationBlockEntity blockEntity, PoseStack pose,
-                                     MultiBufferSource bufferSource) {
+                                     MultiBufferSource bufferSource, int packedLight) {
         pose.pushPose();
         pose.scale(1.0F / 16.0F, 1.0F / 16.0F, 1.0F / 16.0F);
         try {
-            drawEssentiaScaled(blockEntity, pose, bufferSource);
+            drawEssentiaScaled(blockEntity, pose, bufferSource, packedLight);
         } finally {
             pose.popPose();
         }
     }
 
     private static void drawEssentiaScaled(EssentiaIntegrationBlockEntity blockEntity, PoseStack pose,
-                                           MultiBufferSource bufferSource) {
+                                           MultiBufferSource bufferSource, int packedLight) {
         AspectList aspects = blockEntity.getAspects();
         int total = aspects.totalAmount();
         if (total <= 0) return;
@@ -173,53 +175,40 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
         float b = (color & 255) / 255.0F;
         float fraction = Math.min(1.0F, total / (EssentiaIntegrationBlockEntity.CAPACITY / (float) TANKS.length));
 
-        VertexConsumer fill = bufferSource.getBuffer(RenderType.debugFilledBox());
+        TextureAtlasSprite sprite = Minecraft.getInstance().getModelManager()
+                .getAtlas(TextureAtlas.LOCATION_BLOCKS)
+                .getSprite(ResourceLocation.fromNamespaceAndPath("thaumcraft", "block/animatedglow"));
+        VertexConsumer fill = sprite.wrap(bufferSource.getBuffer(
+                RenderType.entityTranslucent(TextureAtlas.LOCATION_BLOCKS)));
         for (double[] tank : TANKS) {
             double x1 = tank[0] + 1.2, y1 = tank[1] + 1.0, z1 = tank[2] + 1.2;
             double x2 = tank[3] - 1.2, z2 = tank[5] - 1.2;
             double y2 = y1 + (tank[4] - tank[1] - 2.0) * fraction;
-            box(fill, pose, x1, y1, z1, x2, y2, z2, r, g, b, 0.72F);
-        }
-
-        ResourceLocation image = dominant.image();
-        if (image == null) return;
-        VertexConsumer icon = bufferSource.getBuffer(RenderType.entityCutoutNoCull(image));
-        for (double[] tank : TANKS) {
-            double cx = (tank[0] + tank[3]) / 2.0;
-            double cy = (tank[1] + tank[4]) / 2.0;
-            double cz = (tank[2] + tank[5]) / 2.0;
-            iconQuad(icon, pose, tank[0] - 0.02, cy, cz, -1, 0, 0, 6.0);
-            iconQuad(icon, pose, tank[3] + 0.02, cy, cz, 1, 0, 0, 6.0);
+            liquidCube(fill, pose, (float) x1, (float) y1, (float) z1,
+                    (float) x2, (float) y2, (float) z2, r, g, b, 230, packedLight);
         }
     }
 
-    private static void box(VertexConsumer c, PoseStack pose, double x1, double y1, double z1,
-                            double x2, double y2, double z2, float r, float g, float b, float a) {
-        quad(c, pose, x1, y1, z1, x1, y2, z1, x2, y2, z1, x2, y1, z1, 0, 0, -1, r, g, b, a);
-        quad(c, pose, x2, y1, z2, x2, y2, z2, x1, y2, z2, x1, y1, z2, 0, 0, 1, r, g, b, a);
-        quad(c, pose, x1, y1, z2, x1, y2, z2, x1, y2, z1, x1, y1, z1, -1, 0, 0, r, g, b, a);
-        quad(c, pose, x2, y1, z1, x2, y2, z1, x2, y2, z2, x2, y1, z2, 1, 0, 0, r, g, b, a);
-        quad(c, pose, x1, y1, z1, x2, y1, z1, x2, y1, z2, x1, y1, z2, 0, -1, 0, r, g, b, a);
-        quad(c, pose, x1, y2, z2, x2, y2, z2, x2, y2, z1, x1, y2, z1, 0, 1, 0, r, g, b, a);
+    private static void liquidCube(VertexConsumer c, PoseStack pose,
+                                   float x1, float y1, float z1, float x2, float y2, float z2,
+                                   float r, float g, float b, int a, int light) {
+        liquidQuad(c, pose, x1, y2, z1, x2, y2, z1, x2, y2, z2, x1, y2, z2, r, g, b, a, light, 0, 1, 0);
+        liquidQuad(c, pose, x1, y1, z2, x2, y1, z2, x2, y1, z1, x1, y1, z1, r, g, b, a, light, 0, -1, 0);
+        liquidQuad(c, pose, x1, y1, z1, x2, y1, z1, x2, y2, z1, x1, y2, z1, r, g, b, a, light, 0, 0, -1);
+        liquidQuad(c, pose, x2, y1, z2, x1, y1, z2, x1, y2, z2, x2, y2, z2, r, g, b, a, light, 0, 0, 1);
+        liquidQuad(c, pose, x1, y1, z2, x1, y1, z1, x1, y2, z1, x1, y2, z2, r, g, b, a, light, -1, 0, 0);
+        liquidQuad(c, pose, x2, y1, z1, x2, y1, z2, x2, y2, z2, x2, y2, z1, r, g, b, a, light, 1, 0, 0);
     }
 
-    private static void quad(VertexConsumer c, PoseStack pose, double ax, double ay, double az,
-                             double bx, double by, double bz, double cx, double cy, double cz,
-                             double dx, double dy, double dz, float nx, float ny, float nz,
-                             float r, float g, float b, float a) {
-        c.addVertex(pose.last(), (float) ax, (float) ay, (float) az).setColor(r, g, b, a);
-        c.addVertex(pose.last(), (float) bx, (float) by, (float) bz).setColor(r, g, b, a);
-        c.addVertex(pose.last(), (float) cx, (float) cy, (float) cz).setColor(r, g, b, a);
-        c.addVertex(pose.last(), (float) dx, (float) dy, (float) dz).setColor(r, g, b, a);
-    }
-
-    private static void iconQuad(VertexConsumer c, PoseStack pose, double x, double y, double z,
-                                 float nx, float ny, float nz, double size) {
-        double h = size / 2.0;
-        c.addVertex(pose.last(), (float) (x), (float) (y - h), (float) (z + h)).setColor(255, 255, 255, 255).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose.last(), nx, ny, nz);
-        c.addVertex(pose.last(), (float) (x), (float) (y + h), (float) (z + h)).setColor(255, 255, 255, 255).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose.last(), nx, ny, nz);
-        c.addVertex(pose.last(), (float) (x), (float) (y + h), (float) (z - h)).setColor(255, 255, 255, 255).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose.last(), nx, ny, nz);
-        c.addVertex(pose.last(), (float) (x), (float) (y - h), (float) (z - h)).setColor(255, 255, 255, 255).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose.last(), nx, ny, nz);
+    private static void liquidQuad(VertexConsumer c, PoseStack pose,
+                                   float x1, float y1, float z1, float x2, float y2, float z2,
+                                   float x3, float y3, float z3, float x4, float y4, float z4,
+                                   float r, float g, float b, int a, int light,
+                                   float nx, float ny, float nz) {
+        c.addVertex(pose.last(), x1, y1, z1).setColor(r, g, b, a / 255.0F).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose.last(), nx, ny, nz);
+        c.addVertex(pose.last(), x2, y2, z2).setColor(r, g, b, a / 255.0F).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose.last(), nx, ny, nz);
+        c.addVertex(pose.last(), x3, y3, z3).setColor(r, g, b, a / 255.0F).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose.last(), nx, ny, nz);
+        c.addVertex(pose.last(), x4, y4, z4).setColor(r, g, b, a / 255.0F).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose.last(), nx, ny, nz);
     }
 
     private static ModelData model() {
