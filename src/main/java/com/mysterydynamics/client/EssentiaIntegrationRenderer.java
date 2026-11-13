@@ -24,6 +24,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.phys.Vec3;
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
 
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -119,7 +121,94 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
                         .setNormal(pose.last(), quad.nx(), quad.ny(), quad.nz());
             }
         }
+        drawEssentia(blockEntity, pose, bufferSource);
         pose.popPose();
+    }
+
+    private static final double[][] TANKS = {
+            {18.125, 17.225, -12, 29.125, 27.225, -2},
+            {18.125, 17.225, 3, 29.125, 27.225, 13},
+            {18.125, 17.225, 19, 29.125, 27.225, 29},
+            {18.125, 1.225, -12, 29.125, 11.225, -2},
+            {18.125, 1.225, 3, 29.125, 11.225, 13},
+            {18.125, 1.225, 19, 29.125, 11.225, 29},
+            {-13, 17.225, -12, -2, 27.225, -2},
+            {-13, 17.225, 3, -2, 27.225, 13},
+            {-13, 17.225, 19, -2, 27.225, 29},
+            {-13, 1.225, -12, -2, 11.225, -2},
+            {-13, 1.225, 3, -2, 11.225, 13},
+            {-13, 1.225, 19, -2, 11.225, 29},
+    };
+
+    private static void drawEssentia(EssentiaIntegrationBlockEntity blockEntity, PoseStack pose,
+                                     MultiBufferSource bufferSource) {
+        AspectList aspects = blockEntity.getAspects();
+        int total = aspects.totalAmount();
+        if (total <= 0) return;
+        Aspect dominant = null;
+        int best = 0;
+        for (Aspect aspect : aspects.aspects()) {
+            int amount = aspects.amount(aspect);
+            if (amount > best) {
+                best = amount;
+                dominant = aspect;
+            }
+        }
+        if (dominant == null) return;
+
+        int color = dominant.color();
+        float r = ((color >> 16) & 255) / 255.0F;
+        float g = ((color >> 8) & 255) / 255.0F;
+        float b = (color & 255) / 255.0F;
+        float fraction = Math.min(1.0F, total / (EssentiaIntegrationBlockEntity.CAPACITY / (float) TANKS.length));
+
+        VertexConsumer fill = bufferSource.getBuffer(RenderType.debugFilledBox());
+        for (double[] tank : TANKS) {
+            double x1 = tank[0] + 1.2, y1 = tank[1] + 1.0, z1 = tank[2] + 1.2;
+            double x2 = tank[3] - 1.2, z2 = tank[5] - 1.2;
+            double y2 = y1 + (tank[4] - tank[1] - 2.0) * fraction;
+            box(fill, pose, x1, y1, z1, x2, y2, z2, r, g, b, 0.72F);
+        }
+
+        ResourceLocation image = dominant.image();
+        if (image == null) return;
+        VertexConsumer icon = bufferSource.getBuffer(RenderType.entityCutoutNoCull(image));
+        for (double[] tank : TANKS) {
+            double cx = (tank[0] + tank[3]) / 2.0;
+            double cy = (tank[1] + tank[4]) / 2.0;
+            double cz = (tank[2] + tank[5]) / 2.0;
+            iconQuad(icon, pose, tank[0] - 0.02, cy, cz, -1, 0, 0, 6.0);
+            iconQuad(icon, pose, tank[3] + 0.02, cy, cz, 1, 0, 0, 6.0);
+        }
+    }
+
+    private static void box(VertexConsumer c, PoseStack pose, double x1, double y1, double z1,
+                            double x2, double y2, double z2, float r, float g, float b, float a) {
+        quad(c, pose, x1, y1, z1, x1, y2, z1, x2, y2, z1, x2, y1, z1, 0, 0, -1, r, g, b, a);
+        quad(c, pose, x2, y1, z2, x2, y2, z2, x1, y2, z2, x1, y1, z2, 0, 0, 1, r, g, b, a);
+        quad(c, pose, x1, y1, z2, x1, y2, z2, x1, y2, z1, x1, y1, z1, -1, 0, 0, r, g, b, a);
+        quad(c, pose, x2, y1, z1, x2, y2, z1, x2, y2, z2, x2, y1, z2, 1, 0, 0, r, g, b, a);
+        quad(c, pose, x1, y1, z1, x2, y1, z1, x2, y1, z2, x1, y1, z2, 0, -1, 0, r, g, b, a);
+        quad(c, pose, x1, y2, z2, x2, y2, z2, x2, y2, z1, x1, y2, z1, 0, 1, 0, r, g, b, a);
+    }
+
+    private static void quad(VertexConsumer c, PoseStack pose, double ax, double ay, double az,
+                             double bx, double by, double bz, double cx, double cy, double cz,
+                             double dx, double dy, double dz, float nx, float ny, float nz,
+                             float r, float g, float b, float a) {
+        c.addVertex(pose.last(), (float) ax, (float) ay, (float) az).setColor(r, g, b, a);
+        c.addVertex(pose.last(), (float) bx, (float) by, (float) bz).setColor(r, g, b, a);
+        c.addVertex(pose.last(), (float) cx, (float) cy, (float) cz).setColor(r, g, b, a);
+        c.addVertex(pose.last(), (float) dx, (float) dy, (float) dz).setColor(r, g, b, a);
+    }
+
+    private static void iconQuad(VertexConsumer c, PoseStack pose, double x, double y, double z,
+                                 float nx, float ny, float nz, double size) {
+        double h = size / 2.0;
+        c.addVertex(pose.last(), (float) (x), (float) (y - h), (float) (z + h)).setColor(255, 255, 255, 255).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT);
+        c.addVertex(pose.last(), (float) (x), (float) (y + h), (float) (z + h)).setColor(255, 255, 255, 255).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT);
+        c.addVertex(pose.last(), (float) (x), (float) (y + h), (float) (z - h)).setColor(255, 255, 255, 255).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT);
+        c.addVertex(pose.last(), (float) (x), (float) (y - h), (float) (z - h)).setColor(255, 255, 255, 255).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT);
     }
 
     private static ModelData model() {
