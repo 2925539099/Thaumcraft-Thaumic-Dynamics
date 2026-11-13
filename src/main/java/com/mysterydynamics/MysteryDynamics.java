@@ -73,6 +73,7 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.EssentiaCapabilities;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.research.ResearchBookApi;
 import thaumcraft.api.research.ResearchRecipePageRegistry;
@@ -577,6 +578,8 @@ public class MysteryDynamics {
                 INFERNAL_BOILER_CASING.get(), INFERNAL_BOILER_SHELL.get(),
                 INFERNAL_BOILER_FACE.get());
         if (ModList.get().isLoaded("thaumcraft")) {
+            event.registerBlockEntity(EssentiaCapabilities.TRANSPORT,
+                    ESSENTIA_INTEGRATION_BE.get(), (be, side) -> be);
             com.mysterydynamics.compat.InfernalBoilerCompat.registerCapabilities(event);
             com.mysterydynamics.compat.LargeCentrifugeCompat.registerCapabilities(event);
         }
