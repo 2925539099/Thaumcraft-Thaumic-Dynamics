@@ -197,6 +197,16 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
                     (float) (x2 + 0.02), (float) y2, (float) z2,
                     (float) (x2 + 0.02), (float) y2, (float) z1,
                     r, g, b, 230, packedLight, 1, 0, 0);
+            liquidQuad(fill, pose, (float) x1, (float) y1, (float) (z1 - 0.02),
+                    (float) x2, (float) y1, (float) (z1 - 0.02),
+                    (float) x2, (float) y2, (float) (z1 - 0.02),
+                    (float) x1, (float) y2, (float) (z1 - 0.02),
+                    r, g, b, 230, packedLight, 0, 0, -1);
+            liquidQuad(fill, pose, (float) x2, (float) y1, (float) (z2 + 0.02),
+                    (float) x1, (float) y1, (float) (z2 + 0.02),
+                    (float) x1, (float) y2, (float) (z2 + 0.02),
+                    (float) x2, (float) y2, (float) (z2 + 0.02),
+                    r, g, b, 230, packedLight, 0, 0, 1);
         }
     }
 
