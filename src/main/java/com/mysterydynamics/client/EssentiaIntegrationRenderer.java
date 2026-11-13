@@ -198,16 +198,21 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
         VertexConsumer fill = sprite.wrap(bufferSource.getBuffer(
                 RenderType.entityCutoutNoCull(TextureAtlas.LOCATION_BLOCKS)));
         for (double[] tank : TANKS) {
-            double w = tank[3] - tank[0];
             double h = tank[4] - tank[1];
-            double d = tank[5] - tank[2];
-            float x1 = (float) (tank[0] + w * 0.25);
-            float x2 = (float) (tank[3] - w * 0.25);
-            float z1 = (float) (tank[2] + d * 0.25);
-            float z2 = (float) (tank[5] - d * 0.25);
             float y1 = (float) (tank[1] + h * 0.0625);
             float y2 = (float) (y1 + h * 0.625 * fraction);
-            liquidCube(fill, pose, x1, y1, z1, x2, y2, z2, r, g, b, 255, LightTexture.FULL_BRIGHT);
+            float xo1 = (float) (tank[0] - 0.03), xo2 = (float) (tank[3] + 0.03);
+            float zo1 = (float) (tank[2] - 0.03), zo2 = (float) (tank[5] + 0.03);
+            float x1 = (float) tank[0], x2 = (float) tank[3];
+            float z1 = (float) tank[2], z2 = (float) tank[5];
+            liquidQuad(fill, pose, xo1, y1, z2, xo1, y1, z1, xo1, y2, z1, xo1, y2, z2,
+                    r, g, b, 255, LightTexture.FULL_BRIGHT, -1, 0, 0);
+            liquidQuad(fill, pose, xo2, y1, z1, xo2, y1, z2, xo2, y2, z2, xo2, y2, z1,
+                    r, g, b, 255, LightTexture.FULL_BRIGHT, 1, 0, 0);
+            liquidQuad(fill, pose, x1, y1, zo1, x2, y1, zo1, x2, y2, zo1, x1, y2, zo1,
+                    r, g, b, 255, LightTexture.FULL_BRIGHT, 0, 0, -1);
+            liquidQuad(fill, pose, x2, y1, zo2, x1, y1, zo2, x1, y2, zo2, x2, y2, zo2,
+                    r, g, b, 255, LightTexture.FULL_BRIGHT, 0, 0, 1);
         }
     }
 
