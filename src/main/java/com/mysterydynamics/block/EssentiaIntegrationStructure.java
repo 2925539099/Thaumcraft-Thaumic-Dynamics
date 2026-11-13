@@ -7,6 +7,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.event.level.BlockEvent;
 
 /** 源质集成存储站：3×3×3 多方块结构，支持四个水平朝向。 */
 public final class EssentiaIntegrationStructure {
@@ -128,6 +129,23 @@ public final class EssentiaIntegrationStructure {
             }
         }
         return null;
+    }
+
+    /** 成型结构被破坏时直接取消这次破坏，并原地还原整座结构。 */
+    public static void onBreak(BlockEvent.BreakEvent event) {
+        if (event.getLevel().isClientSide()) return;
+        if (!(event.getLevel() instanceof Level level)) return;
+        BlockState state = event.getState();
+        if (!(state.is(MysteryDynamics.ESSENTIA_INTEGRATION_STATION.get())
+                || state.is(MysteryDynamics.ENGINEERING_CONSTRUCT.get())
+                || state.is(MysteryDynamics.REINFORCED_ESSENTIA_TANK.get()))) {
+            return;
+        }
+        BlockPos controller = findFormedController(level, event.getPos());
+        if (controller != null) {
+            event.setCanceled(true);
+            dismantle(level, controller);
+        }
     }
 
     public static void dismantleAround(Level level, BlockPos around) {

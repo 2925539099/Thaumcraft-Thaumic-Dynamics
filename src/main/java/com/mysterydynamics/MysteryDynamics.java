@@ -581,6 +581,8 @@ public class MysteryDynamics {
 
     private static void commonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
+            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
+                    com.mysterydynamics.block.EssentiaIntegrationStructure::onBreak);
             // 高压动力发射器沿用土豆加农炮的 Shift 概要，但移除蔬菜那句。
             com.simibubi.create.foundation.item.ItemDescription.useKey(
                     HIGH_PRESSURE_LAUNCHER.get(), "item.mystery_dynamics.high_pressure_launcher");
