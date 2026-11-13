@@ -20,6 +20,8 @@ import com.mysterydynamics.block.LargeCentrifugeInputBlockEntity;
 import com.mysterydynamics.block.LargeCentrifugePortBlock;
 import com.mysterydynamics.block.LargeCentrifugePortBlockEntity;
 import com.mysterydynamics.block.RedstoneEngineBlock;
+import com.mysterydynamics.block.EngineeringConstructBlock;
+import com.mysterydynamics.block.EssentiaIntegrationBlockEntity;
 import com.mysterydynamics.block.ReinforcedEssentiaTankBlock;
 import com.mysterydynamics.block.ReinforcedEssentiaTankBlockEntity;
 import com.mysterydynamics.block.StationBlock;
@@ -203,10 +205,18 @@ public class MysteryDynamics {
             BLOCKS.register("thaumaturge_workstation",
                     () -> new StationBlock(stationProperties()));
 
-    /** 工程构材：装饰性工程建筑材料。 */
-    public static final DeferredBlock<Block> ENGINEERING_CONSTRUCT =
+    /** 工程构材：装饰性工程建筑材料，也可作为集成存储站控制器。 */
+    public static final DeferredBlock<EngineeringConstructBlock> ENGINEERING_CONSTRUCT =
             BLOCKS.register("engineering_construct",
-                    () -> new Block(engineeringProperties()));
+                    () -> new EngineeringConstructBlock(engineeringProperties()));
+
+    /** 仅用于加载 3×3×3 集成存储模型，不放置、不显示在创造模式。 */
+    public static final DeferredBlock<Block> ESSENTIA_INTEGRATION_STATION_MODEL =
+            BLOCKS.register("essentia_integration_station",
+                    () -> new Block(BlockBehaviour.Properties.of()
+                            .noOcclusion()
+                            .noLootTable()
+                            .strength(-1.0F, 3600000.0F)));
 
     /** 加固源质储罐：可接受源质管道输入的容器方块。 */
     public static final DeferredBlock<ReinforcedEssentiaTankBlock> REINFORCED_ESSENTIA_TANK =
@@ -346,6 +356,12 @@ public class MysteryDynamics {
                             reinforcedEssentiaTankType(), pos, state),
                     REINFORCED_ESSENTIA_TANK.get()).build(null));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<EssentiaIntegrationBlockEntity>> ESSENTIA_INTEGRATION_BE =
+            BLOCK_ENTITY_TYPES.register("essentia_integration", () -> BlockEntityType.Builder.of(
+                    (pos, state) -> new EssentiaIntegrationBlockEntity(
+                            essentiaIntegrationType(), pos, state),
+                    ENGINEERING_CONSTRUCT.get()).build(null));
+
     /** 独立创造模式标签页。 */
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = CREATIVE_TABS.register("main",
             () -> CreativeModeTab.builder()
@@ -448,6 +464,10 @@ public class MysteryDynamics {
 
     private static BlockEntityType<?> reinforcedEssentiaTankType() {
         return REINFORCED_ESSENTIA_TANK_BE.get();
+    }
+
+    private static BlockEntityType<?> essentiaIntegrationType() {
+        return ESSENTIA_INTEGRATION_BE.get();
     }
 
     private static BlockBehaviour.Properties stationProperties() {

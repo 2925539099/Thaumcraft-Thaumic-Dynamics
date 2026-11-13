@@ -56,6 +56,8 @@ public final class ClientEvents {
                 InfernalBoilerRenderer::new);
         event.registerBlockEntityRenderer(MysteryDynamics.ARCANE_TURBINE_BE.get(),
                 ArcaneTurbineRenderer::new);
+        event.registerBlockEntityRenderer(MysteryDynamics.ESSENTIA_INTEGRATION_BE.get(),
+                EssentiaIntegrationRenderer::new);
     }
 
     @SubscribeEvent

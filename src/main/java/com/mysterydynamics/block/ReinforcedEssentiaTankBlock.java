@@ -12,15 +12,21 @@ import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
 /** 加固源质储罐：可接受源质管道输入的容器方块，支持水平四向摆放。 */
 public class ReinforcedEssentiaTankBlock extends HorizontalDirectionalBlock implements EntityBlock {
 
+    public static final BooleanProperty FORMED = BooleanProperty.create("formed");
+
     public ReinforcedEssentiaTankBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
+        this.registerDefaultState(this.stateDefinition.any()
+                .setValue(FACING, Direction.NORTH)
+                .setValue(FORMED, false));
     }
 
     @Override
@@ -30,7 +36,12 @@ public class ReinforcedEssentiaTankBlock extends HorizontalDirectionalBlock impl
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
+        builder.add(FACING, FORMED);
+    }
+
+    @Override
+    public RenderShape getRenderShape(BlockState state) {
+        return state.getValue(FORMED) ? RenderShape.INVISIBLE : RenderShape.MODEL;
     }
 
     @Override

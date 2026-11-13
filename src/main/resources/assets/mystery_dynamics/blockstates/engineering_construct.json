@@ -1,7 +1,36 @@
 {
   "variants": {
-    "": {
-      "model": "mystery_dynamics:block/engineering_construct"
+    "facing=north,formed=false": {
+      "model": "mystery_dynamics:block/engineering_construct",
+      "y": 0
+    },
+    "facing=east,formed=false": {
+      "model": "mystery_dynamics:block/engineering_construct",
+      "y": 90
+    },
+    "facing=south,formed=false": {
+      "model": "mystery_dynamics:block/engineering_construct",
+      "y": 180
+    },
+    "facing=west,formed=false": {
+      "model": "mystery_dynamics:block/engineering_construct",
+      "y": 270
+    },
+    "facing=north,formed=true": {
+      "model": "mystery_dynamics:block/engineering_construct",
+      "y": 0
+    },
+    "facing=east,formed=true": {
+      "model": "mystery_dynamics:block/engineering_construct",
+      "y": 90
+    },
+    "facing=south,formed=true": {
+      "model": "mystery_dynamics:block/engineering_construct",
+      "y": 180
+    },
+    "facing=west,formed=true": {
+      "model": "mystery_dynamics:block/engineering_construct",
+      "y": 270
     }
   }
 }
