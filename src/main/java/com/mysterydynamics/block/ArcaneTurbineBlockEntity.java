@@ -412,5 +412,21 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         if (tag.contains("InfernalOverclock")) {
             infernalOverclock = tag.getBoolean("InfernalOverclock");
         }
+        if (!clientPacket) {
+            repairStaleNetworkCapacity();
+        }
+    }
+
+    /**
+     * 旧版本读档时 cachedEfficiency 还是 0，Create 在 initialize() 中
+     * 用 0 转速减旧容量，导致旧容量残留；这里在初始化前把本方块记录的
+     * AddedCapacity 提升到存档网络容量，确保旧容量能被完整扣除一次。
+     * 正常的存档不会触发这个分支。
+     */
+    private void repairStaleNetworkCapacity() {
+        float speed = Math.abs(getGeneratedSpeed());
+        if (speed > 0.001F && capacity > lastCapacityProvided * speed + 1.0F) {
+            lastCapacityProvided = capacity / speed;
+        }
     }
 }
