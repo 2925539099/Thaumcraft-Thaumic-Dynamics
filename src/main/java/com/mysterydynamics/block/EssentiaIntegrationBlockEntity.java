@@ -170,20 +170,9 @@ public class EssentiaIntegrationBlockEntity extends com.simibubi.create.foundati
         return 0;
     }
 
-    /** 端口位于底层两侧：局部 x=±1、y=0。 */
+    /** 所有非控制器存储站方块都可作为接入点，端口贴图只用于视觉。 */
     private boolean isPort() {
-        if (controller || owner == null || owner.equals(BlockPos.ZERO)) return false;
-        int dx = worldPosition.getX() - owner.getX();
-        int dz = worldPosition.getZ() - owner.getZ();
-        if (worldPosition.getY() != owner.getY()) return false;
-        int lx, lz;
-        switch (rotation & 3) {
-            case 1 -> { lx = -dz; lz = dx; }
-            case 2 -> { lx = -dx; lz = -dz; }
-            case 3 -> { lx = dz; lz = -dx; }
-            default -> { lx = dx; lz = dz; }
-        }
-        return Math.abs(lx) == 1;
+        return !controller && owner != null && !owner.equals(BlockPos.ZERO);
     }
 
     @Override
