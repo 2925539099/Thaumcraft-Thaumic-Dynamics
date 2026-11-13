@@ -38,6 +38,7 @@ public final class ClientEvents {
             "textures/research/money_and_power.png",
             "textures/research/outsourcing.png",
             "textures/misc/r_infernal_boiler.png",
+            "textures/misc/r_infernalfurnace.png",
             "textures/misc/r_large_centrifuge.png");
 
     private ClientEvents() {
