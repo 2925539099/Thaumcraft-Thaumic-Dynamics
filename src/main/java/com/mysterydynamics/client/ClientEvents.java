@@ -59,7 +59,6 @@ public final class ClientEvents {
                 ArcaneTurbineRenderer::new);
         event.registerBlockEntityRenderer(MysteryDynamics.ESSENTIA_INTEGRATION_BE.get(),
                 EssentiaIntegrationRenderer::new);
-        event.registerEntityRenderer(EntityType.VILLAGER, MysticVillagerRenderer::new);
     }
 
     @SubscribeEvent
