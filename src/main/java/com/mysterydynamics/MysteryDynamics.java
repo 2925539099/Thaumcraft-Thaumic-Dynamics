@@ -217,7 +217,8 @@ public class MysteryDynamics {
                     () -> new EssentiaIntegrationStationBlock(BlockBehaviour.Properties.of()
                             .noOcclusion()
                             .noLootTable()
-                            .strength(3.0F, 17.0F)));
+                            .requiresCorrectToolForDrops()
+                            .strength(4.0F, 20.0F)));
 
     /** 加固源质储罐：可接受源质管道输入的容器方块。 */
     public static final DeferredBlock<ReinforcedEssentiaTankBlock> REINFORCED_ESSENTIA_TANK =
@@ -509,7 +510,7 @@ public class MysteryDynamics {
     private static BlockBehaviour.Properties largeCentrifugeProperties() {
         return BlockBehaviour.Properties.of()
                 .mapColor(MapColor.METAL)
-                .strength(3.0F, 12.0F)
+                .strength(4.0F, 20.0F)
                 .sound(SoundType.METAL)
                 .noOcclusion()
                 .noLootTable()
@@ -538,7 +539,8 @@ public class MysteryDynamics {
     private static BlockBehaviour.Properties infernalBoilerCasingProperties() {
         return BlockBehaviour.Properties.of()
                 .mapColor(MapColor.NETHER)
-                .strength(2.0F, 6.0F)
+                .strength(4.0F, 20.0F)
+                .requiresCorrectToolForDrops()
                 .sound(SoundType.NETHER_BRICKS)
                 .noOcclusion()
                 .pushReaction(PushReaction.BLOCK);
@@ -547,7 +549,8 @@ public class MysteryDynamics {
     private static BlockBehaviour.Properties infernalBoilerShellProperties() {
         return BlockBehaviour.Properties.of()
                 .mapColor(MapColor.NETHER)
-                .strength(2.0F, 6.0F)
+                .strength(4.0F, 20.0F)
+                .requiresCorrectToolForDrops()
                 .sound(SoundType.NETHER_BRICKS)
                 .noOcclusion()
                 .pushReaction(PushReaction.BLOCK);
