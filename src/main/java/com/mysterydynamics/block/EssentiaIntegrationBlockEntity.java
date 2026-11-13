@@ -216,6 +216,13 @@ public class EssentiaIntegrationBlockEntity extends com.simibubi.create.foundati
                 pos.getX() + 2.0D, pos.getY() + 3.0D, pos.getZ() + 2.0D).inflate(0.5D);
     }
 
+    private void syncAspects() {
+        setChanged();
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
+    }
+
     @Override
     public AspectList getAspects() {
         if (controller) return aspects;
@@ -228,7 +235,7 @@ public class EssentiaIntegrationBlockEntity extends com.simibubi.create.foundati
         if (controller) {
             aspects.aspects.clear();
             if (list != null) aspects.add(list);
-            setChanged();
+            syncAspects();
         } else if (isPort()) {
             EssentiaIntegrationBlockEntity be = controllerBE();
             if (be != null) be.setAspects(list);
@@ -250,7 +257,7 @@ public class EssentiaIntegrationBlockEntity extends com.simibubi.create.foundati
         int accepted = Math.min(amount, CAPACITY - be.aspects.totalAmount());
         if (accepted <= 0) return 0;
         be.aspects.add(aspect, accepted);
-        be.setChanged();
+        be.syncAspects();
         return accepted;
     }
 
@@ -262,7 +269,7 @@ public class EssentiaIntegrationBlockEntity extends com.simibubi.create.foundati
             return false;
         }
         be.aspects.remove(aspect, amount);
-        be.setChanged();
+        be.syncAspects();
         return true;
     }
 
