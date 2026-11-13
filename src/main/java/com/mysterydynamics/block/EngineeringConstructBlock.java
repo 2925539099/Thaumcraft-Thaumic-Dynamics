@@ -74,7 +74,7 @@ public class EngineeringConstructBlock extends HorizontalDirectionalBlock {
                 .add(Aspect.EARTH, VIS_COST)
                 .add(Aspect.ENTROPY, VIS_COST)
                 .add(Aspect.ORDER, VIS_COST);
-        if (!WandApi.consumeVis(stack, player, cost, false)) {
+        if (!WandApi.consumeVis(stack, player, cost, true)) {
             return ItemInteractionResult.FAIL;
         }
         return EssentiaIntegrationStructure.form(level, origin)

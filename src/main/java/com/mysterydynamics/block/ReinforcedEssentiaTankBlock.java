@@ -96,7 +96,7 @@ public class ReinforcedEssentiaTankBlock extends HorizontalDirectionalBlock impl
                 .add(Aspect.EARTH, 75)
                 .add(Aspect.ENTROPY, 75)
                 .add(Aspect.ORDER, 75);
-        if (!WandApi.consumeVis(stack, player, cost, false)) {
+        if (!WandApi.consumeVis(stack, player, cost, true)) {
             return ItemInteractionResult.FAIL;
         }
         return EssentiaIntegrationStructure.form(level, origin)
