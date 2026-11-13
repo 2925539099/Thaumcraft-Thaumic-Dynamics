@@ -196,17 +196,18 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
         TextureAtlasSprite sprite = Minecraft.getInstance().getModelManager()
                 .getAtlas(TextureAtlas.LOCATION_BLOCKS)
                 .getSprite(ResourceLocation.fromNamespaceAndPath("thaumcraft", "block/animatedglow"));
-        VertexConsumer fill = sprite.wrap(bufferSource.getBuffer(LIQUID));
+        VertexConsumer fill = sprite.wrap(bufferSource.getBuffer(
+                RenderType.entityCutoutNoCull(TextureAtlas.LOCATION_BLOCKS)));
         for (double[] tank : TANKS) {
             double h = tank[4] - tank[1];
-            // 比内部栅栏大、比外壳小：外壳向内收 1 像素。
-            double inset = 0.03125;
-            float x1 = (float) (tank[0] + inset);
-            float x2 = (float) (tank[3] - inset);
-            float z1 = (float) (tank[2] + inset);
-            float z2 = (float) (tank[5] - inset);
-            float y1 = (float) (tank[1] + inset);
-            float y2 = (float) (y1 + (h - inset * 2.0) * fraction);
+            // 紧贴外壳外侧 0.01 格，保证深度测试可见，同时不会隔墙显示。
+            double out = 0.01;
+            float x1 = (float) (tank[0] - out);
+            float x2 = (float) (tank[3] + out);
+            float z1 = (float) (tank[2] - out);
+            float z2 = (float) (tank[5] + out);
+            float y1 = (float) (tank[1] - out);
+            float y2 = (float) (y1 + (h + out * 2.0) * fraction);
             liquidCube(fill, pose, x1, y1, z1, x2, y2, z2, r, g, b, 255, LightTexture.FULL_BRIGHT);
         }
     }
@@ -237,7 +238,8 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
                                      float u, float v, float r, float g, float b, int a, int light,
                                      float nx, float ny, float nz) {
         c.addVertex(pose.last(), x, y, z).setColor(r, g, b, a / 255.0F)
-                .setUv(u, v).setLight(light);
+                .setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light)
+                .setNormal(pose.last(), nx, ny, nz);
     }
 
     private static ModelData model() {
