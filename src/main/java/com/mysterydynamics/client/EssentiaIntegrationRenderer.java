@@ -4,9 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Axis;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.logging.LogUtils;
@@ -14,10 +12,8 @@ import com.mysterydynamics.MysteryDynamics;
 import com.mysterydynamics.block.EssentiaIntegrationBlockEntity;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -28,9 +24,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.phys.Vec3;
-import thaumcraft.api.aspects.Aspect;
-import thaumcraft.api.aspects.AspectList;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -50,22 +43,6 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
     private static final Map<ResourceLocation, TextureAtlasSprite> SPRITES = new HashMap<>();
     private static ModelData model;
     private static final Set<BlockPos> RENDERED_THIS_FRAME = new HashSet<>();
-    private static final RenderType LIQUID = RenderType.create(
-            "mystic_essentia_liquid",
-            DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP,
-            VertexFormat.Mode.QUADS,
-            256,
-            false,
-            true,
-            RenderType.CompositeState.builder()
-                    .setShaderState(RenderStateShard.POSITION_COLOR_TEX_LIGHTMAP_SHADER)
-                    .setTextureState(new RenderStateShard.TextureStateShard(TextureAtlas.LOCATION_BLOCKS, false, false))
-                    .setTransparencyState(RenderType.TRANSLUCENT_TRANSPARENCY)
-                    .setDepthTestState(RenderStateShard.NO_DEPTH_TEST)
-                    .setCullState(RenderType.NO_CULL)
-                    .createCompositeState(false)
-    );
-
     private record Vertex(float x, float y, float z, float u, float v) {
     }
 
@@ -141,105 +118,7 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
                         .setNormal(pose.last(), quad.nx(), quad.ny(), quad.nz());
             }
         }
-        drawEssentia(blockEntity, pose, bufferSource, packedLight);
         pose.popPose();
-    }
-
-    private static final double[][] TANKS = {
-            {18.125, 17.225, -12, 29.125, 27.225, -2},
-            {18.125, 17.225, 3, 29.125, 27.225, 13},
-            {18.125, 17.225, 19, 29.125, 27.225, 29},
-            {18.125, 1.225, -12, 29.125, 11.225, -2},
-            {18.125, 1.225, 3, 29.125, 11.225, 13},
-            {18.125, 1.225, 19, 29.125, 11.225, 29},
-            {-13, 17.225, -12, -2, 27.225, -2},
-            {-13, 17.225, 3, -2, 27.225, 13},
-            {-13, 17.225, 19, -2, 27.225, 29},
-            {-13, 1.225, -12, -2, 11.225, -2},
-            {-13, 1.225, 3, -2, 11.225, 13},
-            {-13, 1.225, 19, -2, 11.225, 29},
-    };
-
-    private static void drawEssentia(EssentiaIntegrationBlockEntity blockEntity, PoseStack pose,
-                                     MultiBufferSource bufferSource, int packedLight) {
-        pose.pushPose();
-        pose.scale(1.0F / 16.0F, 1.0F / 16.0F, 1.0F / 16.0F);
-        try {
-            drawEssentiaScaled(blockEntity, pose, bufferSource, packedLight);
-        } finally {
-            pose.popPose();
-        }
-    }
-
-    private static void drawEssentiaScaled(EssentiaIntegrationBlockEntity blockEntity, PoseStack pose,
-                                           MultiBufferSource bufferSource, int packedLight) {
-        AspectList aspects = blockEntity.getAspects();
-        int total = aspects.totalAmount();
-        if (total <= 0) return;
-        Aspect dominant = null;
-        int best = 0;
-        for (Aspect aspect : aspects.aspects()) {
-            int amount = aspects.amount(aspect);
-            if (amount > best) {
-                best = amount;
-                dominant = aspect;
-            }
-        }
-        if (dominant == null) return;
-
-        int color = dominant.color();
-        float r = ((color >> 16) & 255) / 255.0F;
-        float g = ((color >> 8) & 255) / 255.0F;
-        float b = (color & 255) / 255.0F;
-        float fraction = Math.min(1.0F, total / (EssentiaIntegrationBlockEntity.CAPACITY / (float) TANKS.length));
-
-        TextureAtlasSprite sprite = Minecraft.getInstance().getModelManager()
-                .getAtlas(TextureAtlas.LOCATION_BLOCKS)
-                .getSprite(ResourceLocation.fromNamespaceAndPath("thaumcraft", "block/animatedglow"));
-        VertexConsumer fill = sprite.wrap(bufferSource.getBuffer(
-                RenderType.entityCutoutNoCull(TextureAtlas.LOCATION_BLOCKS)));
-        for (double[] tank : TANKS) {
-            double h = tank[4] - tank[1];
-            // 以外壳为基准，四边内缩 0.05 格。
-            double inset = 0.02;
-            float x1 = (float) (tank[0] + inset);
-            float x2 = (float) (tank[3] - inset);
-            float z1 = (float) (tank[2] + inset);
-            float z2 = (float) (tank[5] - inset);
-            float y1 = (float) (tank[1] + inset);
-            float y2 = (float) (y1 + (h - inset * 2.0) * fraction);
-            liquidCube(fill, pose, x1, y1, z1, x2, y2, z2, r, g, b, 255, LightTexture.FULL_BRIGHT);
-        }
-    }
-
-    private static void liquidCube(VertexConsumer c, PoseStack pose,
-                                   float x1, float y1, float z1, float x2, float y2, float z2,
-                                   float r, float g, float b, int a, int light) {
-        liquidQuad(c, pose, x1, y2, z1, x2, y2, z1, x2, y2, z2, x1, y2, z2, r, g, b, a, light, 0, 1, 0);
-        liquidQuad(c, pose, x1, y1, z2, x2, y1, z2, x2, y1, z1, x1, y1, z1, r, g, b, a, light, 0, -1, 0);
-        liquidQuad(c, pose, x1, y1, z1, x2, y1, z1, x2, y2, z1, x1, y2, z1, r, g, b, a, light, 0, 0, -1);
-        liquidQuad(c, pose, x2, y1, z2, x1, y1, z2, x1, y2, z2, x2, y2, z2, r, g, b, a, light, 0, 0, 1);
-        liquidQuad(c, pose, x1, y1, z2, x1, y1, z1, x1, y2, z1, x1, y2, z2, r, g, b, a, light, -1, 0, 0);
-        liquidQuad(c, pose, x2, y1, z1, x2, y1, z2, x2, y2, z2, x2, y2, z1, r, g, b, a, light, 1, 0, 0);
-    }
-
-    private static void liquidQuad(VertexConsumer c, PoseStack pose,
-                                   float x1, float y1, float z1, float x2, float y2, float z2,
-                                   float x3, float y3, float z3, float x4, float y4, float z4,
-                                   float r, float g, float b, int a, int light,
-                                   float nx, float ny, float nz) {
-        liquidVertex(c, pose, x1, y1, z1, 0, 0, r, g, b, a, light, nx, ny, nz);
-        liquidVertex(c, pose, x2, y2, z2, 1, 0, r, g, b, a, light, nx, ny, nz);
-        liquidVertex(c, pose, x3, y3, z3, 1, 1, r, g, b, a, light, nx, ny, nz);
-        liquidVertex(c, pose, x4, y4, z4, 0, 1, r, g, b, a, light, nx, ny, nz);
-    }
-
-    private static void liquidVertex(VertexConsumer c, PoseStack pose, float x, float y, float z,
-                                     float u, float v, float r, float g, float b, int a, int light,
-                                     float nx, float ny, float nz) {
-        c.addVertex(pose.last(), x, y, z).setColor(r, g, b, a / 255.0F)
-                .setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light)
-                .setNormal(pose.last(), nx, ny, nz);
     }
 
     private static ModelData model() {
