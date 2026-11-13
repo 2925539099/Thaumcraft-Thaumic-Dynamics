@@ -117,7 +117,7 @@ public class EssentiaIntegrationBlockEntity extends com.simibubi.create.foundati
     @Override
     public int getSuctionAmount(Direction side) {
         EssentiaIntegrationBlockEntity be = controllerBE();
-        return side == portFace() && be != null && be.aspects.totalAmount() < CAPACITY ? 64 : 0;
+        return side == portFace() && be != null && be.aspects.totalAmount() < CAPACITY ? 24 : 0;
     }
 
     @Override
@@ -198,6 +198,8 @@ public class EssentiaIntegrationBlockEntity extends com.simibubi.create.foundati
                     || source instanceof EssentiaIntegrationBlockEntity) continue;
             Direction face = direction.getOpposite();
             if (!source.canOutputTo(face)) continue;
+            // 炼金塔等更高吸力的设备优先，端口不在更强吸力存在时抢源质。
+            if (source.getSuctionAmount(face) > 24) continue;
             Aspect aspect = source.getEssentiaType(face);
             if (aspect == null) aspect = source.getEssentiaType(null);
             if (aspect == null) continue;
