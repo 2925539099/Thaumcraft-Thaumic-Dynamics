@@ -539,7 +539,7 @@ public class MysteryDynamics {
     private static BlockBehaviour.Properties infernalBoilerCasingProperties() {
         return BlockBehaviour.Properties.of()
                 .mapColor(MapColor.NETHER)
-                .strength(4.0F, 20.0F)
+                .strength(50.0F, 1200.0F)
                 .requiresCorrectToolForDrops()
                 .sound(SoundType.NETHER_BRICKS)
                 .noOcclusion()
@@ -549,7 +549,7 @@ public class MysteryDynamics {
     private static BlockBehaviour.Properties infernalBoilerShellProperties() {
         return BlockBehaviour.Properties.of()
                 .mapColor(MapColor.NETHER)
-                .strength(4.0F, 20.0F)
+                .strength(50.0F, 1200.0F)
                 .requiresCorrectToolForDrops()
                 .sound(SoundType.NETHER_BRICKS)
                 .noOcclusion()
