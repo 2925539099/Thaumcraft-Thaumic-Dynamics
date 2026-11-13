@@ -62,8 +62,8 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
         }
 
         pose.pushPose();
-        // 模型坐标是 -16..32；控制器在底层中心，平移一格后正好覆盖 0..3 格。
-        pose.translate(1.0D, 1.0D, 1.0D);
+        // 模型坐标 -16..32 本身就是以控制器方块为中心的 3×3×3 范围，不需要整体平移。
+        // 额外平移会让整座模型错开一格。
 
         VertexConsumer consumer = bufferSource.getBuffer(RenderType.translucent());
         var atlas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS);
