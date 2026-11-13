@@ -47,6 +47,18 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
     }
 
     @Override
+    public void initialize() {
+        // Create 在 initialize() 里按 lastCapacityProvided 减去旧网络容量。
+        // 若此时 cachedEfficiency 仍为 0，getGeneratedSpeed() 会返回 0，
+        // 旧容量减不掉，随后新容量再加一次，造成读档后容量翻倍。
+        // 优先使用 NBT 中恢复的缓存；老存档没有缓存时再现场扫描。
+        if (level != null && !level.isClientSide && cachedEfficiency <= 0.0F) {
+            refreshBoilerState();
+        }
+        super.initialize();
+    }
+
+    @Override
     public void tick() {
         boolean lower = isLowerHalf();
         // 双端都刷新缓存（客户端用于护目镜显示），但只按间隔扫描。
@@ -369,6 +381,11 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
                          net.minecraft.core.HolderLookup.Provider registries,
                          boolean clientPacket) {
         tag.putInt("TurbineDirection", movementDirection);
+        tag.putFloat("CachedEfficiency", cachedEfficiency);
+        tag.putInt("EngineCount", currentEngineCount);
+        tag.putFloat("BoilerTotalStress", currentBoilerTotalStress);
+        tag.putBoolean("InfernalAttached", infernalAttached);
+        tag.putBoolean("InfernalOverclock", infernalOverclock);
         super.write(tag, registries, clientPacket);
     }
 
@@ -379,6 +396,21 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         super.read(tag, registries, clientPacket);
         if (tag.contains("TurbineDirection")) {
             movementDirection = tag.getInt("TurbineDirection") < 0 ? -1 : 1;
+        }
+        if (tag.contains("CachedEfficiency")) {
+            cachedEfficiency = tag.getFloat("CachedEfficiency");
+        }
+        if (tag.contains("EngineCount")) {
+            currentEngineCount = Math.max(1, tag.getInt("EngineCount"));
+        }
+        if (tag.contains("BoilerTotalStress")) {
+            currentBoilerTotalStress = tag.getFloat("BoilerTotalStress");
+        }
+        if (tag.contains("InfernalAttached")) {
+            infernalAttached = tag.getBoolean("InfernalAttached");
+        }
+        if (tag.contains("InfernalOverclock")) {
+            infernalOverclock = tag.getBoolean("InfernalOverclock");
         }
     }
 }
