@@ -92,17 +92,17 @@ public class EssentiaIntegrationBlockEntity extends com.simibubi.create.foundati
 
     @Override
     public boolean isConnectable(Direction side) {
-        return isPort();
+        return side == portFace();
     }
 
     @Override
     public boolean canInputFrom(Direction side) {
-        return isPort();
+        return side == portFace();
     }
 
     @Override
     public boolean canOutputTo(Direction side) {
-        return isPort();
+        return side == portFace();
     }
 
     @Override
@@ -117,12 +117,12 @@ public class EssentiaIntegrationBlockEntity extends com.simibubi.create.foundati
     @Override
     public int getSuctionAmount(Direction side) {
         EssentiaIntegrationBlockEntity be = controllerBE();
-        return isPort() && be != null && be.aspects.totalAmount() < CAPACITY ? 24 : 0;
+        return side == portFace() && be != null && be.aspects.totalAmount() < CAPACITY ? 24 : 0;
     }
 
     @Override
     public int takeEssentia(Aspect aspect, int amount, Direction side) {
-        if (!isPort()) return 0;
+        if (side != portFace()) return 0;
         EssentiaIntegrationBlockEntity be = controllerBE();
         if (be == null || aspect == null || amount <= 0) return 0;
         int taken = Math.min(amount, be.aspects.amount(aspect));
@@ -140,13 +140,13 @@ public class EssentiaIntegrationBlockEntity extends com.simibubi.create.foundati
     @Override
     public Aspect getEssentiaType(Direction side) {
         EssentiaIntegrationBlockEntity be = controllerBE();
-        if (!isPort() || be == null || be.aspects.isEmpty()) return null;
+        if (side != portFace() || be == null || be.aspects.isEmpty()) return null;
         return be.aspects.aspects().get(0);
     }
 
     @Override
     public int simulateAddEssentia(Aspect aspect, int amount, Direction side) {
-        if (!isPort() || aspect == null || amount <= 0) return 0;
+        if (side != portFace() || aspect == null || amount <= 0) return 0;
         EssentiaIntegrationBlockEntity be = controllerBE();
         if (be == null) return 0;
         return Math.min(amount, CAPACITY - be.aspects.totalAmount());
@@ -154,7 +154,7 @@ public class EssentiaIntegrationBlockEntity extends com.simibubi.create.foundati
 
     @Override
     public int simulateTakeEssentia(Aspect aspect, int amount, Direction side) {
-        if (!isPort() || aspect == null || amount <= 0) return 0;
+        if (side != portFace() || aspect == null || amount <= 0) return 0;
         EssentiaIntegrationBlockEntity be = controllerBE();
         return be == null ? 0 : Math.min(amount, be.aspects.amount(aspect));
     }
@@ -162,7 +162,7 @@ public class EssentiaIntegrationBlockEntity extends com.simibubi.create.foundati
     @Override
     public int getEssentiaAmount(Direction side) {
         EssentiaIntegrationBlockEntity be = controllerBE();
-        return isPort() && be != null ? be.aspects.totalAmount() : 0;
+        return side == portFace() && be != null ? be.aspects.totalAmount() : 0;
     }
 
     @Override
@@ -170,9 +170,20 @@ public class EssentiaIntegrationBlockEntity extends com.simibubi.create.foundati
         return 0;
     }
 
-    /** 所有非控制器存储站方块都可作为接入点，端口贴图只用于视觉。 */
+    /** 端口位于底层两侧：局部 x=±1、y=0。 */
     private boolean isPort() {
-        return !controller && owner != null && !owner.equals(BlockPos.ZERO);
+        if (controller || owner == null || owner.equals(BlockPos.ZERO)) return false;
+        int dx = worldPosition.getX() - owner.getX();
+        int dz = worldPosition.getZ() - owner.getZ();
+        if (worldPosition.getY() != owner.getY()) return false;
+        int lx;
+        switch (rotation & 3) {
+            case 1 -> lx = -dz;
+            case 2 -> lx = -dx;
+            case 3 -> lx = dz;
+            default -> lx = dx;
+        }
+        return Math.abs(lx) == 1;
     }
 
     @Override
