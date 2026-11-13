@@ -199,17 +199,14 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
         VertexConsumer fill = sprite.wrap(bufferSource.getBuffer(
                 RenderType.entityCutoutNoCull(TextureAtlas.LOCATION_BLOCKS)));
         for (double[] tank : TANKS) {
-            double w = tank[3] - tank[0];
             double h = tank[4] - tank[1];
-            double d = tank[5] - tank[2];
-            // 比罐体内部模型大 0.1 格（1.6 像素），以内部模型中心为中心覆盖。
-            double grow = 1.6;
-            float x1 = (float) (tank[0] - grow);
-            float x2 = (float) (tank[3] + grow);
-            float z1 = (float) (tank[2] - grow);
-            float z2 = (float) (tank[5] + grow);
-            float y1 = (float) (tank[1] + h * 0.0625 - grow);
-            float y2 = (float) (y1 + (h + grow * 2.0) * 0.625 * fraction);
+            // 只比内部栅栏大 1 像素：使用罐体外框，略微内缩避免与玻璃面重合。
+            float x1 = (float) (tank[0] + 0.01);
+            float x2 = (float) (tank[3] - 0.01);
+            float z1 = (float) (tank[2] + 0.01);
+            float z2 = (float) (tank[5] - 0.01);
+            float y1 = (float) (tank[1] + 0.01);
+            float y2 = (float) (y1 + (h - 0.02) * fraction);
             liquidCube(fill, pose, x1, y1, z1, x2, y2, z2, r, g, b, 255, LightTexture.FULL_BRIGHT);
         }
     }
