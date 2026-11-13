@@ -5,7 +5,12 @@ import com.mysterydynamics.MysteryDynamics;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -17,6 +22,9 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.wands.WandApi;
 
 /** 加固源质储罐：可接受源质管道输入的容器方块，支持水平四向摆放。 */
 public class ReinforcedEssentiaTankBlock extends HorizontalDirectionalBlock implements EntityBlock {
@@ -66,6 +74,34 @@ public class ReinforcedEssentiaTankBlock extends HorizontalDirectionalBlock impl
             EssentiaIntegrationStructure.dismantleAround(level, pos);
         }
         return super.playerWillDestroy(level, pos, state, player);
+    }
+
+    @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
+                                              Player player, InteractionHand hand, BlockHitResult hit) {
+        if (!WandApi.isWand(stack)) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+        BlockPos origin = EssentiaIntegrationStructure.findOrigin(level, pos);
+        if (origin == null || !EssentiaIntegrationStructure.isValid(level, origin)) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+        if (level.isClientSide) {
+            return ItemInteractionResult.SUCCESS;
+        }
+        AspectList cost = new AspectList()
+                .add(Aspect.AIR, 75)
+                .add(Aspect.FIRE, 75)
+                .add(Aspect.WATER, 75)
+                .add(Aspect.EARTH, 75)
+                .add(Aspect.ENTROPY, 75)
+                .add(Aspect.ORDER, 75);
+        if (!WandApi.consumeVis(stack, player, cost, false)) {
+            return ItemInteractionResult.FAIL;
+        }
+        return EssentiaIntegrationStructure.form(level, origin)
+                ? ItemInteractionResult.SUCCESS
+                : ItemInteractionResult.FAIL;
     }
 
     @Override
