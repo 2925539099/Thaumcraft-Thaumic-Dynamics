@@ -200,14 +200,14 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
                 RenderType.entityCutoutNoCull(TextureAtlas.LOCATION_BLOCKS)));
         for (double[] tank : TANKS) {
             double h = tank[4] - tank[1];
-            // 紧贴外壳外侧 0.01 格，保证深度测试可见，同时不会隔墙显示。
-            double out = 0.01;
-            float x1 = (float) (tank[0] - out);
-            float x2 = (float) (tank[3] + out);
-            float z1 = (float) (tank[2] - out);
-            float z2 = (float) (tank[5] + out);
-            float y1 = (float) (tank[1] - out);
-            float y2 = (float) (y1 + (h + out * 2.0) * fraction);
+            // 以外壳为基准，四边内缩 0.05 格。
+            double inset = 0.05;
+            float x1 = (float) (tank[0] + inset);
+            float x2 = (float) (tank[3] - inset);
+            float z1 = (float) (tank[2] + inset);
+            float z2 = (float) (tank[5] - inset);
+            float y1 = (float) (tank[1] + inset);
+            float y2 = (float) (y1 + (h - inset * 2.0) * fraction);
             liquidCube(fill, pose, x1, y1, z1, x2, y2, z2, r, g, b, 255, LightTexture.FULL_BRIGHT);
         }
     }
