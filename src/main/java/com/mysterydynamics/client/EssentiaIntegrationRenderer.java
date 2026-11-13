@@ -142,6 +142,17 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
 
     private static void drawEssentia(EssentiaIntegrationBlockEntity blockEntity, PoseStack pose,
                                      MultiBufferSource bufferSource) {
+        pose.pushPose();
+        pose.scale(1.0F / 16.0F, 1.0F / 16.0F, 1.0F / 16.0F);
+        try {
+            drawEssentiaScaled(blockEntity, pose, bufferSource);
+        } finally {
+            pose.popPose();
+        }
+    }
+
+    private static void drawEssentiaScaled(EssentiaIntegrationBlockEntity blockEntity, PoseStack pose,
+                                           MultiBufferSource bufferSource) {
         AspectList aspects = blockEntity.getAspects();
         int total = aspects.totalAmount();
         if (total <= 0) return;
