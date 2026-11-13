@@ -4,7 +4,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Axis;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.logging.LogUtils;
@@ -15,6 +17,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -47,6 +50,20 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
     private static final Map<ResourceLocation, TextureAtlasSprite> SPRITES = new HashMap<>();
     private static ModelData model;
     private static final Set<BlockPos> RENDERED_THIS_FRAME = new HashSet<>();
+    private static final RenderType LIQUID = RenderType.create(
+            "mystic_essentia_liquid",
+            DefaultVertexFormat.POSITION_COLOR,
+            VertexFormat.Mode.QUADS,
+            256,
+            false,
+            true,
+            RenderType.CompositeState.builder()
+                    .setShaderState(RenderType.RENDERTYPE_TRANSLUCENT_SHADER)
+                    .setTextureState(RenderStateShard.NO_TEXTURE)
+                    .setTransparencyState(RenderType.TRANSLUCENT_TRANSPARENCY)
+                    .setDepthTestState(RenderStateShard.NO_DEPTH_TEST)
+                    .setCullState(RenderType.NO_CULL)
+                    .createCompositeState(false));
 
     private record Vertex(float x, float y, float z, float u, float v) {
     }
@@ -175,11 +192,7 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
         float b = (color & 255) / 255.0F;
         float fraction = Math.min(1.0F, total / (EssentiaIntegrationBlockEntity.CAPACITY / (float) TANKS.length));
 
-        TextureAtlasSprite sprite = Minecraft.getInstance().getModelManager()
-                .getAtlas(TextureAtlas.LOCATION_BLOCKS)
-                .getSprite(ResourceLocation.fromNamespaceAndPath("thaumcraft", "block/animatedglow"));
-        VertexConsumer fill = sprite.wrap(bufferSource.getBuffer(
-                RenderType.entityTranslucent(TextureAtlas.LOCATION_BLOCKS)));
+        VertexConsumer fill = bufferSource.getBuffer(LIQUID);
         for (double[] tank : TANKS) {
             double x1 = tank[0] + 1.2, y1 = tank[1] + 1.0, z1 = tank[2] + 1.2;
             double x2 = tank[3] - 1.2, z2 = tank[5] - 1.2;
@@ -226,10 +239,10 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
                                    float x3, float y3, float z3, float x4, float y4, float z4,
                                    float r, float g, float b, int a, int light,
                                    float nx, float ny, float nz) {
-        c.addVertex(pose.last(), x1, y1, z1).setColor(r, g, b, a / 255.0F).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose.last(), nx, ny, nz);
-        c.addVertex(pose.last(), x2, y2, z2).setColor(r, g, b, a / 255.0F).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose.last(), nx, ny, nz);
-        c.addVertex(pose.last(), x3, y3, z3).setColor(r, g, b, a / 255.0F).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose.last(), nx, ny, nz);
-        c.addVertex(pose.last(), x4, y4, z4).setColor(r, g, b, a / 255.0F).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose.last(), nx, ny, nz);
+        c.addVertex(pose.last(), x1, y1, z1).setColor(r, g, b, a / 255.0F);
+        c.addVertex(pose.last(), x2, y2, z2).setColor(r, g, b, a / 255.0F);
+        c.addVertex(pose.last(), x3, y3, z3).setColor(r, g, b, a / 255.0F);
+        c.addVertex(pose.last(), x4, y4, z4).setColor(r, g, b, a / 255.0F);
     }
 
     private static ModelData model() {
