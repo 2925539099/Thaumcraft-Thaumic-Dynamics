@@ -145,6 +145,21 @@ public class EssentiaIntegrationBlockEntity extends com.simibubi.create.foundati
     }
 
     @Override
+    public int simulateAddEssentia(Aspect aspect, int amount, Direction side) {
+        if (side != portFace() || aspect == null || amount <= 0) return 0;
+        EssentiaIntegrationBlockEntity be = controllerBE();
+        if (be == null) return 0;
+        return Math.min(amount, CAPACITY - be.aspects.totalAmount());
+    }
+
+    @Override
+    public int simulateTakeEssentia(Aspect aspect, int amount, Direction side) {
+        if (side != portFace() || aspect == null || amount <= 0) return 0;
+        EssentiaIntegrationBlockEntity be = controllerBE();
+        return be == null ? 0 : Math.min(amount, be.aspects.amount(aspect));
+    }
+
+    @Override
     public int getEssentiaAmount(Direction side) {
         EssentiaIntegrationBlockEntity be = controllerBE();
         return side == portFace() && be != null ? be.aspects.totalAmount() : 0;
