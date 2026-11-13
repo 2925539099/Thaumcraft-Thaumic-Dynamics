@@ -55,6 +55,9 @@ public class ArcaneTurbineBlockEntity extends GeneratingKineticBlockEntity {
         if (level != null && !level.isClientSide && cachedEfficiency <= 0.0F) {
             refreshBoilerState();
         }
+        if (level != null && !level.isClientSide) {
+            repairStaleNetworkCapacity();
+        }
         super.initialize();
     }
 
