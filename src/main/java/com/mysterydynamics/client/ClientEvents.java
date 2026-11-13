@@ -82,6 +82,7 @@ public final class ClientEvents {
     public static void addLayers(EntityRenderersEvent.AddLayers event) {
         if (event.getRenderer(EntityType.VILLAGER) instanceof VillagerRenderer renderer) {
             renderer.addLayer(new MechanistSkinLayer(renderer));
+            renderer.addLayer(new ThaumaturgeSkinLayer(renderer));
         }
     }
 
