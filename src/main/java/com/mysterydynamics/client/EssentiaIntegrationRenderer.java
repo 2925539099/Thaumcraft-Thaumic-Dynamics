@@ -220,6 +220,29 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
                     (float) x1, (float) y2, (float) (z2 + 0.02),
                     (float) x2, (float) y2, (float) (z2 + 0.02),
                     r, g, b, 230, packedLight, 0, 0, 1);
+            // 外侧玻璃面：位于罐体外表面之外，确保不会被玻璃深度遮挡。
+            double xo1 = tank[0] - 0.03, xo2 = tank[3] + 0.03;
+            double zo1 = tank[2] - 0.03, zo2 = tank[5] + 0.03;
+            liquidQuad(fill, pose, (float) xo1, (float) y1, (float) tank[2],
+                    (float) xo1, (float) y1, (float) tank[5],
+                    (float) xo1, (float) y2, (float) tank[5],
+                    (float) xo1, (float) y2, (float) tank[2],
+                    r, g, b, 230, packedLight, -1, 0, 0);
+            liquidQuad(fill, pose, (float) xo2, (float) y1, (float) tank[5],
+                    (float) xo2, (float) y1, (float) tank[2],
+                    (float) xo2, (float) y2, (float) tank[2],
+                    (float) xo2, (float) y2, (float) tank[5],
+                    r, g, b, 230, packedLight, 1, 0, 0);
+            liquidQuad(fill, pose, (float) tank[0], (float) y1, (float) zo1,
+                    (float) tank[3], (float) y1, (float) zo1,
+                    (float) tank[3], (float) y2, (float) zo1,
+                    (float) tank[0], (float) y2, (float) zo1,
+                    r, g, b, 230, packedLight, 0, 0, -1);
+            liquidQuad(fill, pose, (float) tank[3], (float) y1, (float) zo2,
+                    (float) tank[0], (float) y1, (float) zo2,
+                    (float) tank[0], (float) y2, (float) zo2,
+                    (float) tank[3], (float) y2, (float) zo2,
+                    r, g, b, 230, packedLight, 0, 0, 1);
         }
     }
 
