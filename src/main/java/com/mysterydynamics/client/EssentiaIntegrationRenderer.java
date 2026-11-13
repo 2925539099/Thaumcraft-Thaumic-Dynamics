@@ -192,57 +192,35 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
         float b = (color & 255) / 255.0F;
         float fraction = Math.min(1.0F, total / (EssentiaIntegrationBlockEntity.CAPACITY / (float) TANKS.length));
 
-        VertexConsumer fill = bufferSource.getBuffer(RenderType.debugFilledBox());
+        TextureAtlasSprite sprite = Minecraft.getInstance().getModelManager()
+                .getAtlas(TextureAtlas.LOCATION_BLOCKS)
+                .getSprite(ResourceLocation.withDefaultNamespace("block/white_concrete"));
+        VertexConsumer fill = sprite.wrap(bufferSource.getBuffer(RenderType.translucent()));
         for (double[] tank : TANKS) {
-            double x1 = tank[0] + 1.2, y1 = tank[1] + 1.0, z1 = tank[2] + 1.2;
-            double x2 = tank[3] - 1.2, z2 = tank[5] - 1.2;
+            double y1 = tank[1] + 1.0;
             double y2 = y1 + (tank[4] - tank[1] - 2.0) * fraction;
-            liquidCube(fill, pose, (float) x1, (float) y1, (float) z1,
-                    (float) x2, (float) y2, (float) z2, r, g, b, 230, packedLight);
-            // 罐体玻璃前面的液面，避免液体被玻璃深度遮挡。
-            liquidQuad(fill, pose, (float) (x1 - 0.02), (float) y1, (float) z2,
-                    (float) (x1 - 0.02), (float) y1, (float) z1,
-                    (float) (x1 - 0.02), (float) y2, (float) z1,
-                    (float) (x1 - 0.02), (float) y2, (float) z2,
-                    r, g, b, 230, packedLight, -1, 0, 0);
-            liquidQuad(fill, pose, (float) (x2 + 0.02), (float) y1, (float) z1,
-                    (float) (x2 + 0.02), (float) y1, (float) z2,
-                    (float) (x2 + 0.02), (float) y2, (float) z2,
-                    (float) (x2 + 0.02), (float) y2, (float) z1,
-                    r, g, b, 230, packedLight, 1, 0, 0);
-            liquidQuad(fill, pose, (float) x1, (float) y1, (float) (z1 - 0.02),
-                    (float) x2, (float) y1, (float) (z1 - 0.02),
-                    (float) x2, (float) y2, (float) (z1 - 0.02),
-                    (float) x1, (float) y2, (float) (z1 - 0.02),
-                    r, g, b, 230, packedLight, 0, 0, -1);
-            liquidQuad(fill, pose, (float) x2, (float) y1, (float) (z2 + 0.02),
-                    (float) x1, (float) y1, (float) (z2 + 0.02),
-                    (float) x1, (float) y2, (float) (z2 + 0.02),
-                    (float) x2, (float) y2, (float) (z2 + 0.02),
-                    r, g, b, 230, packedLight, 0, 0, 1);
-            // 外侧玻璃面：位于罐体外表面之外，确保不会被玻璃深度遮挡。
             double xo1 = tank[0] - 0.03, xo2 = tank[3] + 0.03;
             double zo1 = tank[2] - 0.03, zo2 = tank[5] + 0.03;
             liquidQuad(fill, pose, (float) xo1, (float) y1, (float) tank[2],
                     (float) xo1, (float) y1, (float) tank[5],
                     (float) xo1, (float) y2, (float) tank[5],
                     (float) xo1, (float) y2, (float) tank[2],
-                    r, g, b, 230, packedLight, -1, 0, 0);
+                    r, g, b, 220, packedLight, -1, 0, 0);
             liquidQuad(fill, pose, (float) xo2, (float) y1, (float) tank[5],
                     (float) xo2, (float) y1, (float) tank[2],
                     (float) xo2, (float) y2, (float) tank[2],
                     (float) xo2, (float) y2, (float) tank[5],
-                    r, g, b, 230, packedLight, 1, 0, 0);
+                    r, g, b, 220, packedLight, 1, 0, 0);
             liquidQuad(fill, pose, (float) tank[0], (float) y1, (float) zo1,
                     (float) tank[3], (float) y1, (float) zo1,
                     (float) tank[3], (float) y2, (float) zo1,
                     (float) tank[0], (float) y2, (float) zo1,
-                    r, g, b, 230, packedLight, 0, 0, -1);
+                    r, g, b, 220, packedLight, 0, 0, -1);
             liquidQuad(fill, pose, (float) tank[3], (float) y1, (float) zo2,
                     (float) tank[0], (float) y1, (float) zo2,
                     (float) tank[0], (float) y2, (float) zo2,
                     (float) tank[3], (float) y2, (float) zo2,
-                    r, g, b, 230, packedLight, 0, 0, 1);
+                    r, g, b, 220, packedLight, 0, 0, 1);
         }
     }
 
@@ -262,10 +240,10 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
                                    float x3, float y3, float z3, float x4, float y4, float z4,
                                    float r, float g, float b, int a, int light,
                                    float nx, float ny, float nz) {
-        c.addVertex(pose.last(), x1, y1, z1).setColor(r, g, b, a / 255.0F);
-        c.addVertex(pose.last(), x2, y2, z2).setColor(r, g, b, a / 255.0F);
-        c.addVertex(pose.last(), x3, y3, z3).setColor(r, g, b, a / 255.0F);
-        c.addVertex(pose.last(), x4, y4, z4).setColor(r, g, b, a / 255.0F);
+        c.addVertex(pose.last(), x1, y1, z1).setColor(r, g, b, a / 255.0F).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose.last(), nx, ny, nz);
+        c.addVertex(pose.last(), x2, y2, z2).setColor(r, g, b, a / 255.0F).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose.last(), nx, ny, nz);
+        c.addVertex(pose.last(), x3, y3, z3).setColor(r, g, b, a / 255.0F).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose.last(), nx, ny, nz);
+        c.addVertex(pose.last(), x4, y4, z4).setColor(r, g, b, a / 255.0F).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose.last(), nx, ny, nz);
     }
 
     private static ModelData model() {
