@@ -194,33 +194,20 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
 
         TextureAtlasSprite sprite = Minecraft.getInstance().getModelManager()
                 .getAtlas(TextureAtlas.LOCATION_BLOCKS)
-                .getSprite(ResourceLocation.withDefaultNamespace("block/white_concrete"));
-        VertexConsumer fill = sprite.wrap(bufferSource.getBuffer(RenderType.translucent()));
+                .getSprite(ResourceLocation.fromNamespaceAndPath("thaumcraft", "block/animatedglow"));
+        VertexConsumer fill = sprite.wrap(bufferSource.getBuffer(
+                RenderType.entityCutoutNoCull(TextureAtlas.LOCATION_BLOCKS)));
         for (double[] tank : TANKS) {
-            double y1 = tank[1] + 1.0;
-            double y2 = y1 + (tank[4] - tank[1] - 2.0) * fraction;
-            double xo1 = tank[0] - 0.03, xo2 = tank[3] + 0.03;
-            double zo1 = tank[2] - 0.03, zo2 = tank[5] + 0.03;
-            liquidQuad(fill, pose, (float) xo1, (float) y1, (float) tank[2],
-                    (float) xo1, (float) y1, (float) tank[5],
-                    (float) xo1, (float) y2, (float) tank[5],
-                    (float) xo1, (float) y2, (float) tank[2],
-                    r, g, b, 220, packedLight, -1, 0, 0);
-            liquidQuad(fill, pose, (float) xo2, (float) y1, (float) tank[5],
-                    (float) xo2, (float) y1, (float) tank[2],
-                    (float) xo2, (float) y2, (float) tank[2],
-                    (float) xo2, (float) y2, (float) tank[5],
-                    r, g, b, 220, packedLight, 1, 0, 0);
-            liquidQuad(fill, pose, (float) tank[0], (float) y1, (float) zo1,
-                    (float) tank[3], (float) y1, (float) zo1,
-                    (float) tank[3], (float) y2, (float) zo1,
-                    (float) tank[0], (float) y2, (float) zo1,
-                    r, g, b, 220, packedLight, 0, 0, -1);
-            liquidQuad(fill, pose, (float) tank[3], (float) y1, (float) zo2,
-                    (float) tank[0], (float) y1, (float) zo2,
-                    (float) tank[0], (float) y2, (float) zo2,
-                    (float) tank[3], (float) y2, (float) zo2,
-                    r, g, b, 220, packedLight, 0, 0, 1);
+            double w = tank[3] - tank[0];
+            double h = tank[4] - tank[1];
+            double d = tank[5] - tank[2];
+            float x1 = (float) (tank[0] + w * 0.25);
+            float x2 = (float) (tank[3] - w * 0.25);
+            float z1 = (float) (tank[2] + d * 0.25);
+            float z2 = (float) (tank[5] - d * 0.25);
+            float y1 = (float) (tank[1] + h * 0.0625);
+            float y2 = (float) (y1 + h * 0.625 * fraction);
+            liquidCube(fill, pose, x1, y1, z1, x2, y2, z2, r, g, b, 255, LightTexture.FULL_BRIGHT);
         }
     }
 
@@ -240,10 +227,18 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
                                    float x3, float y3, float z3, float x4, float y4, float z4,
                                    float r, float g, float b, int a, int light,
                                    float nx, float ny, float nz) {
-        c.addVertex(pose.last(), x1, y1, z1).setColor(r, g, b, a / 255.0F).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose.last(), nx, ny, nz);
-        c.addVertex(pose.last(), x2, y2, z2).setColor(r, g, b, a / 255.0F).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose.last(), nx, ny, nz);
-        c.addVertex(pose.last(), x3, y3, z3).setColor(r, g, b, a / 255.0F).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose.last(), nx, ny, nz);
-        c.addVertex(pose.last(), x4, y4, z4).setColor(r, g, b, a / 255.0F).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose.last(), nx, ny, nz);
+        liquidVertex(c, pose, x1, y1, z1, 0, 0, r, g, b, a, light, nx, ny, nz);
+        liquidVertex(c, pose, x2, y2, z2, 1, 0, r, g, b, a, light, nx, ny, nz);
+        liquidVertex(c, pose, x3, y3, z3, 1, 1, r, g, b, a, light, nx, ny, nz);
+        liquidVertex(c, pose, x4, y4, z4, 0, 1, r, g, b, a, light, nx, ny, nz);
+    }
+
+    private static void liquidVertex(VertexConsumer c, PoseStack pose, float x, float y, float z,
+                                     float u, float v, float r, float g, float b, int a, int light,
+                                     float nx, float ny, float nz) {
+        c.addVertex(pose.last(), x, y, z).setColor(r, g, b, a / 255.0F)
+                .setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light)
+                .setNormal(pose.last(), nx, ny, nz);
     }
 
     private static ModelData model() {
