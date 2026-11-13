@@ -19,9 +19,11 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.phys.Vec3;
 
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -29,6 +31,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.slf4j.Logger;
 
@@ -38,6 +42,7 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final Map<ResourceLocation, TextureAtlasSprite> SPRITES = new HashMap<>();
     private static ModelData model;
+    private static final Set<BlockPos> RENDERED_THIS_FRAME = new HashSet<>();
 
     private record Vertex(float x, float y, float z, float u, float v) {
     }
@@ -57,16 +62,42 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
         if (!blockEntity.isFormed()) {
             return;
         }
+        RENDERED_THIS_FRAME.add(blockEntity.getBlockPos());
+        draw(blockEntity, pose, bufferSource, packedLight);
+    }
+
+    public static boolean wasRenderedThisFrame(BlockPos pos) {
+        return RENDERED_THIS_FRAME.contains(pos);
+    }
+
+    public static void clearFrameCache() {
+        RENDERED_THIS_FRAME.clear();
+    }
+
+    /** 视锥兜底渲染：pose 为相机空间，需要自行平移到控制器。 */
+    public static void renderAt(EssentiaIntegrationBlockEntity blockEntity, float partialTick,
+                                PoseStack pose, Vec3 camera, MultiBufferSource bufferSource,
+                                int packedLight) {
+        if (!blockEntity.isFormed()) {
+            return;
+        }
+        BlockPos pos = blockEntity.getBlockPos();
+        pose.pushPose();
+        pose.translate(pos.getX() - camera.x, pos.getY() - camera.y, pos.getZ() - camera.z);
+        draw(blockEntity, pose, bufferSource, packedLight);
+        pose.popPose();
+    }
+
+    private static void draw(EssentiaIntegrationBlockEntity blockEntity, PoseStack pose,
+                             MultiBufferSource bufferSource, int packedLight) {
         ModelData data = model();
         if (data == null || data.quads().isEmpty()) {
             return;
         }
 
         pose.pushPose();
-        // 水平方向模型坐标 -16..32 已以控制器方块为中心；
-        // 垂直方向模型最低点在 -16，需要上移一格才能与结构底层对齐。
+        // 模型坐标 -16..32 以控制器方块为中心；最低点 -16 需要上移一格。
         pose.translate(0.0D, 1.0D, 0.0D);
-        // 按结构实际朝向旋转整座模型；旋转轴穿过控制器方块中心。
         int rotation = blockEntity.getRotation();
         if (rotation != 0) {
             pose.translate(0.5D, 0.0D, 0.5D);

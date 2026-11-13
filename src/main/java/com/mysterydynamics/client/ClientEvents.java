@@ -65,6 +65,7 @@ public final class ClientEvents {
     public static void clientSetup(FMLClientSetupEvent event) {
         // 游戏总线监听只注册一次（RegisterRenderers 不保证只触发一次）。
         NeoForge.EVENT_BUS.addListener(InfernalBoilerWorldRenderer::onRenderLevel);
+        NeoForge.EVENT_BUS.addListener(EssentiaIntegrationWorldRenderer::onRenderLevel);
         event.enqueueWork(ClientEvents::preloadResearchIcons);
     }
 
