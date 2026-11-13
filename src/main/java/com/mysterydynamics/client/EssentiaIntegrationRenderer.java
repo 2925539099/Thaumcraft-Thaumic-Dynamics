@@ -153,7 +153,7 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
             case UP -> new float[][]{
                     {x1, y2, z1}, {x1, y2, z2}, {x2, y2, z2}, {x2, y2, z1}};
             case DOWN -> new float[][]{
-                    {x1, y1, z1}, {x1, y1, z2}, {x2, y1, z2}, {x2, y1, z1}};
+                    {x1, y1, z1}, {x2, y1, z1}, {x2, y1, z2}, {x1, y1, z2}};
             default -> new float[0][];
         };
         float[][] uvs = {
