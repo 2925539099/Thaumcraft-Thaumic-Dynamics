@@ -20,6 +20,8 @@ import com.mysterydynamics.block.LargeCentrifugeInputBlockEntity;
 import com.mysterydynamics.block.LargeCentrifugePortBlock;
 import com.mysterydynamics.block.LargeCentrifugePortBlockEntity;
 import com.mysterydynamics.block.RedstoneEngineBlock;
+import com.mysterydynamics.block.ReinforcedEssentiaTankBlock;
+import com.mysterydynamics.block.ReinforcedEssentiaTankBlockEntity;
 import com.mysterydynamics.block.StationBlock;
 import com.mysterydynamics.block.RedstoneEngineBlockEntity;
 import com.mysterydynamics.compat.InfernalBoilerConstruct;
@@ -206,10 +208,10 @@ public class MysteryDynamics {
             BLOCKS.register("engineering_construct",
                     () -> new Block(engineeringProperties()));
 
-    /** 加固源质储罐：装饰性储罐方块。 */
-    public static final DeferredBlock<Block> REINFORCED_ESSENTIA_TANK =
+    /** 加固源质储罐：可接受源质管道输入的容器方块。 */
+    public static final DeferredBlock<ReinforcedEssentiaTankBlock> REINFORCED_ESSENTIA_TANK =
             BLOCKS.register("reinforced_essentia_tank",
-                    () -> new Block(tankProperties()));
+                    () -> new ReinforcedEssentiaTankBlock(tankProperties()));
 
     // ---- 物品 ----
     public static final DeferredItem<BlockItem> STRAW_ITEM = ITEMS.registerSimpleBlockItem(STRAW_GOLEM_POWER);
@@ -338,6 +340,12 @@ public class MysteryDynamics {
                             largeCentrifugeCasingType(), pos, state),
                     LARGE_CENTRIFUGE_CASING.get()).build(null));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ReinforcedEssentiaTankBlockEntity>> REINFORCED_ESSENTIA_TANK_BE =
+            BLOCK_ENTITY_TYPES.register("reinforced_essentia_tank", () -> BlockEntityType.Builder.of(
+                    (pos, state) -> new ReinforcedEssentiaTankBlockEntity(
+                            reinforcedEssentiaTankType(), pos, state),
+                    REINFORCED_ESSENTIA_TANK.get()).build(null));
+
     /** 独立创造模式标签页。 */
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = CREATIVE_TABS.register("main",
             () -> CreativeModeTab.builder()
@@ -436,6 +444,10 @@ public class MysteryDynamics {
 
     private static BlockEntityType<?> largeCentrifugeCasingType() {
         return LARGE_CENTRIFUGE_CASING_BE.get();
+    }
+
+    private static BlockEntityType<?> reinforcedEssentiaTankType() {
+        return REINFORCED_ESSENTIA_TANK_BE.get();
     }
 
     private static BlockBehaviour.Properties stationProperties() {
