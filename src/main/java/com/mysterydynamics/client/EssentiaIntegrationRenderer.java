@@ -201,7 +201,7 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
         for (double[] tank : TANKS) {
             double h = tank[4] - tank[1];
             // 以外壳为基准，四边内缩 0.05 格。
-            double inset = 0.05;
+            double inset = 0.02;
             float x1 = (float) (tank[0] + inset);
             float x2 = (float) (tank[3] - inset);
             float z1 = (float) (tank[2] + inset);
