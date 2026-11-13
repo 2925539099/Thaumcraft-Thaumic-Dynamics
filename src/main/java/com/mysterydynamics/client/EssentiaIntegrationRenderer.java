@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.logging.LogUtils;
 import com.mysterydynamics.MysteryDynamics;
@@ -65,6 +66,13 @@ public final class EssentiaIntegrationRenderer implements BlockEntityRenderer<Es
         // 水平方向模型坐标 -16..32 已以控制器方块为中心；
         // 垂直方向模型最低点在 -16，需要上移一格才能与结构底层对齐。
         pose.translate(0.0D, 1.0D, 0.0D);
+        // 按结构实际朝向旋转整座模型；旋转轴穿过控制器方块中心。
+        int rotation = blockEntity.getRotation();
+        if (rotation != 0) {
+            pose.translate(0.5D, 0.0D, 0.5D);
+            pose.mulPose(Axis.YP.rotationDegrees(rotation * 90.0F));
+            pose.translate(-0.5D, 0.0D, -0.5D);
+        }
 
         VertexConsumer consumer = bufferSource.getBuffer(RenderType.translucent());
         var atlas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS);
