@@ -22,6 +22,7 @@ public class EssentiaIntegrationBlockEntity extends CachedRenderBBBlockEntity im
 
     private final AspectList aspects = new AspectList();
     private boolean formed;
+    private int rotation;
 
     public EssentiaIntegrationBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -29,6 +30,15 @@ public class EssentiaIntegrationBlockEntity extends CachedRenderBBBlockEntity im
 
     public boolean isFormed() {
         return formed;
+    }
+
+    public int getRotation() {
+        return rotation & 3;
+    }
+
+    public void setRotation(int rotation) {
+        this.rotation = rotation & 3;
+        setChanged();
     }
 
     @Override
@@ -108,6 +118,7 @@ public class EssentiaIntegrationBlockEntity extends CachedRenderBBBlockEntity im
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putBoolean("Formed", formed);
+        tag.putInt("Rotation", rotation);
         aspects.writeToNBT(tag);
     }
 
@@ -115,6 +126,7 @@ public class EssentiaIntegrationBlockEntity extends CachedRenderBBBlockEntity im
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         formed = tag.getBoolean("Formed");
+        rotation = tag.getInt("Rotation") & 3;
         aspects.readFromNBT(tag);
     }
 }
