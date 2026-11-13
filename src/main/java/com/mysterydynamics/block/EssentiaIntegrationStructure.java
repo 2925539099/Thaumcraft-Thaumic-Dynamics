@@ -22,9 +22,7 @@ public final class EssentiaIntegrationStructure {
      * y=2 左右两列为储罐，中间列为空气。
      */
     public static boolean isValid(Level level, BlockPos origin) {
-        if (level == null) {
-            return false;
-        }
+        if (level == null) return false;
         for (int y = 0; y < SIZE; y++) {
             for (int x = -1; x <= 1; x++) {
                 for (int z = -1; z <= 1; z++) {
@@ -60,25 +58,34 @@ public final class EssentiaIntegrationStructure {
         return null;
     }
 
-    /** 只改方块状态，保留各储罐和方块实体。 */
-    public static void setFormed(Level level, BlockPos origin, boolean formed) {
-        if (level == null) return;
+    /** 成型：底层中心替换成专用控制器方块，其余部件隐藏。 */
+    public static boolean form(Level level, BlockPos origin) {
+        if (!isValid(level, origin)) return false;
         for (int y = 0; y < SIZE; y++) {
             for (int x = -1; x <= 1; x++) {
                 for (int z = -1; z <= 1; z++) {
                     BlockPos pos = origin.offset(x, y, z);
+                    if (pos.equals(origin)) continue;
                     BlockState state = level.getBlockState(pos);
                     if (state.is(MysteryDynamics.ENGINEERING_CONSTRUCT.get())) {
-                        level.setBlock(pos, state.setValue(EngineeringConstructBlock.FORMED, formed), Block.UPDATE_ALL);
+                        level.setBlock(pos, state.setValue(EngineeringConstructBlock.FORMED, true),
+                                Block.UPDATE_ALL);
                     } else if (state.is(MysteryDynamics.REINFORCED_ESSENTIA_TANK.get())) {
-                        level.setBlock(pos, state.setValue(ReinforcedEssentiaTankBlock.FORMED, formed), Block.UPDATE_ALL);
+                        level.setBlock(pos, state.setValue(ReinforcedEssentiaTankBlock.FORMED, true),
+                                Block.UPDATE_ALL);
                     }
                 }
             }
         }
+        level.setBlock(origin, MysteryDynamics.ESSENTIA_INTEGRATION_STATION.get().defaultBlockState(),
+                Block.UPDATE_ALL);
+        if (level.getBlockEntity(origin) instanceof EssentiaIntegrationBlockEntity station) {
+            station.setFormed(true);
+        }
+        return true;
     }
 
-    /** 从任意已成型部件找到控制器位置；拆任意一块时用于恢复整座结构。 */
+    /** 从任意已成型部件找到控制器位置。 */
     public static BlockPos findFormedController(Level level, BlockPos around) {
         for (int dy = -2; dy <= 2; dy++) {
             for (int dx = -2; dx <= 2; dx++) {
@@ -94,10 +101,6 @@ public final class EssentiaIntegrationStructure {
         return null;
     }
 
-    /**
-     * 拆掉任意一个成型部件时，把其余部件原地恢复成工程构材/加固源质储罐，
-     * 而不是留下隐藏方块或只掉落当前这一块。
-     */
     public static void dismantleAround(Level level, BlockPos around) {
         BlockPos controller = findFormedController(level, around);
         if (controller != null) {
@@ -105,10 +108,27 @@ public final class EssentiaIntegrationStructure {
         }
     }
 
+    /** 拆解：所有部件原地恢复为工程构材/加固源质储罐。 */
     public static void dismantle(Level level, BlockPos origin) {
-        setFormed(level, origin, false);
-        if (level.getBlockEntity(origin) instanceof EssentiaIntegrationBlockEntity station) {
-            station.setFormed(false);
+        if (level == null) return;
+        for (int y = 0; y < SIZE; y++) {
+            for (int x = -1; x <= 1; x++) {
+                for (int z = -1; z <= 1; z++) {
+                    BlockPos pos = origin.offset(x, y, z);
+                    if (pos.equals(origin)) continue;
+                    BlockState state = level.getBlockState(pos);
+                    if (!(state.is(MysteryDynamics.ENGINEERING_CONSTRUCT.get())
+                            || state.is(MysteryDynamics.REINFORCED_ESSENTIA_TANK.get()))) {
+                        continue;
+                    }
+                    level.setBlock(pos, state.setValue(
+                            state.is(MysteryDynamics.ENGINEERING_CONSTRUCT.get())
+                                    ? EngineeringConstructBlock.FORMED
+                                    : ReinforcedEssentiaTankBlock.FORMED, false), Block.UPDATE_ALL);
+                }
+            }
         }
+        level.setBlock(origin,
+                MysteryDynamics.ENGINEERING_CONSTRUCT.get().defaultBlockState(), Block.UPDATE_ALL);
     }
 }

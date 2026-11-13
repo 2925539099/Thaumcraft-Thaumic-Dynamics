@@ -166,5 +166,6 @@
   "mystery_dynamics.large_centrifuge.hint.redstone": "存满 24 点自动开始；给底层正面左侧方块红石信号可提前开始",
   "mystery_dynamics.large_centrifuge.incomplete": "结构不完整：(%1$s, %2$s, %3$s) 处应为 %4$s",
   "block.mystery_dynamics.engineering_construct": "工程构材",
-  "block.mystery_dynamics.reinforced_essentia_tank": "加固源质储罐"
+  "block.mystery_dynamics.reinforced_essentia_tank": "加固源质储罐",
+  "block.mystery_dynamics.essentia_integration_station": "源质集成存储站"
 }

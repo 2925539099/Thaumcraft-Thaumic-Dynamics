@@ -166,5 +166,6 @@
   "tc.research_text.MECHANIST_WORKSTATION": "There must be a reason mechanists love green robes",
   "mystery_dynamics.research.mechanist_workstation.text": "There's no great mystery to building a workstation: make a table out of sturdy materials, fit a few durable machining tools on top, and a complete workstation is done.\n\nBut while talking with the villagers you noticed something curious: these mechanists, who spend all day with gears, have an almost obsessive passion for green robes.\n\nYou have no idea what this strange trade custom is based on, but it doesn't affect the delivery of equipment or products. As long as the goods arrive on time, who cares what colour the tinkerers wear?",
   "block.mystery_dynamics.engineering_construct": "Engineering Construct",
-  "block.mystery_dynamics.reinforced_essentia_tank": "Reinforced Essentia Tank"
+  "block.mystery_dynamics.reinforced_essentia_tank": "Reinforced Essentia Tank",
+  "block.mystery_dynamics.essentia_integration_station": "Essentia Integration Station"
 }

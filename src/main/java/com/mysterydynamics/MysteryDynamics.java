@@ -22,6 +22,7 @@ import com.mysterydynamics.block.LargeCentrifugePortBlockEntity;
 import com.mysterydynamics.block.RedstoneEngineBlock;
 import com.mysterydynamics.block.EngineeringConstructBlock;
 import com.mysterydynamics.block.EssentiaIntegrationBlockEntity;
+import com.mysterydynamics.block.EssentiaIntegrationStationBlock;
 import com.mysterydynamics.block.ReinforcedEssentiaTankBlock;
 import com.mysterydynamics.block.ReinforcedEssentiaTankBlockEntity;
 import com.mysterydynamics.block.StationBlock;
@@ -211,12 +212,12 @@ public class MysteryDynamics {
                     () -> new EngineeringConstructBlock(engineeringProperties()));
 
     /** 仅用于加载 3×3×3 集成存储模型，不放置、不显示在创造模式。 */
-    public static final DeferredBlock<Block> ESSENTIA_INTEGRATION_STATION_MODEL =
+    public static final DeferredBlock<EssentiaIntegrationStationBlock> ESSENTIA_INTEGRATION_STATION =
             BLOCKS.register("essentia_integration_station",
-                    () -> new Block(BlockBehaviour.Properties.of()
+                    () -> new EssentiaIntegrationStationBlock(BlockBehaviour.Properties.of()
                             .noOcclusion()
                             .noLootTable()
-                            .strength(-1.0F, 3600000.0F)));
+                            .strength(3.0F, 17.0F)));
 
     /** 加固源质储罐：可接受源质管道输入的容器方块。 */
     public static final DeferredBlock<ReinforcedEssentiaTankBlock> REINFORCED_ESSENTIA_TANK =
@@ -360,7 +361,7 @@ public class MysteryDynamics {
             BLOCK_ENTITY_TYPES.register("essentia_integration", () -> BlockEntityType.Builder.of(
                     (pos, state) -> new EssentiaIntegrationBlockEntity(
                             essentiaIntegrationType(), pos, state),
-                    ENGINEERING_CONSTRUCT.get()).build(null));
+                    ESSENTIA_INTEGRATION_STATION.get()).build(null));
 
     /** 独立创造模式标签页。 */
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = CREATIVE_TABS.register("main",
