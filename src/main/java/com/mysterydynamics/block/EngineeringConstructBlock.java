@@ -103,6 +103,14 @@ public class EngineeringConstructBlock extends HorizontalDirectionalBlock implem
     }
 
     @Override
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, net.minecraft.world.entity.player.Player player) {
+        if (!level.isClientSide && state.getValue(FORMED)) {
+            EssentiaIntegrationStructure.dismantleAround(level, pos);
+        }
+        return super.playerWillDestroy(level, pos, state, player);
+    }
+
+    @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!level.isClientSide && state.is(this) && !newState.is(this)) {
             BlockEntity be = level.getBlockEntity(pos);

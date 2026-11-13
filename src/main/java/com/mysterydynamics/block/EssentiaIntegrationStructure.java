@@ -78,6 +78,33 @@ public final class EssentiaIntegrationStructure {
         }
     }
 
+    /** 从任意已成型部件找到控制器位置；拆任意一块时用于恢复整座结构。 */
+    public static BlockPos findFormedController(Level level, BlockPos around) {
+        for (int dy = -2; dy <= 2; dy++) {
+            for (int dx = -2; dx <= 2; dx++) {
+                for (int dz = -2; dz <= 2; dz++) {
+                    BlockPos pos = around.offset(dx, dy, dz);
+                    if (level.getBlockEntity(pos) instanceof EssentiaIntegrationBlockEntity station
+                            && station.isFormed()) {
+                        return pos.immutable();
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 拆掉任意一个成型部件时，把其余部件原地恢复成工程构材/加固源质储罐，
+     * 而不是留下隐藏方块或只掉落当前这一块。
+     */
+    public static void dismantleAround(Level level, BlockPos around) {
+        BlockPos controller = findFormedController(level, around);
+        if (controller != null) {
+            dismantle(level, controller);
+        }
+    }
+
     public static void dismantle(Level level, BlockPos origin) {
         setFormed(level, origin, false);
         if (level.getBlockEntity(origin) instanceof EssentiaIntegrationBlockEntity station) {
