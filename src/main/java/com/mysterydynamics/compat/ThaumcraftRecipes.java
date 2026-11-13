@@ -207,7 +207,7 @@ public final class ThaumcraftRecipes {
         infusion(
                 "HIGH_PRESSURE_LAUNCHER",
                 new ItemStack(MysteryDynamics.HIGH_PRESSURE_LAUNCHER.get()),
-                8,
+                3,
                 new AspectList()
                         .add(Aspect.WEAPON, 12)
                         .add(Aspect.TOOL, 24)
