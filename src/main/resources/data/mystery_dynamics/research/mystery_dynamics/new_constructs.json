@@ -19,7 +19,7 @@
   "text_pages": [
     "mystery_dynamics.research.new_constructs.text"
   ],
-  "icon": "mystery_dynamics:textures/misc/r_new_constructs.png",
+  "item": "mystery_dynamics:reinforced_essentia_tank",
   "aspects": [
     {
       "aspect": "machina",
