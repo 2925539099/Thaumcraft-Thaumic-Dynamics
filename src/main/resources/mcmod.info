@@ -1,0 +1,19 @@
+[
+  {
+    "modid": "mystery_dynamics",
+    "name": "Thaumcraft: 神秘动力学",
+    "description": "Thaumcraft: 神秘动力学（Thaumic Dynamics）——基于神秘时代，为机械动力增添新的炼金与动力设备。",
+    "version": "0.9.5",
+    "mcversion": "1.21.1",
+    "logoFile": "icon.png",
+    "url": "https://github.com/2925539099/Thaumcraft-Thaumic-Dynamics",
+    "updateUrl": "",
+    "authors": [
+      "神秘动力学开发组"
+    ],
+    "credits": "",
+    "parent": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]
