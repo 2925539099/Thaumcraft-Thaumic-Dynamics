@@ -2,23 +2,17 @@ package com.mysterydynamics.item;
 
 import com.mysterydynamics.MysteryDynamics;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 
 import thaumcraft.api.IRepairable;
 import thaumcraft.common.items.TCItemBehaviors;
-
-import java.util.List;
 
 /**
  * 旅行者战靴：神秘要塞甲胄套装第四件，同时继承旅行者之靴的移动机制。
@@ -60,15 +54,5 @@ public class TravelerBootsItem extends TCItemBehaviors.TravellerBootsItem implem
                                 AttributeModifier.Operation.ADD_VALUE),
                         EquipmentSlotGroup.FEET)
                 .build();
-    }
-
-    @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context,
-                                List<Component> tooltip, TooltipFlag flag) {
-        super.appendHoverText(stack, context, tooltip, flag);
-        tooltip.add(Component.translatable("tooltip.mystery_dynamics.traveler_boots.set")
-                .withStyle(ChatFormatting.GOLD));
-        tooltip.add(Component.translatable("tooltip.mystery_dynamics.traveler_boots.full_set")
-                .withStyle(ChatFormatting.DARK_PURPLE));
     }
 }
