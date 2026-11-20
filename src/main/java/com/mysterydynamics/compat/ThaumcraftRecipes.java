@@ -5,7 +5,9 @@ import com.mysterydynamics.MysteryDynamics;
 
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -344,6 +346,26 @@ public final class ThaumcraftRecipes {
                 'A', thaumium,
                 'B', essentiaJar,
                 'C', essentiaBuffer);
+
+        // 旅行者战靴：注魔祭坛，旅行者之靴 + 神秘锭×5 + 风之碎片×2 + 生鱼标签 + 羽毛
+        ItemStack travelerBoots = stack("thaumcraft", "boots_traveller");
+        ItemStack airShard = stack("thaumcraft", "air_shard");
+        TagKey<Item> rawFish = TagKey.create(Registries.ITEM,
+                ResourceLocation.fromNamespaceAndPath("c", "raw_fish"));
+        ThaumcraftApi.getCraftingRecipes().add(new TaggedInfusionRecipe(
+                "TRAVELER_BOOTS",
+                new ItemStack(MysteryDynamics.TRAVELER_BOOTS.get()),
+                5,
+                new AspectList()
+                        .add(Aspect.METAL, 24)
+                        .add(Aspect.MAGIC, 16)
+                        .add(Aspect.ARMOR, 16)
+                        .add(Aspect.TRAVEL, 25)
+                        .add(Aspect.FLIGHT, 25),
+                travelerBoots,
+                rawFish,
+                thaumium, thaumium, thaumium, thaumium, thaumium,
+                airShard, airShard, new ItemStack(Items.COD), new ItemStack(Items.FEATHER)));
     }
 
     /** 书页居中显示（图案补到 3 格宽），合成时仍允许左右平移。 */

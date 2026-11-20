@@ -42,6 +42,10 @@
       "type": "TEXT",
       "text": "mystery_dynamics.research.traveler_boots.text",
       "source": "mystery_dynamics.research.traveler_boots.text"
+    },
+    {
+      "type": "INFUSION",
+      "source": "TRAVELER_BOOTS"
     }
   ]
 }
