@@ -46,7 +46,11 @@
     },
     {
       "type": "ARCANE",
-      "source": "NEW_CONSTRUCTS"
+      "source": "NEW_CONSTRUCTS_ENGINEERING"
+    },
+    {
+      "type": "ARCANE",
+      "source": "NEW_CONSTRUCTS_TANK"
     }
   ]
 }
