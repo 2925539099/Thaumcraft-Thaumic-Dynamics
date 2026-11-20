@@ -6,8 +6,12 @@
   "row": 6,
   "complexity": 2,
   "warp": 0,
-  "parents": [],
-  "parents_hidden": [],
+  "parents": [
+    "DISTILESSENTIA"
+  ],
+  "parents_hidden": [
+    "DISTILESSENTIA"
+  ],
   "siblings": [],
   "flags": [
     "concealed"
