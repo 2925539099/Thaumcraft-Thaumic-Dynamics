@@ -312,7 +312,7 @@ public final class ThaumcraftRecipes {
         //           神秘锭 / 神秘锭 / 神秘锭
         arcane(
                 "NEW_CONSTRUCTS",
-                new ItemStack(MysteryDynamics.ENGINEERING_CONSTRUCT_ITEM.get()),
+                new ItemStack(MysteryDynamics.ENGINEERING_CONSTRUCT_ITEM.get(), 4),
                 new AspectList()
                         .add(Aspect.AIR, 15)
                         .add(Aspect.FIRE, 15)
