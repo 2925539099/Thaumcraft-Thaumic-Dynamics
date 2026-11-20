@@ -189,7 +189,7 @@ public final class ThaumcraftRecipes {
                 new ItemStack(MysteryDynamics.NERIIDS_PROTECTION.get()),
                 3,
                 new AspectList()
-                        .add(Aspect.AESTUS, 16)
+                        .add(Aspect.MAGIC, 16)
                         .add(Aspect.WATER, 24)
                         .add(Aspect.TOOL, 4)
                         .add(Aspect.MOTION, 16),
