@@ -45,9 +45,8 @@
       "source": "mystery_dynamics.research.integrated_essentia_storage.text"
     },
     {
-      "type": "TEXT",
-      "text": "mystery_dynamics.research.integrated_essentia_storage.structure",
-      "source": "mystery_dynamics.research.integrated_essentia_storage.structure"
+      "type": "CONSTRUCT",
+      "source": "INTEGRATED_ESSENTIA_STORAGE"
     }
   ]
 }

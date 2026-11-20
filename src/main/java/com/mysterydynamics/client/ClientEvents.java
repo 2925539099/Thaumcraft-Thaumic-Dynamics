@@ -6,6 +6,8 @@ import com.simibubi.create.content.equipment.potatoCannon.PotatoCannonItemRender
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.VillagerRenderer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.EntityType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -15,6 +17,12 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
+import java.util.List;
+
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.research.ResearchBookApi;
 
 /** 客户端注册（专用服务器不会加载本类）。 */
@@ -27,6 +35,22 @@ public final class ClientEvents {
             case "ESSENTIADISTILLATION_LINK" -> "DISTILESSENTIA";
             case "INFERNALFURNACE_LINK" -> "INFERNALFURNACE";
             default -> key;
+        });
+        ResearchBookApi.addConstructSource(key -> {
+            if (!"INTEGRATED_ESSENTIA_STORAGE".equals(key)) {
+                return List.of();
+            }
+            ItemStack engineering = new ItemStack(MysteryDynamics.ENGINEERING_CONSTRUCT_ITEM.get());
+            ItemStack tank = new ItemStack(MysteryDynamics.REINFORCED_ESSENTIA_TANK_ITEM.get());
+            List<ItemStack> blocks = new java.util.ArrayList<>(27);
+            for (int i = 0; i < 9; i++) blocks.add(engineering);
+            for (int i = 0; i < 9; i++) blocks.add(i == 4 ? engineering : tank);
+            for (int i = 0; i < 9; i++) blocks.add(i == 4 ? ItemStack.EMPTY : tank);
+            AspectList cost = new AspectList()
+                    .add(Aspect.AIR, 75).add(Aspect.FIRE, 75)
+                    .add(Aspect.WATER, 75).add(Aspect.EARTH, 75)
+                    .add(Aspect.ENTROPY, 75).add(Aspect.ORDER, 75);
+            return List.of(new ResearchBookApi.Construct(cost, blocks, 3, 3, 3));
         });
         NeoForge.EVENT_BUS.addListener(StressTooltipEvents::onItemTooltip);
         ArcaneTurbinePartialModels.init();
