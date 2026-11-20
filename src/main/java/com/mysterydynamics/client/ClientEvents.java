@@ -39,7 +39,8 @@ public final class ClientEvents {
             "textures/research/outsourcing.png",
             "textures/misc/r_infernal_boiler.png",
             "thaumcraft:textures/misc/r_infernalfurnace.png",
-            "textures/misc/r_large_centrifuge.png");
+            "textures/misc/r_large_centrifuge.png",
+            "textures/misc/r_integrated_essentia_storage.png");
 
     private ClientEvents() {
     }

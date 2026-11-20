@@ -1,0 +1,48 @@
+{
+  "key": "INTEGRATED_ESSENTIA_STORAGE",
+  "order": 26,
+  "category": "MYSTERY_DYNAMICS",
+  "col": 6,
+  "row": 6,
+  "complexity": 3,
+  "warp": 0,
+  "parents": [
+    "NEW_CONSTRUCTS"
+  ],
+  "parents_hidden": [
+    "NEW_CONSTRUCTS"
+  ],
+  "siblings": [],
+  "flags": [
+    "concealed"
+  ],
+  "text_pages": [
+    "mystery_dynamics.research.integrated_essentia_storage.text"
+  ],
+  "icon": "mystery_dynamics:textures/misc/r_integrated_essentia_storage.png",
+  "aspects": [
+    {
+      "aspect": "machina",
+      "amount": 10
+    },
+    {
+      "aspect": "vas",
+      "amount": 10
+    },
+    {
+      "aspect": "praecantatio",
+      "amount": 8
+    },
+    {
+      "aspect": "ordo",
+      "amount": 6
+    }
+  ],
+  "pages": [
+    {
+      "type": "TEXT",
+      "text": "mystery_dynamics.research.integrated_essentia_storage.text",
+      "source": "mystery_dynamics.research.integrated_essentia_storage.text"
+    }
+  ]
+}
