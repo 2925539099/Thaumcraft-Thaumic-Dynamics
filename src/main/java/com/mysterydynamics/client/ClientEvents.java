@@ -4,9 +4,10 @@ import com.mysterydynamics.MysteryDynamics;
 import com.simibubi.create.content.equipment.potatoCannon.PotatoCannonItemRenderer;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.entity.VillagerRenderer;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.EntityType;
 import net.neoforged.api.distmarker.Dist;
@@ -19,8 +20,6 @@ import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.List;
 
-import thaumcraft.api.aspects.Aspect;
-import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.research.ResearchBookApi;
@@ -109,6 +108,11 @@ public final class ClientEvents {
     public static void addLayers(EntityRenderersEvent.AddLayers event) {
         if (event.getRenderer(EntityType.VILLAGER) instanceof VillagerRenderer renderer) {
             renderer.addLayer(new MechanistSkinLayer(renderer));
+        }
+        for (PlayerSkin.Model skin : event.getSkins()) {
+            if (event.getSkin(skin) instanceof PlayerRenderer renderer) {
+                renderer.addLayer(new TravelerBootsSetLayer(renderer, event.getEntityModels()));
+            }
         }
     }
 

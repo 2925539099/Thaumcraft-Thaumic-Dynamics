@@ -33,6 +33,7 @@ import com.mysterydynamics.compat.LargeCentrifugeConstruct;
 import com.mysterydynamics.item.HighPressureLauncherItem;
 import com.mysterydynamics.item.NeriidsProtectionItem;
 import com.mysterydynamics.item.RevealingEngineerGogglesItem;
+import com.mysterydynamics.item.TravelerBootsItem;
 import com.mysterydynamics.villager.ModVillagers;
 import com.simibubi.create.api.stress.BlockStressValues;
 import com.simibubi.create.content.equipment.goggles.GogglesItem;
@@ -296,6 +297,27 @@ public class MysteryDynamics {
                                     .durability(ArmorItem.Type.HELMET.getDurability(25))
                                     .rarity(Rarity.RARE)));
 
+    // ---- 旅行者战靴：神秘要塞甲胄套装第四件，3 护甲、440 耐久 ----
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> TRAVELER_BOOTS_MATERIAL =
+            ARMOR_MATERIALS.register("traveler_boots", () -> new ArmorMaterial(
+                    java.util.Map.of(
+                            ArmorItem.Type.BOOTS, 3,
+                            ArmorItem.Type.LEGGINGS, 0,
+                            ArmorItem.Type.CHESTPLATE, 0,
+                            ArmorItem.Type.HELMET, 0),
+                    25,
+                    SoundEvents.ARMOR_EQUIP_IRON,
+                    () -> Ingredient.of(TCItems.THAUMIUM_INGOT.get()),
+                    List.of(new ArmorMaterial.Layer(
+                            ResourceLocation.fromNamespaceAndPath(MODID, "traveler_boots"), "", false)),
+                    0.0F,
+                    0.0F));
+
+    public static final DeferredItem<TravelerBootsItem> TRAVELER_BOOTS =
+            ITEMS.register("traveler_boots",
+                    () -> new TravelerBootsItem(
+                            new Item.Properties().stacksTo(1).durability(440).rarity(Rarity.RARE)));
+
     // ---- 高压动力发射器：暂用土豆加农炮的全部数据 ----
     public static final DeferredItem<HighPressureLauncherItem> HIGH_PRESSURE_LAUNCHER =
             ITEMS.register("high_pressure_launcher",
@@ -378,6 +400,7 @@ public class MysteryDynamics {
                         output.accept(INFERNAL_BOILER_FACE.get());
                         output.accept(REVEALING_ENGINEER_GOGGLES.get());
                         output.accept(NERIIDS_PROTECTION.get());
+                        output.accept(TRAVELER_BOOTS.get());
                         output.accept(HIGH_PRESSURE_LAUNCHER.get());
                         output.accept(ARCANE_TURBINE_ITEM.get());
                         output.accept(MECHANIST_WORKSTATION_ITEM.get());
