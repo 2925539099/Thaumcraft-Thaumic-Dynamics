@@ -124,6 +124,25 @@ public class LargeCentrifugePortBlockEntity extends BlockEntity
     }
 
     @Override
+    public int simulateAddEssentia(Aspect aspect, int amount, Direction side) {
+        LargeCentrifugeControllerBlockEntity c = controller();
+        if (!input || c == null || !portSide(side) || !c.canInputEssentia()
+                || !c.canAcceptAspect(aspect) || amount <= 0) {
+            return 0;
+        }
+        return Math.min(amount, LargeCentrifugeControllerBlockEntity.CAPACITY - c.storedInput());
+    }
+
+    @Override
+    public int simulateTakeEssentia(Aspect aspect, int amount, Direction side) {
+        LargeCentrifugeControllerBlockEntity c = controller();
+        if (input || c == null || !portSide(side) || aspect == null || amount <= 0) {
+            return 0;
+        }
+        return Math.min(amount, c.outputAmount(aspect));
+    }
+
+    @Override
     public int addEssentia(Aspect aspect, int amount, Direction side) {
         LargeCentrifugeControllerBlockEntity c = controller();
         if (!input || c == null || !portSide(side) || !c.canInputEssentia()) {
