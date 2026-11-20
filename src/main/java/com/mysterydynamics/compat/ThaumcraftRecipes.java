@@ -326,9 +326,10 @@ public final class ThaumcraftRecipes {
                 'C', alchemicalConstruct);
 
         // 加固源质储罐：神秘锭 / 源质罐子 / 神秘锭
-        //               源质罐子 / 源质罐子 / 源质罐子
+        //               源质罐子 / 源质缓存器 / 源质罐子
         //               神秘锭 / 神秘锭 / 神秘锭
         ItemStack essentiaJar = stack("thaumcraft", "jar_of_essentia");
+        ItemStack essentiaBuffer = stack("thaumcraft", "essentia_buffer");
         arcane(
                 "NEW_CONSTRUCTS",
                 new ItemStack(MysteryDynamics.REINFORCED_ESSENTIA_TANK_ITEM.get()),
@@ -339,9 +340,10 @@ public final class ThaumcraftRecipes {
                         .add(Aspect.EARTH, 25)
                         .add(Aspect.ORDER, 25)
                         .add(Aspect.ENTROPY, 25),
-                "ABA", "BBB", "AAA",
+                "ABA", "BCB", "AAA",
                 'A', thaumium,
-                'B', essentiaJar);
+                'B', essentiaJar,
+                'C', essentiaBuffer);
     }
 
     /** 书页居中显示（图案补到 3 格宽），合成时仍允许左右平移。 */
