@@ -24,6 +24,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.research.ResearchApi;
 import thaumcraft.api.wands.WandApi;
 
 /** 加固源质储罐：可接受源质管道输入的容器方块，支持水平四向摆放。 */
@@ -88,6 +89,9 @@ public class ReinforcedEssentiaTankBlock extends HorizontalDirectionalBlock impl
         }
         if (level.isClientSide) {
             return ItemInteractionResult.SUCCESS;
+        }
+        if (!ResearchApi.isComplete(player, "INTEGRATED_ESSENTIA_STORAGE")) {
+            return ItemInteractionResult.FAIL;
         }
         AspectList cost = new AspectList()
                 .add(Aspect.AIR, 75)

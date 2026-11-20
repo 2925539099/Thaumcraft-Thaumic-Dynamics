@@ -43,6 +43,11 @@
       "type": "TEXT",
       "text": "mystery_dynamics.research.integrated_essentia_storage.text",
       "source": "mystery_dynamics.research.integrated_essentia_storage.text"
+    },
+    {
+      "type": "IMAGE",
+      "image": "mystery_dynamics:textures/research/station_structure.png",
+      "text": "mystery_dynamics.research.integrated_essentia_storage.structure"
     }
   ]
 }

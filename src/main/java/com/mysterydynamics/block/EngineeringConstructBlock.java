@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.research.ResearchApi;
 import thaumcraft.api.wands.WandApi;
 
 /** 工程构材；同时也是源质集成存储站的搭建材料。 */
@@ -65,6 +66,9 @@ public class EngineeringConstructBlock extends HorizontalDirectionalBlock {
         }
         if (level.isClientSide) {
             return ItemInteractionResult.SUCCESS;
+        }
+        if (!ResearchApi.isComplete(player, "INTEGRATED_ESSENTIA_STORAGE")) {
+            return ItemInteractionResult.FAIL;
         }
 
         AspectList cost = new AspectList()
