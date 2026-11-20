@@ -44,8 +44,8 @@ public final class ClientEvents {
             ItemStack tank = new ItemStack(MysteryDynamics.REINFORCED_ESSENTIA_TANK_ITEM.get());
             List<ItemStack> blocks = new java.util.ArrayList<>(27);
             // 研究书从上往下显示：顶层、中层、底层。
-            for (int i = 0; i < 9; i++) blocks.add(i % 3 == 0 ? ItemStack.EMPTY : tank);
-            for (int i = 0; i < 9; i++) blocks.add(i % 3 == 0 ? engineering : tank);
+            for (int i = 0; i < 9; i++) blocks.add(i % 3 == 1 ? ItemStack.EMPTY : tank);
+            for (int i = 0; i < 9; i++) blocks.add(i % 3 == 1 ? engineering : tank);
             for (int i = 0; i < 9; i++) blocks.add(engineering);
             AspectList cost = new AspectList()
                     .add(Aspect.AIR, 75).add(Aspect.FIRE, 75)
