@@ -12,6 +12,7 @@ import net.minecraft.world.phys.AABB;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IAspectContainer;
+import thaumcraft.api.aspects.IAspectSource;
 import thaumcraft.api.aspects.IEssentiaTransport;
 
 /**
@@ -19,7 +20,7 @@ import thaumcraft.api.aspects.IEssentiaTransport;
  * 底层两侧（局部 x=±1, y=0）为端口，所有端口共享控制器 3500 点容量。
  */
 public class EssentiaIntegrationBlockEntity extends com.simibubi.create.foundation.blockEntity.CachedRenderBBBlockEntity
-        implements IAspectContainer, IEssentiaTransport {
+        implements IAspectContainer, IAspectSource, IEssentiaTransport {
 
     public static final int CAPACITY = 3500;
     private static final AspectList EMPTY = new AspectList();
@@ -262,7 +263,6 @@ public class EssentiaIntegrationBlockEntity extends com.simibubi.create.foundati
 
     @Override
     public boolean takeFromContainer(Aspect aspect, int amount) {
-        if (!controller && !isPort()) return false;
         EssentiaIntegrationBlockEntity be = controllerBE();
         if (be == null || aspect == null || amount <= 0 || be.aspects.amount(aspect) < amount) {
             return false;
@@ -274,14 +274,12 @@ public class EssentiaIntegrationBlockEntity extends com.simibubi.create.foundati
 
     @Override
     public boolean doesContainerContainAmount(Aspect aspect, int amount) {
-        if (!controller && !isPort()) return false;
         EssentiaIntegrationBlockEntity be = controllerBE();
         return be != null && aspect != null && be.aspects.amount(aspect) >= amount;
     }
 
     @Override
     public int containerContains(Aspect aspect) {
-        if (!controller && !isPort()) return 0;
         EssentiaIntegrationBlockEntity be = controllerBE();
         return be == null || aspect == null ? 0 : be.aspects.amount(aspect);
     }
