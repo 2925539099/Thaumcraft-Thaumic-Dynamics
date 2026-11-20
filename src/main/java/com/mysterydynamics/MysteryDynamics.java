@@ -195,17 +195,17 @@ public class MysteryDynamics {
     /** 器械制作台 / 机械师工作站。 */
     public static final DeferredBlock<Block> MECHANIST_WORKSTATION =
             BLOCKS.register("mechanist_workstation",
-                    () -> new StationBlock(stationProperties()));
+                    () -> new StationBlock(mechanistStationProperties()));
 
     /** 轻量化炼金作坊 / 小型炼金台。 */
     public static final DeferredBlock<Block> ALCHEMY_WORKSHOP =
             BLOCKS.register("alchemy_workshop",
-                    () -> new StationBlock(stationProperties()));
+                    () -> new StationBlock(arcaneStationProperties()));
 
     /** 神秘使工作站。 */
     public static final DeferredBlock<Block> THAUMATURGE_WORKSTATION =
             BLOCKS.register("thaumaturge_workstation",
-                    () -> new StationBlock(stationProperties()));
+                    () -> new StationBlock(arcaneStationProperties()));
 
     /** 工程构材：装饰性工程建筑材料，也可作为集成存储站控制器。 */
     public static final DeferredBlock<EngineeringConstructBlock> ENGINEERING_CONSTRUCT =
@@ -478,6 +478,25 @@ public class MysteryDynamics {
                 .mapColor(MapColor.WOOD)
                 .strength(2.5F, 6.0F)
                 .sound(SoundType.WOOD)
+                .noOcclusion();
+    }
+
+    /** 与神秘时代奥术工作台一致：2.5 硬度、0 抗爆、木质。 */
+    private static BlockBehaviour.Properties arcaneStationProperties() {
+        return BlockBehaviour.Properties.of()
+                .mapColor(MapColor.WOOD)
+                .strength(2.5F, 0.0F)
+                .sound(SoundType.WOOD)
+                .noOcclusion();
+    }
+
+    /** 与神秘块一致：4.0 硬度、20 抗爆、需要正确工具。 */
+    private static BlockBehaviour.Properties mechanistStationProperties() {
+        return BlockBehaviour.Properties.of()
+                .mapColor(MapColor.METAL)
+                .strength(4.0F, 20.0F)
+                .requiresCorrectToolForDrops()
+                .sound(SoundType.STONE)
                 .noOcclusion();
     }
 
