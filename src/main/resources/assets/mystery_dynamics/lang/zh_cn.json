@@ -174,5 +174,5 @@
   "tc.research_name.INTEGRATED_ESSENTIA_STORAGE": "集成源质存储",
   "tc.research_text.INTEGRATED_ESSENTIA_STORAGE": "大型NAS存储",
   "mystery_dynamics.research.integrated_essentia_storage.text": "你实在是受够了工坊里那堆密密麻麻的源质罐子了。每次寻找特定的源质都像在翻找垃圾堆，这严重拖慢了你的生产效率。<BR><BR>感谢某位前辈的无私开源，你剖析了源质库的原理，并结合你自己的一些设计来捣鼓出了这个大家伙。<BR><BR>虽然为了安全考虑，你在安全阈值上做了保守削减，但其容量依然达到了惊人的 3500 点。更美妙的是，得益于源质库的结构设计，它也无需像传统罐子那样分类隔离，而是能够以复合混装的形态同时容纳多种源质。<BR><BR>为了致敬前辈的开源精神，你慷慨地将这份设计蓝图完全公开——至于其他同行能不能看懂你那套夹杂了各种设计的公式，那可就不关你的事了。",
-  "mystery_dynamics.research.integrated_essentia_storage.structure": "用工程构材搭建底层，中层中心放工程构材、其余位置放加固源质储罐，顶层四周放加固源质储罐，中心留空。用法杖右击任意结构方块成型。"
+  "mystery_dynamics.research.integrated_essentia_storage.structure": "<IMG>mystery_dynamics:textures/research/station_structure.png:0:0:900:1080:0.22</IMG><BR><BR>用工程构材搭建底层，中层中心放工程构材、其余位置放加固源质储罐，顶层四周放加固源质储罐，中心留空。用法杖右击任意结构方块成型。"
 }
