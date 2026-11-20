@@ -23,6 +23,7 @@
     "mystery_dynamics:large_centrifuge_input",
     "mystery_dynamics:large_centrifuge_input_port",
     "mystery_dynamics:large_centrifuge_output_port",
-    "mystery_dynamics:essentia_integration_station"
+    "mystery_dynamics:essentia_integration_station",
+    "mystery_dynamics:mechanist_workstation"
   ]
 }

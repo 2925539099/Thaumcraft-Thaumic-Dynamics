@@ -10,6 +10,8 @@
     "mystery_dynamics:iron_golem_power",
     "mystery_dynamics:mystery_golem_power",
     "mystery_dynamics:golem_power_frame",
-    "mystery_dynamics:arcane_turbine"
+    "mystery_dynamics:arcane_turbine",
+    "mystery_dynamics:alchemy_workshop",
+    "mystery_dynamics:thaumaturge_workstation"
   ]
 }
