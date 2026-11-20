@@ -174,5 +174,8 @@
   "tc.research_name.INTEGRATED_ESSENTIA_STORAGE": "集成源质存储",
   "tc.research_text.INTEGRATED_ESSENTIA_STORAGE": "大型NAS存储",
   "mystery_dynamics.research.integrated_essentia_storage.text": "你实在是受够了工坊里那堆密密麻麻的源质罐子了。每次寻找特定的源质都像在翻找垃圾堆，这严重拖慢了你的生产效率。<BR><BR>感谢某位前辈的无私开源，你剖析了源质库的原理，并结合你自己的一些设计来捣鼓出了这个大家伙。<BR><BR>虽然为了安全考虑，你在安全阈值上做了保守削减，但其容量依然达到了惊人的 3500 点。更美妙的是，得益于源质库的结构设计，它也无需像传统罐子那样分类隔离，而是能够以复合混装的形态同时容纳多种源质。<BR><BR>为了致敬前辈的开源精神，你慷慨地将这份设计蓝图完全公开——至于其他同行能不能看懂你那套夹杂了各种设计的公式，那可就不关你的事了。",
-  "item.mystery_dynamics.traveler_boots": "旅行者战靴"
+  "item.mystery_dynamics.traveler_boots": "旅行者战靴",
+  "tc.research_name.TRAVELER_BOOTS": "旅行者战靴",
+  "tc.research_text.TRAVELER_BOOTS": "洪炉无久停，日月速若飞。",
+  "mystery_dynamics.research.traveler_boots.text": "平心而论，传统的旅行者之靴确实是个不错的设计——胜在便宜。但对于需要直面武装冲突的安保队伍和外派工程队而言，那层薄薄的皮革在防护力上实在有些不够看。<BR><BR>为此，你对其进行了一次彻头彻尾的改良。你用坚固的神秘锭底替代了脆弱的皮革鞋面，并额外融入了大量的素材来抵消材质更换所导致的机动力折损。成品不仅保留了标志性的迅捷步幅与跨越能力，防御性能更是远胜从前。<BR><BR>最令人惊喜的意外收获在于：这双战靴能够与神秘要塞套装产生共鸣，将整套护甲的防御力再度推向一个新的台阶。"
 }

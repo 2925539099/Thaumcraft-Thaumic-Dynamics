@@ -1,0 +1,47 @@
+{
+  "key": "TRAVELER_BOOTS",
+  "order": 27,
+  "category": "MYSTERY_DYNAMICS",
+  "col": 5,
+  "row": -2,
+  "complexity": 2,
+  "warp": 0,
+  "parents": [
+    "BOOTSTRAVELLER",
+    "ARMORFORTRESS"
+  ],
+  "parents_hidden": [],
+  "siblings": [],
+  "flags": [
+    "concealed"
+  ],
+  "text_pages": [
+    "mystery_dynamics.research.traveler_boots.text"
+  ],
+  "item": "mystery_dynamics:traveler_boots",
+  "aspects": [
+    {
+      "aspect": "motus",
+      "amount": 8
+    },
+    {
+      "aspect": "metallum",
+      "amount": 6
+    },
+    {
+      "aspect": "praecantatio",
+      "amount": 6
+    },
+    {
+      "aspect": "tutamen",
+      "amount": 4
+    }
+  ],
+  "pages": [
+    {
+      "type": "TEXT",
+      "text": "mystery_dynamics.research.traveler_boots.text",
+      "source": "mystery_dynamics.research.traveler_boots.text"
+    }
+  ]
+}
