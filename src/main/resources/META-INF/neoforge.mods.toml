@@ -6,6 +6,7 @@ license = "MIT"
 modId = "mystery_dynamics"
 version = "${version}"
 displayName = "Thaumcraft: 神秘动力学 (Thaumic Dynamics)"
+logoFile = "icon.png"
 description = '''Thaumcraft: 神秘动力学（Thaumic Dynamics）——基于神秘时代，为机械动力增添新的炼金与动力设备。'''
 
 [[dependencies.mystery_dynamics]]
