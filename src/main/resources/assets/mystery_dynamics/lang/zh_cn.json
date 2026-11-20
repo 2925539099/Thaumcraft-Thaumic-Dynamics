@@ -167,5 +167,8 @@
   "mystery_dynamics.large_centrifuge.incomplete": "结构不完整：(%1$s, %2$s, %3$s) 处应为 %4$s",
   "block.mystery_dynamics.engineering_construct": "工程构材",
   "block.mystery_dynamics.reinforced_essentia_tank": "加固源质储罐",
-  "block.mystery_dynamics.essentia_integration_station": "源质集成存储站"
+  "block.mystery_dynamics.essentia_integration_station": "源质集成存储站",
+  "tc.research_name.NEW_CONSTRUCTS": "新型构材",
+  "tc.research_text.NEW_CONSTRUCTS": "人总得与时俱进不是吗？",
+  "mystery_dynamics.research.new_constructs.text": "人总是得与时俱进的，尤其是在如今的形式下，总不能一直坐吃山空吧。<BR><BR>你试着对一些玩意进行了改良，以便于研发更多的新设备。"
 }

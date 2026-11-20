@@ -306,6 +306,42 @@ public final class ThaumcraftRecipes {
                 'F', stack("thaumcraft", "greatwood_planks"),
                 'G', stack("thaumcraft", "thaumium_ingot"),
                 'H', stack("thaumcraft", "thaumium_block"));
+
+        // 工程构材：神秘锭 / 炼金构材 / 神秘锭
+        //           炼金构材 / 炼金构材 / 炼金构材
+        //           神秘锭 / 神秘锭 / 神秘锭
+        arcane(
+                "NEW_CONSTRUCTS",
+                new ItemStack(MysteryDynamics.ENGINEERING_CONSTRUCT_ITEM.get()),
+                new AspectList()
+                        .add(Aspect.AIR, 15)
+                        .add(Aspect.FIRE, 15)
+                        .add(Aspect.WATER, 15)
+                        .add(Aspect.EARTH, 15)
+                        .add(Aspect.ORDER, 15)
+                        .add(Aspect.ENTROPY, 15),
+                "ABA", "CCC", "AAA",
+                'A', thaumium,
+                'B', alchemicalConstruct,
+                'C', alchemicalConstruct);
+
+        // 加固源质储罐：神秘锭 / 源质罐子 / 神秘锭
+        //               源质罐子 / 源质罐子 / 源质罐子
+        //               神秘锭 / 神秘锭 / 神秘锭
+        ItemStack essentiaJar = stack("thaumcraft", "jar_of_essentia");
+        arcane(
+                "NEW_CONSTRUCTS",
+                new ItemStack(MysteryDynamics.REINFORCED_ESSENTIA_TANK_ITEM.get()),
+                new AspectList()
+                        .add(Aspect.AIR, 25)
+                        .add(Aspect.FIRE, 25)
+                        .add(Aspect.WATER, 25)
+                        .add(Aspect.EARTH, 25)
+                        .add(Aspect.ORDER, 25)
+                        .add(Aspect.ENTROPY, 25),
+                "ABA", "BBB", "AAA",
+                'A', thaumium,
+                'B', essentiaJar);
     }
 
     /** 书页居中显示（图案补到 3 格宽），合成时仍允许左右平移。 */

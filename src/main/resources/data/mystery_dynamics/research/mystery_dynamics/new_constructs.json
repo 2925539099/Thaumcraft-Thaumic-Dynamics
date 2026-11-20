@@ -1,0 +1,48 @@
+{
+  "key": "NEW_CONSTRUCTS",
+  "order": 25,
+  "category": "MYSTERY_DYNAMICS",
+  "col": 4,
+  "row": 6,
+  "complexity": 2,
+  "warp": 0,
+  "parents": [],
+  "parents_hidden": [],
+  "siblings": [],
+  "flags": [
+    "concealed"
+  ],
+  "text_pages": [
+    "mystery_dynamics.research.new_constructs.text"
+  ],
+  "icon": "mystery_dynamics:textures/misc/r_new_constructs.png",
+  "aspects": [
+    {
+      "aspect": "machina",
+      "amount": 8
+    },
+    {
+      "aspect": "metallum",
+      "amount": 8
+    },
+    {
+      "aspect": "ordo",
+      "amount": 6
+    },
+    {
+      "aspect": "praecantatio",
+      "amount": 6
+    }
+  ],
+  "pages": [
+    {
+      "type": "TEXT",
+      "text": "mystery_dynamics.research.new_constructs.text",
+      "source": "mystery_dynamics.research.new_constructs.text"
+    },
+    {
+      "type": "ARCANE",
+      "source": "NEW_CONSTRUCTS"
+    }
+  ]
+}
